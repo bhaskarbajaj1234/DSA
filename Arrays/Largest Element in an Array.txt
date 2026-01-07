@@ -1,0 +1,17 @@
+//Approach
+1. Take lar as the least element possible
+2. iterate through all elements and check if any element greater than existing lar is found then change
+3. Return lar
+
+
+class Solution {
+    public int largestElement(int[] nums) {
+        int lar = Integer.MIN_VALUE;
+        for(int i=0; i<nums.length; i++){
+            if(nums[i] > lar){
+                lar = nums[i];
+            }
+        }
+        return lar;
+    }
+}
