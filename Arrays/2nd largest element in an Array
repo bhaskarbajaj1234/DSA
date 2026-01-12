@@ -1,0 +1,37 @@
+Approach:-
+1. fLar is marked as arr[0]
+2. sLar is marked as Integer.MIN_VALUE & bool value marked as false
+3. loop through the entire array and if:
+4. number appears larger than fLar, then both changes
+5. if the number is larger than sLar but smaller than fLar, then only sLar gets changed
+6. if at end bool value is false then return false else true
+
+
+Code:
+class Solution {
+    public int secondLargestElement(int[] nums) {
+        int fLar = nums[0];
+        int secLar = Integer.MIN_VALUE;
+        boolean check = false;
+
+        for(int i=1; i<nums.length; i++){
+            if(nums[i] > fLar){
+                secLar = fLar;
+                fLar = nums[i];
+                check = true;
+            }
+            else if(nums[i] > secLar && nums[i] < fLar){
+                secLar = nums[i];
+                check = true;
+            }
+        }
+
+        if(check == true){
+            return secLar;
+        }
+        else{
+            return -1;
+        }
+        
+    }
+}
