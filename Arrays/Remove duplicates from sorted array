@@ -1,0 +1,21 @@
+Approach:
+1. Since the array is already sorted, then means the duplicates will always be present just after the current element.
+2. loop in the similar manner
+
+
+Code:
+class Solution {
+    public int removeDuplicates(int[] nums) {
+
+        int i = 0;
+        for(int j=1; j<nums.length; j++){
+            if(nums[j] != nums[i]){
+                i++;
+                nums[i] = nums[j];
+                
+            }
+        }
+        return  i+1;
+        
+    }
+}
