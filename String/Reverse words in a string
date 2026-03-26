@@ -1,0 +1,54 @@
+#Approach:
+
+Reverse Words in a String – Reverse Entire String + Reverse Each Word
+
+Is problem me hume words ka order reverse karna hai, lekin characters ka order correct rehna chahiye.
+
+Sabse pehle poori string ko reverse kar dete hain.
+Isse words ka order reverse ho jata hai, lekin har word bhi reverse ho jata hai.
+
+Ab reversed string me traverse karte hain aur har word ko alag nikaalte hain.
+Har word ko dobara reverse kar dete hain taki word sahi ho jaye.
+
+Agar word empty nahi hai, to usse result me add kar dete hain.
+Aur ensure karte hain ki words ke beech sirf ek hi space aaye.
+
+Is approach se:
+extra spaces handle ho jaate hain,
+leading aur trailing spaces remove ho jaate hain,
+aur words correct order me reverse ho jaate hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public String reverseWords(String s) {
+
+        StringBuilder result = new StringBuilder();
+        StringBuilder orignal = new StringBuilder(s);
+
+        orignal.reverse();
+        int n = orignal.length();
+        
+        for(int i=0; i<n; i++){
+            StringBuilder word = new StringBuilder();
+            while(i < n && orignal.charAt(i) != ' '){
+                word.append(orignal.charAt(i));
+                i++;
+            }
+
+            word.reverse();
+
+            if(word.length() > 0){
+                if(result.length() > 0){
+                    result.append(" ");
+                }
+                result.append(word);
+            }
+        }
+        return result.toString();
+        
+    }
+}
