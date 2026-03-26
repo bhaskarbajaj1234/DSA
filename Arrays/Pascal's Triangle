@@ -1,0 +1,58 @@
+#Approach:
+
+Pascal’s Triangle – nCr Combination Approach
+
+Is problem me hume Pascal Triangle ki rows generate karni hoti hain.
+Pascal triangle me har element combination formula se nikal sakte hain:
+
+nCr = n! / (r! * (n-r)!)
+
+Lekin factorial use karenge to time zyada lagega,
+isliye hum ek optimized formula use karte hain:
+
+next = previous * (n - i) / i
+
+Yaha:
+previous = previous element
+i = column index
+
+Har row ka pehla element hamesha 1 hota hai.
+Uske baad har next element upar wale formula se generate kar sakte hain.
+
+To approach:
+Har row ke liye 1 se start karo
+Formula use karke next elements nikaalo
+Row ko answer list me add karo
+Ye process numRows tak repeat karo
+
+Is approach me factorial calculate nahi karna padta,
+aur har row efficiently generate ho jaati hai.
+
+Time Complexity: O(n^2)
+Space Complexity: O(1) (excluding output)
+
+#Code:
+
+class Solution {
+
+    private List<Integer> pascal(int n){
+        List<Integer> ans = new ArrayList<>();
+        ans.add(1);
+        int x = 1;
+
+        for(int i = 1; i<n; i++){
+            x = x * (n-i);
+            x = x / (i);
+            ans.add(x);
+        }
+        return ans;
+    }
+
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> result = new ArrayList<>();
+        for(int i=0; i<numRows; i++){
+            result.add(pascal(i+1));
+        }
+        return result;
+    }
+}
