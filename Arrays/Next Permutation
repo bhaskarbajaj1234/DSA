@@ -1,0 +1,72 @@
+#Approach:
+
+Next Permutation – Approach
+
+Sabse pehle array ko right se traverse karke first aisa index find karo
+jaha nums[i] < nums[i+1] ho.
+Is index ko breakpoint bolte hain.
+Yahi wo position hoti hai jahan next greater permutation banana possible hota hai.
+
+Agar aisa breakpoint na mile, matlab array pure descending order me hai
+aur wo already last permutation hai.
+Is case me poora array reverse kar do taki smallest permutation mil jaye.
+
+Agar breakpoint mil jaye, to right side se first aisa element dhoondo
+jo breakpoint wale element se bada ho.
+Usse swap kar do.
+
+Swap ke baad breakpoint ke right wala part descending order me hota hai,
+isliye us part ko reverse kar do taki wo smallest possible order me aa jaye.
+
+Is tarah hume current arrangement se just next lexicographically greater permutation mil jata hai.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+
+    private void swap(int[] nums, int a, int b){
+        int temp = nums[a];
+        nums[a] = nums[b];
+        nums[b] = temp;
+    }
+
+    private void reverse(int[] nums, int start, int end){
+        while(start < end){
+            int temp = nums[start];
+            nums[start] = nums[end];
+            nums[end] = temp;
+            start++;
+            end--;
+        }
+    }
+
+    public void nextPermutation(int[] nums) {
+        int n = nums.length;
+        int idx = -1;
+        for(int i=n-2; i>=0; i--){
+            if(nums[i] < nums[i+1]){
+                idx = i;
+                break;
+            }
+        }
+
+        if(idx == -1){
+            reverse(nums, 0, n-1);
+            return;
+        }
+
+        //otherwise
+        for(int i=n-1; i>= idx+1; i--){
+            if(nums[i] > nums[idx]){
+                swap(nums, i, idx);
+                break;
+            }
+        }
+
+        reverse(nums, idx+1, n-1);
+        
+    }
+}
