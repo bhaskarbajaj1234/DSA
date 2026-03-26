@@ -1,0 +1,94 @@
+#Approach:
+
+Set Matrix Zeroes – Optimal In-Place Approach
+
+Is problem me hume agar kisi cell me 0 mile,
+to uski poori row aur poori column ko 0 karna hota hai.
+Challenge ye hai ki ye kaam in-place karna hai, extra matrix use nahi karni.
+
+Isliye hum 0th row aur 0th column ko marker ki tarah use karte hain.
+
+Sabse pehle separately check karte hain ki 0th row me koi 0 hai ya nahi
+aur 0th column me koi 0 hai ya nahi.
+Iske liye do boolean variables rakhte hain: rowZero aur colZero.
+
+Ab matrix ke remaining part ko traverse karte hain (1,1 se start karke).
+Jahan bhi 0 mile, us row ka marker matrix[i][0] ko 0 kar do
+aur us column ka marker matrix[0][j] ko 0 kar do.
+
+Ab 0th row ko dekh kar un columns ko zero karo jinke markers 0 hain.
+Phir 0th column ko dekh kar un rows ko zero karo jinke markers 0 hain.
+
+End me agar initially 0th row me zero tha to poori 0th row ko 0 kar do,
+aur agar initially 0th column me zero tha to poori 0th column ko 0 kar do.
+
+Is tarah hum extra space use kiye bina matrix ko modify kar dete hain.
+
+Time Complexity: O(n * m)
+Space Complexity: O(1)
+
+#Code:
+class Solution {
+    public void setZeroes(int[][] matrix) {
+        boolean rowZero = false;
+        boolean colZero = false;
+        int n = matrix.length;
+        int m = matrix[0].length;
+
+        //finding zero in row zero
+        for(int j=0; j<m; j++){
+            if(matrix[0][j] == 0){
+                rowZero = true;
+            }
+        }
+
+        //finding zero in column zero
+        for(int i=0; i<n; i++){
+            if(matrix[i][0] == 0){
+                colZero = true;
+            }
+        }
+
+        //Traversing in small matrix
+        for(int i=1; i<n; i++){
+            for(int j=1; j<m; j++){
+                if(matrix[i][j] == 0){
+                    matrix[0][j] = 0;
+                    matrix[i][0] = 0;
+                }
+            }
+        }
+
+        //traversing in 0th row
+        for(int j=1; j<m; j++){
+            if(matrix[0][j] == 0){
+                for(int i=1; i<n; i++){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+
+        //traversing in 0th column
+        for(int i=1; i<n; i++){
+            if(matrix[i][0] == 0){
+                for(int j=1; j<m; j++){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+
+        //Check if zero row contains any 0
+        if(rowZero == true){
+            for(int j=0; j<m; j++){
+                matrix[0][j] = 0;
+            }
+        }
+
+        //Check if zero column contains any 0
+        if(colZero == true){
+            for(int i=0; i<n; i++){
+                matrix[i][0] = 0;
+            }
+        }
+    }
+}
