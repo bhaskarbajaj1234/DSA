@@ -1,0 +1,22 @@
+#Approach:
+Left Rotate Array by One – Approach (Hinglish)
+
+1. Sabse pehle first element ko ek temporary variable me store kar lo (kyunki woh overwrite ho jayega).
+2. Phir array ko left shift karo:
+    i = 1 se n-1 tak loop chalao
+    Har element ko ek position left shift kar do
+    nums[i-1] = nums[i]
+3. Ab last index pe temporary wala first element daal do.
+4. Array left rotate ho jayega by 1.
+
+#Code:
+class Solution {
+    public void rotateArrayByOne(int[] nums) {
+        int temp = nums[0];
+        int n = nums.length;
+        for(int i=1; i<n; i++){
+            nums[i-1] = nums[i];
+        }
+        nums[n-1] = temp;
+    }
+}
