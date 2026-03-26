@@ -1,0 +1,31 @@
+#Approach:
+
+Single Number – XOR Approach
+
+Is problem me har element do baar aata hai aur sirf ek element ek hi baar aata hai.
+Hum XOR use karte hain kyunki XOR me same numbers cancel ho jate hain.
+
+Important XOR properties:
+a ^ a = 0
+a ^ 0 = a
+
+Agar hum array ke saare elements ka XOR karein, to jo numbers do baar aayenge wo cancel ho jayenge
+aur jo number ek baar aaya hai wahi answer bachega.
+
+Isliye hum ek variable me sab elements ka XOR karte hain aur final XOR hi single number hota hai.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int singleNumber(int[] nums) {
+        int xor = 0;
+
+        for(int i=0; i<nums.length; i++){
+            xor = xor ^ nums[i];
+        }
+        return xor;
+    }
+}
