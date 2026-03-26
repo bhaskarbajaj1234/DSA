@@ -1,0 +1,61 @@
+#Approach:
+
+Sort Colors – Dutch National Flag Algorithm (3 Pointer Approach)
+
+Is problem me array me sirf 0, 1 aur 2 hote hain.
+Hume inhe sort karna hai without using sort function aur in-place.
+
+Hum 3 pointers use karte hain: low, mid, high.
+
+low ka matlab: 0s ka region
+mid ka matlab: current element
+high ka matlab: 2s ka region
+
+Algorithm:
+Agar nums[mid] == 0:
+Swap nums[low] aur nums[mid], phir low++ aur mid++
+
+Agar nums[mid] == 1:
+Bas mid++ (kyunki 1 already correct position me hai)
+
+Agar nums[mid] == 2:
+Swap nums[mid] aur nums[high], phir high--
+(mid ko yaha increment nahi karte kyunki swapped element check karna hota hai)
+
+Is tarah array 3 parts me divide ho jata hai:
+0s | 1s | 2s
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+
+    private void swap(int[] nums, int start, int end){
+        int temp = nums[start];
+        nums[start] = nums[end];
+        nums[end] = temp;
+    }
+
+    public void sortColors(int[] nums) {
+        int low = 0;
+        int mid = 0;
+        int high = nums.length - 1;
+
+        while (mid <= high){
+            if(nums[mid] == 0){
+                swap(nums, low, mid);
+                low++;
+                mid++;
+            }
+            else if(nums[mid] == 1){
+                mid++;
+            }
+            else{
+                swap(nums, mid, high);
+                high--;
+            }
+        }
+    }
+}
