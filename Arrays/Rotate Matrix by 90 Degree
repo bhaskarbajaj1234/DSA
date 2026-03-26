@@ -1,0 +1,70 @@
+#Approach:
+Rotate Image by 90 Degree Clockwise – Approach
+
+Matrix ko 90 degree clockwise rotate karne ke liye do steps use karte hain:
+Transpose + Reverse each row.
+
+Step 1: Transpose the matrix
+Transpose ka matlab hota hai matrix[i][j] ko matrix[j][i] se swap karna.
+Isse rows columns me convert ho jaati hain.
+
+Step 2: Har row ko reverse kar do
+Transpose ke baad agar hum har row ko reverse kar denge,
+to matrix 90 degree clockwise rotate ho jayega.
+
+Example:
+1 2 3
+4 5 6
+7 8 9
+
+Transpose:
+1 4 7
+2 5 8
+3 6 9
+
+Reverse rows:
+7 4 1
+8 5 2
+9 6 3
+
+Time Complexity: O(n^2)
+Space Complexity: O(1) (In-place rotation)
+
+#Code:
+class Solution {
+
+    private void swap(int[][] matrix, int row1, int col1, int row2, int col2){
+        if (row1 < 0 || row1 >= matrix.length || col1 < 0 || col1 >= matrix[row1].length ||
+            row2 < 0 || row2 >= matrix.length || col2 < 0 || col2 >= matrix[row2].length) {
+            System.out.println("Error: Indices are out of bounds.");
+            return;
+        }
+
+        int temp = matrix[row1][col1];
+        matrix[row1][col1] = matrix[row2][col2];
+        matrix[row2][col2] = temp;
+    }
+
+    public void rotate(int[][] matrix) {
+        //Step-1: Transpose matrix
+        int n = matrix.length;
+        for(int i=0; i<n; i++){
+            for(int j=i+1; j<n; j++){
+                swap(matrix, i, j, j, i);
+            }
+        }
+
+        //Step-2: reverse the arrays
+        for(int i=0; i<n; i++){
+            int start = 0;
+            int end = matrix[i].length - 1;
+            while(start < end){
+                int temp = matrix[i][start];
+                matrix[i][start] = matrix[i][end];
+                matrix[i][end] = temp;
+                start++;
+                end--;
+            } 
+        }
+    }
+}
