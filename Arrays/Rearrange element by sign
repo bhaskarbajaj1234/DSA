@@ -1,0 +1,52 @@
+#Approach:
+
+Rearrange Array Elements by Sign – Two Pointer Approach
+
+Is problem me equal number of positive aur negative numbers diye hote hain
+aur hume array ko is tarah arrange karna hota hai ki positive aur negative alternate aaye
+aur order bhi same rahe (relative order maintain karna hai).
+
+Hum ek naya array banate hain aur do pointers use karte hain:
+pIdx = 0 → positive numbers ke liye (even index)
+nIdx = 1 → negative numbers ke liye (odd index)
+
+Array traverse karte hain:
+Agar element positive hai to usse ans[pIdx] par daal do aur pIdx += 2
+Agar element negative hai to usse ans[nIdx] par daal do aur nIdx += 2
+
+Isse positive even index par aur negative odd index par aayenge
+aur alternating pattern ban jayega.
+
+Important:
+Yeh approach tab use hoti hai jab positive aur negative numbers equal ho.
+
+Agar positive aur negative numbers unequal ho,
+to pehle saare positive aur negative numbers alag arrays me store karo,
+phir merge sort ki tarah alternate karke final array banao,
+aur jo elements bach jaye unhe end me add kar do.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+class Solution {
+    public int[] rearrangeArray(int[] nums) {
+
+        int n = nums.length;
+        int[] ans = new int[n];
+        int pIdx = 0;        
+        int nIdx = 1;
+
+        for(int i=0; i<n; i++){
+            if(nums[i] < 0){
+                ans[nIdx] = nums[i];
+                nIdx += 2;
+            }
+            else{
+                ans[pIdx] = nums[i];
+                pIdx += 2;
+            }
+        }
+        return ans;
+    }
+}
