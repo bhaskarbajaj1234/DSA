@@ -1,0 +1,47 @@
+#Approach:
+
+Largest Subarray with Sum 0 – Prefix Sum + HashMap Approach
+
+Is problem me hum prefix sum use karte hain.
+Hum running sum calculate karte hain aur HashMap me store karte hain
+ki kaunsa prefix sum kis index par pehli baar aaya tha.
+
+Agar running sum kabhi 0 ho jaye, iska matlab starting se current index tak ka subarray sum 0 hai.
+
+Agar koi prefix sum dobara mil jaye,
+to iska matlab beech ka subarray ka sum 0 hoga.
+Isliye current index - previous index se subarray ki length nikalte hain
+aur max length update karte hain.
+
+Important:
+HashMap me prefix sum ka sirf first occurrence store karna hai,
+kyunki hume longest subarray chahiye.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public int maxLen(int[] arr) {
+        // Your code goes here
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int maxLen = 0;
+        int sum = 0;
+
+        for(int i=0; i<arr.length; i++){
+            sum += arr[i];
+            if(sum == 0){
+                maxLen = Math.max(maxLen, i+1);
+            }
+
+            if(map.containsKey(sum)){
+                int len = i - map.get(sum);
+                maxLen = Math.max(maxLen, len);
+            }else{
+                map.put(sum, i);
+            }
+        }
+        return maxLen;
+    }
+}
