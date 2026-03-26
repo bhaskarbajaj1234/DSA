@@ -1,0 +1,49 @@
+#Approach:
+Merge Intervals – Sorting + Traversal Approach
+
+Sabse pehle intervals ko starting time ke basis par sort karte hain.
+
+Phir first interval ko answer me daal dete hain aur usse current merged interval maan lete hain.
+
+Ab baaki intervals ko ek ek karke check karte hain:
+Agar current merged interval ka end, next interval ke start se greater ya equal hai,
+to dono overlap karte hain.
+Is case me merged interval ka end update kar dete hain using max(end1, end2).
+
+Agar overlap nahi hai, to iska matlab new disjoint interval start ho gaya hai.
+To usse answer me add kar dete hain aur usse new current merged interval bana dete hain.
+
+End me saare merged intervals return kar dete hain.
+
+Time Complexity: O(n log n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.*;
+
+class Solution {
+    public int[][] merge(int[][] intervals) {
+        if(intervals.length <= 1){
+            return intervals;
+        }
+
+        Arrays.sort(intervals, Comparator.comparingInt(a -> a[0]));
+
+        List<int[]> result = new ArrayList<>();
+        int[] newInterval = intervals[0];
+        result.add(newInterval);
+
+        for(int[] interval : intervals){
+            if(newInterval[1] >= interval[0]){
+                newInterval[1] = Math.max(newInterval[1], interval[1]);
+            }
+            else{
+                newInterval = interval;
+                result.add(newInterval);
+            }
+        }
+
+        return result.toArray(new int[result.size()][]);
+    }
+}
