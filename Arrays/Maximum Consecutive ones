@@ -1,0 +1,33 @@
+#Approach:
+
+Max Consecutive Ones – Approach
+
+Array ko traverse karo aur ek counter rakho jo consecutive 1s ko count kare.
+Jab bhi 1 mile, counter ko increment karo.
+Jab 0 mile, counter ko reset karke 0 kar do kyunki consecutive sequence break ho gaya.
+
+Har step par maximum length update karte raho using max variable.
+End me max variable me hi maximum consecutive 1s mil jayenge.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int findMaxConsecutiveOnes(int[] nums) {
+        int maxi = 0;
+        int cnt = 0;
+
+        for(int i=0; i<nums.length; i++){
+            if(nums[i] == 1){
+                cnt++;
+                maxi = Math.max(cnt, maxi);
+            }
+            else{
+                cnt = 0;
+            }
+        }
+        return maxi;
+    }
+}
