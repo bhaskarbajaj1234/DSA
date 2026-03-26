@@ -1,0 +1,38 @@
+#Approach:
+
+Two Sum – HashMap Approach
+
+Is problem me hume do numbers find karne hain jinka sum target ke equal ho.
+Iske liye hum HashMap use karte hain jisme number ko key aur uska index value me store karte hain.
+
+Array traverse karte waqt har element ke liye check karte hain ki target - current element
+(pehle se map me present hai ya nahi). Agar present hai, to iska matlab hume required pair mil gaya.
+
+Agar required number map me mil jaye, to uska index aur current index return kar do.
+Agar nahi mile, to current number aur uska index map me store kar do future ke liye.
+
+Is tarah hum ek hi traversal me answer find kar lete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+
+        for(int i=0; i<nums.length; i++){
+            int moreNeeded = target - nums[i];
+
+            if(map.containsKey(moreNeeded)){
+                int[] ans = {map.get(moreNeeded), i};
+                return ans;
+            }
+            else{
+                map.put(nums[i], i);
+            }
+        }
+        return new int[]{-1, -1};
+    }
+}
