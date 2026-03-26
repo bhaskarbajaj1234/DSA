@@ -1,0 +1,37 @@
+#Approach:
+
+Leaders in an Array – Approach
+
+Leader wo element hota hai jo apne right side ke sab elements se bada ho.
+Rightmost element hamesha leader hota hai.
+
+Isliye array ko right se traverse karte hain aur ek variable maxi rakhte hain
+jo ab tak ka right side ka maximum element store karta hai.
+
+Agar current element maxi se bada ho, to wo leader hai,
+usse list me add karo aur maxi update kar do.
+
+Kyuki hum right se leaders add kar rahe hain,
+isliye end me list ko reverse kar dete hain taki order same rahe.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public List<Integer> leaders(int[] nums) {
+
+        List<Integer> aList = new ArrayList<>();
+        int n = nums.length;
+        int maxi = Integer.MIN_VALUE;
+        for(int i=n-1; i>=0; i--){
+            if(nums[i] > maxi){
+                aList.add(nums[i]);
+                maxi = nums[i];
+            }
+        }
+        Collections.reverse(aList);
+        return aList;
+    }
+}
