@@ -1,0 +1,47 @@
+#Approach:
+
+Longest Subarray with Sum K – Prefix Sum + HashMap Approach
+
+Is problem me hum prefix sum use karte hain.
+Hum running sum calculate karte hain aur HashMap me store karte hain
+ki kaunsa sum kis index par pehli baar aaya tha.
+
+Agar kisi index par current sum - k map me mil jata hai,
+to iska matlab beech ka subarray ka sum k hai.
+Us subarray ki length nikalte hain using current index - stored index
+aur max length update karte hain.
+
+Important:
+Map me hamesha prefix sum ka first occurrence store karna hai,
+kyunki hume longest subarray chahiye.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+class Solution {
+    public int longestSubarray(int[] nums, int k) {
+       HashMap<Integer, Integer> map = new HashMap<>();
+       int sum = 0;
+       int maxLen = 0;
+
+       for(int i=0; i<nums.length; i++){
+           sum += nums[i];
+           if(sum == k){
+            maxLen = Math.max(maxLen, i+1);
+           }
+
+           int rem = sum - k;
+
+           if(map.containsKey(rem)){
+            int len = i - map.get(rem);
+            maxLen = Math.max(maxLen, len);
+           }
+
+           if(!map.containsKey(sum)){
+            map.put(sum, i);
+           }
+       }
+       return maxLen;
+    }
+}
