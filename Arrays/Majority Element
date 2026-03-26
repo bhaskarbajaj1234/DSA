@@ -1,0 +1,58 @@
+#Approach:
+
+Majority Element – Boyer Moore Voting Algorithm
+
+Is problem me hume wo element find karna hai jo array me n/2 se zyada baar aata ho.
+Iske liye hum Boyer-Moore Voting Algorithm use karte hain.
+
+Hum do variables rakhte hain: count aur candidate element.
+
+Array traverse karte waqt:
+Agar count 0 ho jaye, to current element ko candidate bana do aur count = 1 kar do.
+Agar current element candidate ke equal ho, to count increase karo.
+Agar current element candidate ke equal nahi ho, to count decrease karo.
+
+Is process me majority element kabhi completely cancel nahi hota,
+aur end tak candidate variable me majority element bach jata hai.
+
+Last me ek baar manually check kar sakte hain ki candidate actually n/2 se zyada baar aata hai ya nahi.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int majorityElement(int[] nums) {
+        int cnt = 0;
+        int el = 0;
+
+        for(int i=0; i<nums.length; i++){
+            if(cnt == 0){
+                cnt = 1;
+                el = nums[i];
+            }
+            else if(nums[i] == el){
+                cnt++;
+            }
+            else{
+                cnt--;
+            }
+        }
+
+        //Manual checking
+        int cnt1 = 0;
+        for(int i=0; i<nums.length; i++){
+            if(nums[i] == el){
+                cnt++;
+            }
+        }
+
+        if(cnt > nums.length/2){
+            return el;
+        }
+        else{
+            return -1;
+        }
+    }
+}
