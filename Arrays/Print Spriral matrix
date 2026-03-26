@@ -1,0 +1,67 @@
+#Approach:
+
+Spiral Matrix – Boundary Traversal Approach
+
+Is problem me hume matrix ko spiral order me print karna hota hai.
+Iske liye hum 4 boundaries maintain karte hain:
+top, bottom, left, right.
+
+Jab tak left <= right aur top <= bottom ho,
+tab tak hum spiral traversal karte rahenge.
+
+Step 1: Top row traverse karo (left → right), phir top++
+Step 2: Right column traverse karo (top → bottom), phir right--
+Step 3: Bottom row traverse karo (right → left), phir bottom-- 
+        (ye step tabhi karna jab top <= bottom ho)
+Step 4: Left column traverse karo (bottom → top), phir left++
+        (ye step tabhi karna jab left <= right ho)
+
+Is tarah har layer ka outer boundary traverse hota hai
+aur hum dheere dheere andar ki taraf badhte jaate hain.
+
+Time Complexity: O(n * m)
+Space Complexity: O(1) (excluding output list)
+
+#Code:
+class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        int n = matrix.length;
+        int m = matrix[0].length;
+        int left = 0;
+        int right = m-1;
+        int top = 0;
+        int bottom = n-1;
+        List<Integer> ans = new ArrayList<>();
+
+        while(left <= right && top <= bottom){
+            //left
+            for(int i=left; i<=right; i++){
+                ans.add(matrix[top][i]);
+            }
+            top++;
+
+            //right
+            for(int i=top; i<=bottom; i++){
+                ans.add(matrix[i][right]);
+            }
+            right--;
+
+            //left
+            if(top <= bottom){
+                for(int i=right; i>=left; i--){
+                    ans.add(matrix[bottom][i]);
+                }
+                bottom--;
+            }
+
+            //botom
+            if(left <= right){
+                for(int i=bottom; i>=top; i--){
+                    ans.add(matrix[i][left]);
+                }
+                left++;
+            }
+        }
+        return ans;
+    }
+}
