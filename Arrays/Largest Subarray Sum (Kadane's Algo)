@@ -1,0 +1,40 @@
+#Approach:
+
+Maximum Subarray – Kadane’s Algorithm
+
+Is problem me hume continuous subarray ka maximum sum find karna hota hai.
+Iske liye hum Kadane’s Algorithm use karte hain.
+
+Hum ek running sum maintain karte hain.
+Array traverse karte waqt har element ko running sum me add karte hain
+aur har step par maximum sum update karte rehte hain.
+
+Agar running sum kabhi negative ho jaye, to usse 0 kar dete hain
+kyunki negative sum future subarray ko chhota hi karega, bada nahi.
+
+Isliye jab sum negative ho jaye to new subarray start karna better hota hai.
+
+End me jo maximum sum mila hoga wahi maximum subarray sum hoga.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int sum = 0;
+        int maxi = Integer.MIN_VALUE;
+
+        for(int i=0; i<nums.length; i++){
+            sum += nums[i];
+            maxi = Math.max(maxi, sum);
+
+            if(sum < 0){
+                sum = 0;
+            }
+        }
+
+        return maxi;
+    }
+}
