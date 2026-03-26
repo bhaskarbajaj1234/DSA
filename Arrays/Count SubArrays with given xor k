@@ -1,0 +1,43 @@
+#Approach:
+
+Count Subarrays with XOR K – Prefix XOR + HashMap Approach
+
+Is problem me hum prefix XOR use karte hain.
+Har index par current prefix XOR nikalte hain.
+
+Agar kisi subarray ka XOR k hona chahiye,
+to previous prefix XOR aisa hona chahiye ki:
+previousXor ^ currentXor = k
+Isse previousXor = currentXor ^ k
+
+Isliye har step par current XOR nikalne ke baad
+required XOR = currentXor ^ k calculate karte hain.
+Agar ye required XOR pehle map me present hai,
+to uski frequency ko answer me add kar dete hain.
+
+HashMap me prefix XOR ki frequency store karte hain.
+Starting me 0 ko frequency 1 ke saath store karte hain
+taki wo subarrays bhi count ho sakein jo index 0 se start hoti hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public int subarraysWithXorK(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int xor = 0;
+        int cnt = 0;
+        map.put(0,1);
+        for(int i=0; i<nums.length; i++){
+            xor = xor ^ nums[i];
+            int x = xor ^ k;
+
+            cnt += map.getOrDefault(x, 0);
+
+            map.put(xor, map.getOrDefault(xor, 0)+1);
+        }
+        return cnt;
+    }
+}
