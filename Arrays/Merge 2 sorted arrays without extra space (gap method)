@@ -1,0 +1,74 @@
+#Approach:
+Merge Sorted Array – Three Pointer Approach
+
+Is problem me nums1 ke end me already extra space diya hota hai,
+isliye hum merge ko piche se karte hain.
+
+Hum 3 pointers lete hain:
+i = nums1 ke valid part ke end par
+j = nums2 ke end par
+k = nums1 ke total end par
+
+Ab nums1[i] aur nums2[j] ko compare karte hain.
+Jo bada hota hai usse nums1[k] par daal dete hain,
+phir corresponding pointer aur k ko piche le aate hain.
+
+Agar nums2 ke kuch elements bach jayein,
+to unhe nums1 me copy kar dete hain.
+
+Isse in-place merge ho jata hai bina extra array ke.
+
+Time Complexity: O(m + n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int len = (n+m);
+        int gap = (len/2) + (len%2);
+
+        while(gap > 0){
+            int left = 0;
+            int right = left + gap;
+
+            while(right < len){
+                //if left in nums 1 and right in nums2
+                if(left < m && right >= m){
+                    if(nums1[left] > nums2[right - m]){
+                        //swap
+                        int temp = nums1[left];
+                        nums1[left] = nums2[right-m];
+                        nums2[right-m] = temp;
+                    }
+                }
+                // if both left & right are in arr2
+                else if(left >= m){
+                    if(nums2[left-m] > nums2[right-m]){
+                        //swap
+                        int temp = nums2[left-m];
+                        nums2[left-m] = nums2[right-m];
+                        nums2[right-m] = temp;
+                    }
+                }
+
+                //if both left & right are in arr1
+                else{
+                    if(nums1[left] > nums1[right]){
+                        //swap
+                        int temp = nums1[left];
+                        nums1[left] = nums1[right];
+                        nums1[right] = temp;
+                    }
+                }
+                right++;
+                left++;
+            }
+            if(gap == 1) break;
+            gap = (gap/2) + (gap%2);
+        }
+        for(int i = 0; i < n; i++){
+            nums1[m + i] = nums2[i];
+        }
+    }
+}
