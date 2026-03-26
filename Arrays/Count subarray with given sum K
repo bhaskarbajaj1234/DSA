@@ -1,0 +1,45 @@
+#Approach:
+
+Subarray Sum Equals K – Prefix Sum + HashMap Approach
+
+Is problem me hume total count nikalna hota hai un subarrays ka jinka sum k ke equal ho.
+
+Hum prefix sum use karte hain.
+Har index par current prefix sum nikalte hain.
+Agar kisi previous prefix sum ka value (currentPrefixSum - k) ho,
+to iska matlab us previous index ke next se current index tak ka subarray sum k hoga.
+
+Isliye HashMap me prefix sum ki frequency store karte hain.
+
+Har step par:
+current prefix sum nikalo
+required value = prefixSum - k
+agar ye value map me present hai, to uski frequency count me add kar do
+phir current prefix sum ko map me update kar do
+
+Important:
+Map me starting me 0 ko frequency 1 ke saath store karte hain
+taki wo subarrays bhi count ho saken jo index 0 se start hote hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+class Solution {
+    public int subarraySum(int[] nums, int k) {
+        int cnt = 0;
+        int presum = 0;
+        int n = nums.length;
+        HashMap<Integer, Integer> map = new HashMap<>();
+        map.put(0,1);
+
+        for(int i=0; i<n; i++){
+            presum += nums[i];
+            int remove = presum - k;
+            cnt += map.getOrDefault(remove, 0);
+
+            map.put(presum, map.getOrDefault(presum, 0)+1);
+        }
+        return cnt;
+    }
+}
