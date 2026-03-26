@@ -1,0 +1,72 @@
+#Approach:
+
+Union of Two Sorted Arrays – Two Pointer Approach
+
+Dono sorted arrays par do pointers i aur j rakho.
+Dono arrays ko compare karo aur jo chhota element ho usse union list me add karo.
+Agar dono elements equal ho to ek hi baar add karo aur dono pointers aage badhao.
+
+Duplicate avoid karne ke liye check karo ki jo element add kar rahe ho
+wo last added element ke equal na ho.
+
+Agar ek array khatam ho jaye to dusre array ke remaining elements add kar do
+(lekin duplicate check ke saath).
+
+Time Complexity: O(n1 + n2)
+Space Complexity: O(n1 + n2) for union array
+
+#Code:
+
+class Solution {
+    public int[] unionArray(int[] nums1, int[] nums2) {
+        int n1 = nums1.length;
+        int n2 = nums2.length;
+        int i = 0;
+        int j = 0;
+        List<Integer> unionList = new ArrayList<>();
+
+        while(i < n1 && j < n2){
+            if(nums1[i] < nums2[j]){
+                if(unionList.size() == 0 || unionList.get(unionList.size() - 1) != nums1[i]){
+                    unionList.add(nums1[i]);
+                }
+                i++;
+            }else if(nums1[i] > nums2[j]){
+                if(unionList.size() == 0 || unionList.get(unionList.size() - 1) != nums2[j]){
+                    unionList.add(nums2[j]);
+                }
+                j++;
+            }
+            else{ //when both are equal
+                if(unionList.size() == 0 || unionList.get(unionList.size() - 1) != nums1[i]){
+                    unionList.add(nums1[i]);
+                }
+                i++;
+                j++;
+            }
+        }
+
+        //if nums2 gets exhausted and nums1 remained
+        while(i<n1){
+            if(unionList.size() == 0 || unionList.get(unionList.size() - 1) != nums1[i]){
+                unionList.add(nums1[i]);
+            }
+            i++;
+        }
+
+        //if nums1 gets exhausted and nums2 remained
+        while(j<n2){
+            if(unionList.size() == 0 || unionList.get(unionList.size() - 1) != nums2[j]){
+                unionList.add(nums2[j]);
+            }
+            j++;
+        }
+
+        int[] arr = new int[unionList.size()];
+        for(int i=0; i<unionList.size(); i++){
+            arr[i] = unionList.get(i);
+        }
+
+        return arr;
+    }
+}
