@@ -1,0 +1,51 @@
+#Approach:
+
+Longest Subarray with Sum K – Sliding Window Approach
+
+Jab array me sirf positive numbers aur 0 hote hain, tab sliding window use kar sakte hain
+kyunki sum predictable way me behave karta hai.
+
+Hum do pointers lete hain: left aur right.
+Ye dono milkar current window ya subarray represent karte hain.
+Saath me current window ka sum maintain karte hain.
+
+Right pointer ko aage badhate jao aur current element ko sum me add karo.
+Agar sum k se bada ho jaye, to left pointer ko aage badhao aur left wale elements ko sum se minus karo
+jab tak sum k se chhota ya equal na ho jaye.
+
+Jab bhi sum exactly k ke equal ho, current window ki length nikaal kar maximum length update kar do.
+
+Ye approach tabhi sahi kaam karti hai jab array me negative numbers na hon,
+kyunki negative aane par sum ka behavior fixed nahi rehta.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int longestSubarray(int[] nums, int k) {
+        int left = 0;
+        int right = 0;
+
+        int maxlen = 0;
+        int sum = 0;
+
+        while(right < nums.length){
+            while(left <= right && sum > k){
+                sum -= nums[left];
+                left++;
+            }
+
+            if(sum == k){
+                maxLen = Math.max(maxLen, right - left + 1);
+            }
+
+            right++;
+            if(right < nums.length){
+                sum += nums[right];
+            }
+        }
+        return maxLen;
+    }
+}
