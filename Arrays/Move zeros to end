@@ -1,0 +1,50 @@
+#Approach:
+
+Move Zeroes – Two Pointer Approach
+
+Sabse pehle array me first zero ka index find karo aur usse j pointer maan lo.
+Agar zero mile hi na, to array already correct hai, return kar do.
+
+Ab j ke baad traverse karo aur jab bhi non-zero element mile,
+usse j index par swap karo aur j ko aage badha do.
+
+Isse saare non-zero elements apni relative order me aage aa jayenge
+aur saare zeroes automatically end me shift ho jayenge.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+
+    private void swap(int[] nums, int a, int b){
+        int temp = nums[a];
+        nums[a] = nums[b];
+        nums[b] = temp;
+    }
+
+    public void moveZeroes(int[] nums) {
+        //Mark the first occuring zero
+        int n = nums.length;
+        int j = -1;
+        for(int i=0; i<n; i++){
+            if(nums[i] == 0){
+                j = i;
+                break;
+            }
+        }
+
+        // if no zero present
+        if(j == -1) return;
+
+
+        //Now main logic of swapping begins
+        for(int i = j+1; i<n; i++){
+            if(nums[i] != 0){
+                swap(nums, i, j);
+                j++;
+            }
+        }
+    }
+}
