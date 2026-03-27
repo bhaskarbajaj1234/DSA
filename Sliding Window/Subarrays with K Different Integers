@@ -1,0 +1,57 @@
+#Approach:
+
+Approach:
+Ye code exactly k distinct integers wale subarrays count karta hai using:
+
+Exact(k) = AtMost(k) - AtMost(k - 1)
+
+1. helper(nums, k) count karta hai kitne subarrays me at most k distinct elements hain.
+2. Sliding window + HashMap use hota hai:
+   - right pointer se current element window me add karte hain
+   - map me uski frequency maintain karte hain
+3. Agar map.size() > k ho jaaye,
+   to left pointer aage badha ke window shrink karte hain
+   aur frequencies update karte hain.
+4. Har valid window ke liye
+   (right - left + 1) subarrays add ho jaate hain.
+5. Final answer:
+   helper(k) - helper(k - 1)
+
+Main idea:
+Exactly k distinct directly count karna tough hota hai,
+isliye pehle at most k aur at most k-1 count karke difference le lete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(k)
+
+#Code:
+
+class Solution {
+
+    public int helper(int[] nums, int k){
+        int left = 0;
+        int right = 0;
+        int cnt = 0;
+        HashMap<Integer, Integer> map = new HashMap<>();
+
+        while(right < nums.length){
+            map.put(nums[right], map.getOrDefault(nums[right], 0)+1);
+
+            while(map.size() > k){
+                map.put(nums[left], map.get(nums[left])-1);
+                if(map.get(nums[left]) == 0) map.remove(nums[left]);
+                left++;
+            }
+            cnt += (right - left + 1);
+            right++;
+        }
+        return cnt;
+    }
+
+    public int subarraysWithKDistinct(int[] nums, int k) {
+        int val1 = helper(nums, k);
+        int val2 = helper(nums, k-1);
+        int result = val1 - val2;
+        return result;
+    }
+}
