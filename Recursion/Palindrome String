@@ -1,0 +1,123 @@
+#Approach:
+
+Approach (Hinglish) – Palindrome String (Recursion)
+
+Palindrome string wo hoti hai jo left se aur right se same read ho.
+Jaise: "racecar", "madam", "abba"
+
+Is code mein recursion use karke palindrome check kiya gaya hai.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Hum string ke first aur last character compare karte hain.
+Agar dono same hain, to next inner characters check karte hain.
+Agar kahin bhi mismatch mil gaya, to palindrome nahi hai.
+
+Matlab:
+str[i] == str[n-i-1]
+
+Aur fir recursion se i+1 ke liye check karte hain.
+
+Ye exactly two-pointer approach ka recursive version hai.
+
+--------------------------------------------------
+Function Flow
+--------------------------------------------------
+isPalindrome(str) function helper ko call karta hai:
+isPalindromeHelper(str, 0)
+
+Yaha i = starting index hai.
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar i >= str.length()/2
+-> Matlab hum string ke middle tak pahunch gaye
+-> Saare characters match ho gaye
+-> String palindrome hai
+
+if(i >= str.length()/2) return true;
+
+--------------------------------------------------
+Mismatch Case
+--------------------------------------------------
+Agar:
+str.charAt(i) != str.charAt(str.length() - i - 1)
+-> Characters match nahi kar rahe
+-> String palindrome nahi hai
+-> return false
+
+--------------------------------------------------
+Recursive Call
+--------------------------------------------------
+Agar current characters match kar gaye,
+to next inner substring check karte hain:
+
+return isPalindromeHelper(str, i+1);
+
+Har recursive call mein hum inner substring check kar rahe hain.
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+str = "racecar"
+
+i = 0 -> r == r
+i = 1 -> a == a
+i = 2 -> c == c
+i = 3 -> middle -> stop
+
+Return true
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Har character ek baar check hota hai:
+O(n)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack:
+O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har step par first aur last character compare karo
+aur recursively inner substring check karte jao.
+
+Quick Revision – Palindrome Recursion
+
+1. Compare str[i] and str[n-i-1]
+2. Agar mismatch -> false
+3. Agar i >= n/2 -> true
+4. Else recursion call i+1
+
+Time: O(n)
+Space: O(n)
+
+#Code:
+
+public class Solution
+{ 
+    public static boolean isPalindrome(String str)
+    {
+        //You can code here
+        return isPalindromeHelper(str, 0);
+
+    }
+
+    public static boolean isPalindromeHelper(String str, int i){
+      //base case
+      if(i >= str.length()/2){
+        return true;
+      }
+      if(str.charAt(i) != str.charAt(str.length() - i - 1)){
+        return false;
+      }
+
+      return isPalindromeHelper(str, i+1);
+    }
+}
