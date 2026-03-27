@@ -1,0 +1,108 @@
+#Approach:
+
+Approach (Hinglish) – Koko Eating Bananas (Binary Search on Answer)
+
+Is question mein hume minimum eating speed k find karni hai
+aisi ki Koko saare bananas h hours ke andar finish kar de.
+
+Brute force mein hum har possible speed check kar sakte hain,
+lekin piles[i] bahut bada ho sakta hai, isliye efficient approach chahiye.
+Yaha Binary Search on Answer use hota hai.
+
+Key Idea:
+Koko ki eating speed k ki range:
+minimum = 1
+maximum = max(piles)
+
+Agar kisi speed mid par Koko h hours ya usse kam mein saare bananas kha leti hai,
+to ho sakta hai aur chhoti speed par bhi answer mil jaaye.
+Isliye hum left side search karte hain.
+
+Agar kisi speed mid par Koko ko h se zyada hours lag rahe hain,
+to speed kam hai, hume right side jaana padega.
+
+How helper works:
+Har pile ke liye required hours = ceil(piles[i] / mid)
+
+Example:
+pile = 7, speed = 3
+hours = ceil(7/3) = 3
+
+Kyuki:
+1st hour -> 3 bananas
+2nd hour -> 3 bananas
+3rd hour -> 1 banana
+
+Saare piles ke hours add karke totalHours nikalte hain.
+
+Steps:
+1. low = 1, high = maximum pile
+2. mid = (low + high) / 2
+3. mid speed par total required hours nikalo
+4. Agar totalHours <= h
+   -> speed valid hai
+   -> aur minimum chahiye, isliye left side search karo
+   -> high = mid - 1
+5. Else
+   -> speed kam hai
+   -> right side jao
+   -> low = mid + 1
+
+Loop ke end par low minimum valid speed hoti hai.
+
+Why return low?
+Kyuki binary search ke baad low first valid speed par point karta hai
+jahan Koko h hours ke andar finish kar sakti hai.
+
+Time Complexity:
+maxi() -> O(n)
+helper() -> O(n)
+Binary Search -> O(log(max pile))
+Total -> O(n * log(max pile))
+
+Space Complexity:
+O(1)
+
+One line intuition:
+Minimum aisi speed find karni hai jisse total eating hours h se zyada na ho,
+isliye answer space par binary search lagate hain.
+
+#Code:
+
+class Solution {
+
+    public int maxi(int[] piles){
+        int n = piles.length;
+        int maxVal = Integer.MIN_VALUE;
+        for(int i=0; i<n; i++){
+            maxVal = Math.max(maxVal, piles[i]);
+        }
+        return maxVal;
+    }
+
+    public int helper(int[] piles, int mid){
+        int totalHours = 0;
+        for(int i=0; i<piles.length; i++){
+            totalHours += Math.ceil((double)piles[i] / mid);
+        }
+        return totalHours;
+    }
+
+    public int minEatingSpeed(int[] piles, int h) {
+        int low = 1;
+        int high = maxi(piles);
+
+        while(low <= high){
+            int mid = (low + high)/2;
+            int val = helper(piles, mid);
+
+            if(val <= h){
+                high = mid-1;
+            }
+            else{
+                low = mid+1;
+            }
+        }
+        return low;
+    }
+}
