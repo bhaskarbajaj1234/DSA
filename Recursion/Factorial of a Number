@@ -1,0 +1,13 @@
+#Code:
+
+public class Solution{
+    public static int factorial(int n){
+        //Base case
+
+        if(n==1 || n==0){
+            return 1;
+        }
+
+        return (n * factorial(n-1));
+    }
+}
