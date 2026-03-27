@@ -1,0 +1,57 @@
+#Approach:
+
+Approach:
+Ye code postfix ko infix me convert karne ke liye stack of strings use karta hai.
+
+1. Expression ko left se right traverse karte hain.
+2. Agar operand mile, to usse string bana ke stack me push kar do.
+3. Agar operator mile, to stack se top ke 2 operands nikaalte hain:
+   - pehla pop = second operand
+   - doosra pop = first operand
+4. Fir new infix expression banate hain:
+   '(' + first + operator + second + ')'
+5. Is naye expression ko dobara stack me push kar dete hain.
+6. End me stack me jo final string bachegi wahi infix answer hoga.
+
+Main idea:
+Postfix me operator hamesha apne 2 operands ke baad aata hai,
+isliye jaise hi operator milta hai, stack ke top ke 2 expressions ko combine kar dete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+
+    public boolean isOperator(Character a){
+        if((a == '+') || (a == '-') || (a == '*') || (a == '/')){
+            return true;
+        }
+        return false;
+    }
+
+    public String postToInfix(String postExp) {
+        // Your code goes here
+        int n = postExp.length();
+        int i = 0;
+        ArrayDeque<String> stack = new ArrayDeque<>();
+
+        while(i < n){
+            char ch = postExp.charAt(i);
+
+            if(isOperator(ch)){
+                String second = stack.pop();
+                String first = stack.pop();
+                String temp = '(' + first + ch + second + ')';
+                stack.push(temp);
+            }
+            //if operand
+            else{
+                stack.push(Character.toString(ch));
+            }
+            i++;
+        }
+        return stack.peek();
+    }
+}
