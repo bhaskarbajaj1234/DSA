@@ -1,0 +1,165 @@
+#Approach:
+
+Approach (Hinglish) – Aggressive Cows (Binary Search on Answer)
+
+Is question mein hume k cows ko stalls mein aise place karna hai
+ki kisi bhi 2 cows ke beech ka minimum distance maximum ho.
+
+Matlab:
+Hum minimum distance ko jitna ho sake utna bada karna chahte hain.
+
+Ye direct placement problem lagti hai,
+lekin actually ye Binary Search on Answer wala question hai.
+
+--------------------------------------------------
+Step 1: Sorting
+--------------------------------------------------
+Sabse pehle stalls positions ko sort karna zaroori hai,
+taaki hum left to right cows place kar sakein.
+
+Example:
+nums = [0, 3, 4, 7, 10, 9]
+Sort karne ke baad:
+[0, 3, 4, 7, 9, 10]
+
+--------------------------------------------------
+Step 2: Answer Space
+--------------------------------------------------
+Ab hume distance par binary search lagani hai.
+
+Minimum possible distance = 1
+Maximum possible distance = last stall - first stall
+
+So:
+low = 1
+high = nums[n-1] - nums[0]
+
+--------------------------------------------------
+Step 3: Check function
+--------------------------------------------------
+Ab hum ek helper/check function banate hain:
+canWePlace(nums, dist, k)
+
+Ye check karta hai ki kya hum cows ko aise place kar sakte hain
+ki har 2 placed cows ke beech ka distance kam se kam "dist" ho.
+
+Logic:
+1. Pehli cow hamesha first stall par place kar do
+2. Fir next stalls traverse karo
+3. Jis stall ka difference last placed cow se >= dist ho,
+   waha next cow place kar do
+4. Agar total placed cows >= k ho gayi,
+   matlab ye distance possible hai
+
+Ye greedy placement isliye sahi hai
+kyuki hum hamesha earliest possible stall par cow place karte hain,
+taaki baaki cows ke liye zyada jagah bache.
+
+--------------------------------------------------
+Step 4: Binary Search
+--------------------------------------------------
+mid = ek possible minimum distance
+
+Case 1:
+Agar canWePlace(mid) == true
+-> Matlab itni distance maintain karna possible hai
+-> Ho sakta hai aur bada distance bhi possible ho
+-> right side search karo
+-> ans = mid
+-> low = mid + 1
+
+Case 2:
+Agar canWePlace(mid) == false
+-> Matlab distance zyada hai, cows place nahi ho pa rahi
+-> smaller distance try karo
+-> high = mid - 1
+
+--------------------------------------------------
+Why are we moving right when possible?
+--------------------------------------------------
+Kyuki hume sirf valid distance nahi chahiye,
+hume maximum valid minimum distance chahiye.
+Isliye jab current distance possible hota hai,
+tab hum aur bada distance try karte hain.
+
+--------------------------------------------------
+Dry Run
+--------------------------------------------------
+nums = [0, 3, 4, 7, 9, 10], k = 4
+
+Try dist = 3
+Place cows at:
+0, 3, 7, 10
+4 cows place ho gayi
+-> possible
+
+Try dist = 4
+Place cows at:
+0, 4, 9
+sirf 3 cows
+-> not possible
+
+Toh maximum possible minimum distance = 3
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Sorting = O(n log n)
+Each check = O(n)
+Binary Search = O(log(maxDistance))
+
+Total = O(n log n + n * log(maxDistance))
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+O(1) extra space
+(ignoring sorting space used internally)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Aisa maximum minimum distance find karna hai jo cows ke beech maintain ho sake,
+isliye distance answer space par binary search lagate hain.
+
+#Code:
+
+class Solution {
+
+    public boolean canWePlace(int[] nums, int dist, int k){
+        int countCows = 1;
+        int last = nums[0];
+
+        for(int i = 1; i < nums.length; i++){
+            if(nums[i] - last >= dist){
+                countCows++;
+                last = nums[i];
+            }
+            if(countCows >= k){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int aggressiveCows(int[] nums, int k) {
+        Arrays.sort(nums);
+
+        int low = 1;
+        int high = nums[nums.length - 1] - nums[0];
+        int ans = 0;
+
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+
+            if(canWePlace(nums, mid, k)){
+                ans = mid;
+                low = mid + 1;
+            }
+            else{
+                high = mid - 1;
+            }
+        }
+        return ans;
+    }
+}
