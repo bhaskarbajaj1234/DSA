@@ -1,0 +1,63 @@
+#Approach:
+
+Roman to Integer – Left to Right Comparison Approach
+
+Roman numerals me normally bada symbol pehle aata hai aur chhota baad me,
+to hum value add karte hain.
+Lekin agar chhota symbol bade symbol se pehle aa jaye,
+to us case me subtract karna padta hai (jaise IV = 4, IX = 9).
+
+Isliye hum string ko left se right traverse karte hain
+aur current character ko next character se compare karte hain.
+
+Agar current value < next value,
+to iska matlab subtraction case hai,
+to current value ko answer me subtract kar dete hain.
+
+Agar current value >= next value,
+to normal case hai,
+to current value ko answer me add kar dete hain.
+
+Is tarah poori string traverse karne ke baad final integer mil jata hai.
+
+Example:
+MCMXCIV
+M = +1000
+C < M → -100
+M = +1000
+X < C → -10
+C = +100
+I < V → -1
+V = +5
+
+Total = 1994
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int romanToInt(String s) {
+        HashMap<Character, Integer> map = new HashMap<>();
+
+        map.put('V', 5);
+        map.put('I', 1);
+        map.put('X', 10);
+        map.put('L', 50);
+        map.put('C', 100);
+        map.put('D', 500);
+        map.put('M', 1000);
+
+        int ans = 0;
+        for(int i=0; i<s.length(); i++){
+            if(i+1 < s.length() && map.get(s.charAt(i)) < map.get(s.charAt(i+1))){
+                ans -= map.get(s.charAt(i));
+            }
+            else{
+                ans += map.get(s.charAt(i));
+            }
+        }
+        return ans;
+    }
+}
