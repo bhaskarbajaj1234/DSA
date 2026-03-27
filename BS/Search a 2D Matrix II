@@ -1,0 +1,156 @@
+#Approach:
+
+Approach (Hinglish) – Search a 2D Matrix II
+
+Is matrix mein:
+1. Har row left to right sorted hai
+2. Har column top to bottom sorted hai
+
+Yaha pure matrix ko 1D sorted array nahi maan sakte,
+isliye previous question wali binary search trick directly apply nahi hoti.
+
+Is question ka best idea hai:
+Top-right corner se start karo.
+
+--------------------------------------------------
+Why top-right?
+--------------------------------------------------
+Top-right element ke paas ek special property hoti hai:
+
+1. Uske left wale elements usse chhote honge
+2. Uske neeche wale elements usse bade honge
+
+Toh ek hi comparison mein hum ek poori row ya ek poora column eliminate kar sakte hain.
+
+--------------------------------------------------
+Steps
+--------------------------------------------------
+1. Start:
+   row = 0
+   col = m - 1
+
+   Matlab first row ke last column se start kar rahe hain
+
+2. Jab tak row matrix ke andar hai aur col valid hai:
+   - Agar matrix[row][col] == target
+     -> target mil gaya -> return true
+
+   - Agar matrix[row][col] < target
+     -> current element chhota hai
+     -> is row ke saare left elements bhi aur chhote honge
+     -> isliye poori current row eliminate kar do
+     -> row++
+
+   - Agar matrix[row][col] > target
+     -> current element bada hai
+     -> is column ke neeche wale elements aur bade honge
+     -> isliye poora current column eliminate kar do
+     -> col--
+
+3. Agar loop khatam ho gaya,
+   matlab target matrix mein nahi hai
+   -> return false
+
+--------------------------------------------------
+Why row++ when current < target?
+--------------------------------------------------
+Kyuki hum top-right par hain.
+Agar current value target se chhoti hai,
+to us row mein uske left ke saare elements aur bhi chhote honge.
+Toh current row mein target ho hi nahi sakta.
+Isliye next row par jaate hain.
+
+--------------------------------------------------
+Why col-- when current > target?
+--------------------------------------------------
+Agar current value target se badi hai,
+to us column ke neeche ke saare elements aur bade honge.
+Toh current column mein target nahi ho sakta.
+Isliye left move karke column hata dete hain.
+
+--------------------------------------------------
+Dry Run
+--------------------------------------------------
+matrix =
+[
+ [1, 4, 7, 11],
+ [2, 5, 8, 12],
+ [3, 6, 9, 16],
+ [10,13,14,17]
+]
+
+target = 6
+
+Start at top-right = 11
+11 > 6 -> left jao
+
+Now 7
+7 > 6 -> left jao
+
+Now 4
+4 < 6 -> down jao
+
+Now 5
+5 < 6 -> down jao
+
+Now 6
+Mil gaya -> return true
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Har step mein ya to ek row niche ja rahe hain
+ya ek column left ja rahe hain.
+
+Maximum moves:
+n rows + m columns
+
+So Time = O(n + m)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+O(1)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Top-right se start karo,
+agar value chhoti ho to niche jao,
+agar badi ho to left jao,
+aur har step mein ek row ya ek column eliminate kar do.
+
+Quick Revision – Search a 2D Matrix II
+
+1. Top-right corner se start karo
+2. Agar current == target -> return true
+3. Agar current < target -> row++
+4. Agar current > target -> col--
+5. Har step mein ek row ya column eliminate hota hai
+
+Time: O(n + m)
+Space: O(1)
+
+#Code:
+
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        int n = matrix.length;
+        int m = matrix[0].length;
+        int row = 0;
+        int col = m-1;
+
+        while(row < n && col >= 0){
+            if(matrix[row][col] == target){
+                return true;
+            }
+            else if(matrix[row][col] < target){
+                row++;
+            }
+            else{
+                col--;
+            }
+        }
+        return false;
+    }
+}
