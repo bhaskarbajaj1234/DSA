@@ -1,0 +1,35 @@
+#Code:
+
+class MyStack {
+    int top;
+    int arr[];
+
+    MyStack() {
+        top = -1;
+        arr = new int[1000];
+    }
+
+    void push(int a) {
+      //You can code here
+      if(top == arr.length){
+        return;
+      }
+      else{
+        top++;
+        arr[top] = a;
+      }
+    }
+
+    int pop() {
+        //You can code here
+        int temp;
+        if(top == -1){
+            return -1;
+        }
+        else{
+            temp = arr[top];
+            top--;
+        }
+        return temp;
+    }
+}
