@@ -1,0 +1,57 @@
+#Approach:
+
+Approach:
+Ye problem stack se solve hoti hai using LIFO concept.
+
+1. String ko left se right traverse karte hain.
+2. Agar opening bracket mile ( ( { [ ), to stack me push kar do.
+3. Agar closing bracket mile:
+   - Agar stack empty hai → koi matching opening nahi → return 0.
+   - Stack se top pop karo aur check karo ki matching pair hai ya nahi.
+   - Agar matching nahi hai → return 0.
+4. Loop ke end me:
+   - Agar stack empty hai → sab brackets balanced → return 1.
+   - Agar stack empty nahi hai → kuch opening brackets bach gaye → return 0.
+
+Main idea:
+Har closing bracket ko uske nearest opening bracket se match karna hota hai,
+isliye stack use karte hain (Last opened → First close).
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque;
+
+public class Solution {
+    public int isBalanced(String A) {
+        //You can code here
+
+        Deque<Character> stack = new ArrayDeque<>();
+        for(int i=0; i<A.length(); i++){
+          char ch = A.charAt(i);
+
+          if(ch == '(' || ch == '{' || ch == '['){
+            stack.push(ch);
+          }
+          else{
+            if(stack.isEmpty()) return 0;
+
+            char opening = stack.pop();
+            if((ch == ')' && opening == '(') || (ch == '}' && opening == '{') || (ch == ']' && opening == '[')){
+              continue;
+            }
+            else{
+              return 0;
+            }
+          }
+        }
+        if(stack.isEmpty()){
+          return 1;
+        }else{
+          return 0;
+        }
+    }
+}
