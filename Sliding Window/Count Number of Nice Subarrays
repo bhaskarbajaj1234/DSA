@@ -1,0 +1,56 @@
+#Approach:
+
+Approach:
+Ye code exactly k odd numbers wale subarrays count karta hai using:
+
+Exact(k) = AtMost(k) - AtMost(k - 1)
+
+1. helper(nums, k) count karta hai kitne subarrays me at most k odd numbers hain.
+2. Sliding window use hoti hai:
+   - right pointer se window expand karte hain
+   - nums[right] % 2 se check karte hain ki current number odd hai ya nahi
+3. Agar odd count k se zyada ho jaaye,
+   to left pointer aage badha ke window shrink karte hain.
+4. Har valid window ke liye
+   (right - left + 1) subarrays add ho jaate hain.
+5. Final answer:
+   helper(k) - helper(k-1)
+
+Main idea:
+Exactly k odd count directly nikalna tough hota hai,
+isliye pehle at most k aur at most k-1 nikaal ke difference lete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    
+    public int helper(int[] nums, int k){
+        if(k < 0) return 0;
+        int left = 0;
+        int right = 0;
+        int cnt = 0;
+        int sum = 0;
+
+        while(right < nums.length){
+            sum += (nums[right] % 2);
+
+            while(sum > k){
+                sum -= (nums[left] % 2);
+                left++;
+            }
+            cnt += (right - left + 1);
+            right++;
+        }
+        return cnt;
+    }
+
+    public int numberOfSubarrays(int[] nums, int k) {
+        int val1 = helper(nums, k);
+        int val2 = helper(nums, k-1);
+        int result = val1 - val2;
+        return result;
+    }
+}
