@@ -1,0 +1,89 @@
+#Approach:
+
+Approach:
+Ye code har bar ko rectangle ki minimum height maan kar uska maximum possible area nikalta hai.
+
+1. Har index ke liye previous smaller element ka index nikaala gaya hai.
+   Matlab left me pehla chhota bar kahan hai.
+2. Har index ke liye next smaller element ka index bhi nikaala gaya hai.
+   Matlab right me pehla chhota bar kahan hai.
+3. Ab current bar height ke liye rectangle ki width hogi:
+   ns[i] - ps[i] - 1
+4. Rectangle area:
+   height[i] * width
+5. Har bar ke liye area calculate karke maximum area store kar lete hain.
+
+Main idea:
+Agar kisi bar ko rectangle ki height maana jaye,
+to rectangle left aur right me tab tak extend karega jab tak smaller bar na mil jaaye.
+
+Important:
+- previous smaller nahi mile to -1
+- next smaller nahi mile to n
+Ye boundary handling width nikalne ke liye zaroori hai.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque;
+
+class Solution {
+
+    public int[] previousSmaller(int[] heights){
+        int n = heights.length;
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        int[] ans = new int[n];
+
+        for(int i=0; i<n; i++){
+            while(!stack.isEmpty() && heights[stack.peek()] >= heights[i]){
+                stack.pop();
+            }
+
+            if(stack.isEmpty()){
+                ans[i] = -1;
+            }
+            else{
+                ans[i] = stack.peek();
+            }
+            stack.push(i);
+        }
+        return ans;
+    }
+    public int[] nextSmaller(int[] heights){
+        int n = heights.length;
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        int[] ans = new int[n];
+
+        for(int i=n-1; i>=0; i--){
+            while(!stack.isEmpty() && heights[stack.peek()] >= heights[i]){
+                stack.pop();
+            }
+
+            if(stack.isEmpty()){
+                ans[i] = n;
+            }
+            else{
+                ans[i] = stack.peek();
+            }
+            stack.push(i);
+        }
+        return ans;
+    }
+
+    public int largestRectangleArea(int[] heights) {
+        int n = heights.length;
+        int[] ps = previousSmaller(heights);
+        int[] ns = nextSmaller(heights);
+        int maxVal = 0;
+
+        for(int i=0; i<n; i++){
+            int curr = (ns[i] - ps[i] - 1) * heights[i];
+            maxVal = Math.max(maxVal, curr);
+        }
+        return maxVal;
+
+    }
+}
