@@ -1,0 +1,61 @@
+#Approach:
+
+Approach:
+Ye code prefix ko postfix me convert karne ke liye reverse + stack use karta hai.
+
+1. Prefix expression ko pehle reverse kar dete hain.
+2. Ab reversed string ko left se right traverse karte hain.
+3. Agar operand mile, to stack me push kar do.
+4. Agar operator mile, to stack se top ke 2 operands pop karo:
+   - first pop = first operand
+   - second pop = second operand
+5. Postfix banane ka rule:
+   first + second + operator
+6. Is new string ko stack me push kar do.
+7. End me stack ka top hi final postfix expression hoga.
+
+Main idea:
+Prefix: operator operand operand
+Postfix: operand operand operator
+Isliye reverse karke process karte hain aur operator ko last me laga dete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+
+    public boolean isOperator(Character a){
+        if((a == '+') || (a == '-') || (a == '*') || (a == '/')){
+            return true;
+        }
+        return false;
+    }
+
+    public String prefixToPostfix(String s) {
+        // Your code goes here
+        StringBuilder sb = new StringBuilder(s);
+        sb.reverse();
+        int n = sb.length();
+        int i = 0;
+        ArrayDeque<String> stack = new ArrayDeque<>();
+
+        while(i < n){
+            char ch = sb.charAt(i);
+            //if ch is an operator: first + second + operator
+            if(isOperator(ch)){
+                String first = stack.pop();
+                String second = stack.pop();
+                String temp = first + second + ch;
+                stack.push(temp);
+            }
+            //if ch is an operand
+            else{
+                stack.push(Character.toString(ch));
+            }
+            i++;
+        }
+        return stack.peek();
+    }
+}
