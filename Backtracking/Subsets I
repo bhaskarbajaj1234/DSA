@@ -1,0 +1,118 @@
+#Approach:
+
+Approach (Hinglish) – Subset Sums
+
+Is question mein hume saare subsets ka sum return karna hai.
+Subset ka matlab: har element ke paas 2 choices hoti hain:
+1. Include karo
+2. Exclude karo
+
+Aur jab array khatam ho jaye, tab jo sum bana hai usse list mein add kar dena hai.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Har index par 2 recursive calls hongi:
+1. Element ko include karo → sum + nums[index]
+2. Element ko exclude karo → sum same rahega
+
+Jab index array ke end par pahunch jaye,
+to current sum ko result list mein add kar do.
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(nums, index, sum, result)
+
+nums = given array
+index = current element index
+sum = ab tak ka subset sum
+result = final list jisme saare subset sums store honge
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+if(index == nums.length)
+Matlab humne saare elements consider kar liye
+
+To ab jo sum bana hai,
+usse result mein add kar do.
+
+--------------------------------------------------
+Recursive Choices
+--------------------------------------------------
+1. Pick current element:
+helper(nums, index + 1, sum + nums[index], result)
+
+2. Do not pick current element:
+helper(nums, index + 1, sum, result)
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+nums = [2, 3]
+
+Subsets:
+[] → sum = 0
+[2] → sum = 2
+[3] → sum = 3
+[2,3] → sum = 5
+
+Output:
+[0, 2, 3, 5]
+
+--------------------------------------------------
+Recursion Tree
+--------------------------------------------------
+             (0)
+           /     \
+        +2         skip
+       /             \
+     (2)             (0)
+    /   \           /   \
+ +3     skip     +3     skip
+(5)     (2)     (3)     (0)
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Total subsets = 2^n
+So time complexity = O(2^n)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har element ko include/exclude karke saare subsets banao
+aur har subset ka sum store kar lo.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+
+    public List<Integer> subsetSums(int[] nums) {
+        List<Integer> result = new ArrayList<>();
+        helper(nums, 0, 0, result);
+        return result;
+    }
+
+    public void helper(int[] nums, int index, int sum, List<Integer> result) {
+        // Base case
+        if (index == nums.length) {
+            result.add(sum);
+            return;
+        }
+
+        // Pick the element
+        helper(nums, index + 1, sum + nums[index], result);
+
+        // Do not pick the element
+        helper(nums, index + 1, sum, result);
+    }
+}
