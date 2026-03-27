@@ -1,0 +1,113 @@
+#Approach:
+
+Approach (Hinglish) – Josephus Problem (Recursion)
+
+Josephus problem mein n log circle mein baithe hote hain
+aur har baar k-th person eliminate hota hai.
+Elimination ke baad counting next person se start hoti hai.
+Hume last bacha hua (safe position) find karna hai.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Is problem ka ek famous recursive formula hota hai:
+
+f(n, k) = (f(n-1, k) + k-1) % n + 1   (for 1-based indexing)
+
+Yaha:
+f(n, k) = safe position jab n log ho
+f(n-1, k) = safe position jab ek person eliminate ho gaya aur n-1 log bache
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar sirf 1 person hai:
+Safe position obviously 1 hi hogi.
+
+if(n == 1) return 1;
+
+--------------------------------------------------
+Recursive Logic Samjho
+--------------------------------------------------
+Maan lo hume f(n-1, k) pata hai,
+matlab jab ek person eliminate ho gaya,
+to remaining circle mein safe position kya hai.
+
+Ab jab original circle mein wapas map karte hain,
+to position shift ho jaati hai,
+kyuki counting k steps ke baad start hoti hai.
+
+Isliye formula:
+(f(n-1, k) + k-1) % n + 1
+
+Yaha:
++ k-1 -> shift because counting starts after elimination
+% n -> circular rotation handle karne ke liye
++1 -> 1-based indexing maintain karne ke liye
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+n = 3, k = 2
+
+f(1,2) = 1
+
+f(2,2) = (1 + 2 - 1) % 2 + 1
+       = (2 % 2) + 1
+       = 1
+
+f(3,2) = (1 + 2 - 1) % 3 + 1
+       = (2 % 3) + 1
+       = 3
+
+Answer = 3
+
+--------------------------------------------------
+Intuition Simple Words Mein
+--------------------------------------------------
+Har step par ek person eliminate hota hai
+aur problem size n se n-1 ho jaati hai.
+Jo safe position chhote circle mein milti hai,
+usse original circle mein shift karke new safe position mil jaati hai.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Har recursive call mein n 1 se kam ho raha hai:
+O(n)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack:
+O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Chhote circle ki safe position ko k steps shift karke
+bade circle ki safe position mil jaati hai.
+
+Quick Revision – Josephus Problem
+
+Formula:
+f(n, k) = (f(n-1, k) + k-1) % n + 1
+
+Base case:
+f(1, k) = 1
+
+Time: O(n)
+Space: O(n)
+
+#Code:
+
+public class Solution
+{
+    public int josephus(int n, int k){
+      //Base case
+      if(n==1) return 1;
+
+      return (josephus(n-1, k) + k-1)%n+1; //This is for 1-based indexing
+    }
+
+}
