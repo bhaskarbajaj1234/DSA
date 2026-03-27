@@ -1,0 +1,45 @@
+#Approach:
+
+Approach:
+Ye code string ko reverse karne ke liye stack ka LIFO principle use karta hai.
+
+1. Pehle string ke sab characters ko stack me push kar dete hain.
+2. Stack LIFO (Last In First Out) follow karta hai,
+   isliye jo last character push hua tha wo sabse pehle pop hoga.
+3. Ab stack se ek-ek character pop karke new char array me daalte jaate hain.
+4. Isse string reverse order me mil jaati hai.
+
+Main idea:
+Stack ka LIFO nature string reverse karne me help karta hai:
+Push → a b c d
+Pop → d c b a
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque; 
+
+public class Solution {
+    public char[] reverseString(char[] s) {
+        //You can code here
+
+        Deque<Character> stack = new ArrayDeque<>();
+        int n = s.length;
+
+        for(int i=0; i<n; i++){
+          stack.push(s[i]);
+        }
+
+        char[] newString = new char[n];
+
+        for(int i=0; i<n; i++){
+          newString[i] = stack.pop();
+        }
+
+        return newString;
+      
+    }
+}
