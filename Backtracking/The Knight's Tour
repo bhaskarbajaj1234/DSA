@@ -1,0 +1,289 @@
+#Approach:
+
+Approach (Hinglish) – The Knight's Tour (According to This Code)
+
+Is code mein hum knight ko starting position (0,0) se chalate hain
+aur try karte hain ki wo board ke har cell ko exactly ek baar visit kare.
+
+Agar possible hai, to board mein har cell par visit order store hota hai.
+Agar possible nahi hai, to poora board -1 se fill karke return karte hain.
+
+--------------------------------------------------
+Board Initialization
+--------------------------------------------------
+Sabse pehle ek n x m matrix banayi gayi hai:
+int[][] arr = new int[n][m];
+
+Phir poori matrix ko -1 se fill kiya gaya hai.
+Yaha -1 ka matlab hai:
+ye cell abhi tak visit nahi hua hai.
+
+Start position hamesha (0,0) hai,
+isliye:
+arr[0][0] = 0
+
+Matlab knight ne sabse pehle (0,0) visit kiya.
+
+--------------------------------------------------
+Knight Moves
+--------------------------------------------------
+Knight ke total 8 possible moves hote hain.
+Code mein unhe 2 arrays se store kiya gaya hai:
+
+moveX = {2, 1, -1, -2, -2, -1, 1, 2}
+moveY = {1, 2, 2, 1, -1, -2, -2, -1}
+
+Har index i ek valid knight move represent karta hai:
+nextX = currX + moveX[i]
+nextY = currY + moveY[i]
+
+Matlab knight L-shape mein move karta hai:
+2 step ek direction mein aur 1 step doosri direction mein.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Ye Backtracking problem hai.
+
+Current cell se knight ke 8 possible moves try kiye jaate hain.
+Jo move valid hota hai, us cell ko current step number se mark karte hain,
+fir recursion se aage ka path check karte hain.
+
+Agar aage poora tour complete ho jata hai,
+to true return kar dete hain.
+
+Agar aage jaake knight atak jata hai,
+to current move ko undo karte hain
+aur next possible move try karte hain.
+
+--------------------------------------------------
+isValid Function
+--------------------------------------------------
+Ye function check karta hai ki next move valid hai ya nahi.
+
+Valid hone ke liye:
+1. nextX board ke andar ho
+2. nextY board ke andar ho
+3. Wo cell pehle visit na hua ho, yani arr[nextX][nextY] == -1
+
+Agar teeno conditions satisfy ho jayein,
+to knight waha ja sakta hai.
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+knightTourHelper(arr, n, m, currX, currY, moveX, moveY, step)
+
+Yaha:
+currX, currY = knight ki current position
+step = current move number jo next cell par fill hoga
+
+Example:
+Start mein (0,0) already 0 mark hai,
+isliye helper ko step = 1 ke saath call kiya gaya hai.
+
+Matlab:
+ab jo next valid cell hoga, use 1 mark kiya jayega.
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+if(step == n * m){
+    return true;
+}
+
+Iska matlab:
+Agar step n*m tak pahunch gaya,
+to knight ne board ke total n*m cells cover kar liye.
+Tour successfully complete ho gaya.
+Isliye true return kar do.
+
+--------------------------------------------------
+Recursive Flow
+--------------------------------------------------
+Har recursive call mein:
+
+1. 8 possible knight moves ko loop se try karte hain
+2. Har move ke liye nextX aur nextY calculate karte hain
+3. Agar move valid hai:
+   - arr[nextX][nextY] = step
+   - recursion call karte hain with step + 1
+
+Code:
+boolean aageRastaHai = knightTourHelper(..., step + 1);
+
+Agar recursion true return karta hai:
+-> Matlab aage ka full path mil gaya
+-> directly true return kar do
+
+Agar recursion false return karta hai:
+-> Matlab ye move aage chalke fail ho gaya
+-> is cell ko wapas -1 karo
+-> ye backtracking hai
+
+--------------------------------------------------
+Backtracking ka Role
+--------------------------------------------------
+Maan lo knight ne kisi cell par move kiya,
+lekin baad mein pata chala ki us path se poora board cover nahi ho pa raha.
+
+To hume wapas aana padega
+aur us move ko cancel karna padega.
+
+Isliye:
+arr[nextX][nextY] = -1
+
+Ye undo step next possible move try karne ke liye zaroori hai.
+
+Pattern:
+choose -> recurse -> undo
+
+--------------------------------------------------
+If no path is possible
+--------------------------------------------------
+Helper function true/false return karta hai.
+
+Agar:
+boolean possible = knightTourHelper(...)
+
+aur possible false aata hai,
+to code poori matrix ko dobara -1 se fill kar deta hai.
+
+Iska matlab:
+Knight's tour possible nahi tha,
+isliye final answer all -1 matrix return hogi.
+
+--------------------------------------------------
+Important Observation
+--------------------------------------------------
+Code first successful path milte hi return kar deta hai.
+Ye saare tours generate nahi karta,
+sirf ek valid tour dhoondta hai.
+
+Aur question mein bhi wahi required hai:
+return any one valid tour
+
+--------------------------------------------------
+Example Intuition
+--------------------------------------------------
+Suppose board 5 x 5 hai.
+
+Start:
+arr[0][0] = 0
+
+Ab helper next valid knight move par 1 mark karega,
+fir next par 2,
+fir next par 3...
+
+Agar kisi path se 25 cells fill ho gaye,
+to board answer hai.
+
+Agar beech mein koi move kaam nahi karta,
+to backtrack karke doosra move try hota hai.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case mein har cell se 8 moves try ho sakte hain,
+to solution exponential nature ka hota hai.
+
+Roughly:
+O(8^(n*m)) worst case
+
+Kyuki backtracking saare possible paths explore kar sakta hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Board storage = O(n*m)
+Recursion stack = O(n*m)
+
+Total auxiliary space = O(n*m)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Knight ko har step par 8 possible moves mein se valid move par bhejo,
+agar aage full tour mil jaye to answer return karo,
+warna move undo karke backtrack karo.
+
+Quick Revision – Knight's Tour
+
+1. Board ko -1 se fill karo
+2. Start cell (0,0) ko 0 mark karo
+3. Knight ke 8 moves arrays mein store karo
+4. Har valid move par next step number fill karo
+5. Recursively aage solve karo
+6. Agar fail ho to cell ko -1 karke backtrack karo
+7. Agar step == n*m ho gaya -> tour complete
+8. Agar koi path nahi mila -> all -1 matrix return karo
+
+Concept:
+Backtracking
+
+Time: Exponential
+Space: O(n*m)
+
+#Code:
+
+public class Solution {
+  
+    public static int[][] knightTour(int n, int m) {
+        //You can code here
+      int[][] arr = new int[n][m];
+
+      //making the whole array to -1 representing unvisited
+      for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+          arr[i][j] = -1;
+        }
+      }
+      arr[0][0] = 0; //position 1 is visited
+      int step = 1;
+      int[] moveX = {2, 1, -1, -2, -2, -1, 1, 2};
+      int[] moveY = {1, 2, 2, 1, -1, -2, -2, -1};
+
+      boolean possible = knightTourHelper(arr, n, m, 0, 0, moveX, moveY, 1); 
+      if (!possible) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    arr[i][j] = -1;
+                }
+            }
+      }
+      return arr;     
+        
+    }
+
+    public static boolean isValid(int[][] arr, int n, int m, int currX, int currY){
+      if(currX >= 0 && currX < n && currY >=0 && currY < m && arr[currX][currY] == -1){
+        return true;
+      }
+      return false;
+    }
+
+    public static boolean knightTourHelper(int[][] arr, int n, int m, int currX, int currY, int[] moveX, int[] moveY, int step){
+      //Base case
+      if(step == n*m){
+        return true;
+      }
+
+      for(int i=0; i<8; i++){
+        int nextX = currX + moveX[i];
+        int nextY = currY + moveY[i];
+
+        if(isValid(arr, n, m, nextX, nextY)){
+          arr[nextX][nextY] = step;
+          boolean aageRastaHai = knightTourHelper(arr, n, m, nextX, nextY, moveX, moveY, step + 1);
+
+          if(aageRastaHai){
+            return true;
+          }
+          else{
+            arr[nextX][nextY] = -1; // backtrack
+          }
+        }
+      }
+      return false;
+    }
+}
