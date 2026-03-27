@@ -1,0 +1,45 @@
+#Approach:
+
+Longest Common Prefix – Sorting Approach
+
+Is problem me hume sabhi strings ka longest common prefix nikalna hota hai.
+
+Is approach me hum pehle poora string array sort kar dete hain.
+Sorting ke baad jo first string hogi wo lexicographically smallest hogi
+aur last string lexicographically largest hogi.
+
+Longest common prefix sirf first aur last string compare karke mil jayega,
+kyunki baaki saari strings unke beech me hongi aur unka prefix bhi same range me hi hoga.
+
+Ab first aur last string ko character by character compare karte hain.
+Jab tak characters same hain, tab tak prefix me add karte jaate hain.
+Jaise hi mismatch mile, waha stop kar dete hain.
+
+Jo prefix ab tak mila hai wahi longest common prefix hoga.
+
+Time Complexity: O(n log n + m)
+n = number of strings
+m = length of smallest string
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public String longestCommonPrefix(String[] strs) {
+        Arrays.sort(strs);
+        StringBuilder result = new StringBuilder();
+        int n = strs.length;
+        char[] first = strs[0].toCharArray();
+        char[] last = strs[n-1].toCharArray();
+
+        int minLen = Math.min(first.length, last.length);
+
+        for(int i=0; i<minLen; i++){
+            if(first[i] != last[i]){
+                break;
+            }
+            result.append(first[i]);
+        }
+        return result.toString();
+    }
+}
