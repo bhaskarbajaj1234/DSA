@@ -1,0 +1,52 @@
+#Approach:
+
+Approach:
+Ye code sliding window use karta hai longest substring nikalne ke liye
+jise at most k replacements se same character wala bana sakein.
+
+1. Window [left ... right] maintain karte hain.
+2. hash array se current window me har character ki frequency store karte hain.
+3. maxFreq current window ke kisi bhi character ki maximum frequency batata hai.
+4. Agar window length - maxFreq > k ho,
+   matlab itne characters replace karne padenge jo k se zyada hain,
+   to window invalid ho gayi, isliye left ko aage badha dete hain.
+5. Agar valid hai, to current window length se maxLen update karte rehte hain.
+
+Main idea:
+Agar window me sabse frequent character maxFreq baar aa raha hai,
+to baaki sab characters ko replace karke poori window same bana sakte hain.
+Required replacements = window size - maxFreq
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int characterReplacement(String s, int k) {
+
+        int n = s.length();
+        int left = 0;
+        int right = 0;
+        int[] hash = new int[26];
+
+        int maxFreq = 0;
+        int maxLen = 0;
+
+        while (right < n) {
+
+            hash[s.charAt(right) - 'A']++;
+            maxFreq = Math.max(maxFreq, hash[s.charAt(right) - 'A']);
+
+            if ((right - left + 1) - maxFreq > k) {
+                hash[s.charAt(left) - 'A']--;
+                left++;
+            }
+
+            maxLen = Math.max(maxLen, right - left + 1);
+            right++;
+        }
+
+        return maxLen;
+    }
+}
