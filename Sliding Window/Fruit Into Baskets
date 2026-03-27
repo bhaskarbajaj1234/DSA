@@ -1,0 +1,51 @@
+#Approach:
+
+Approach:
+Ye code sliding window + HashMap use karta hai longest subarray nikalne ke liye
+jisme at most 2 different fruits ho.
+
+1. Do pointers use hue hain:
+   - l = window start
+   - r = window end
+2. Jaise hi new fruit window me aata hai, uski frequency map me increase kar dete hain.
+3. Agar map.size() > 2 ho gaya,
+   matlab 2 se zyada fruit types aa gaye,
+   to left side se window shrink karte hain.
+4. Shrink karte time fruits[l] ki frequency kam karte hain,
+   aur agar 0 ho jaaye to map se remove kar dete hain.
+5. Jab window me sirf 2 ya usse kam fruit types bachte hain,
+   to current window length se maxLen update kar dete hain.
+
+Main idea:
+Question basically longest subarray with at most 2 distinct elements hai.
+
+Time Complexity: O(n)
+Space Complexity: O(1) / O(2) practically
+
+#Code:
+
+class Solution {
+    public int totalFruits(int[] fruits) {
+        //your code goes here
+        int l = 0;
+        int r = 0;
+        int n = fruits.length;
+        int maxLen = 0;
+        HashMap<Integer, Integer> map = new HashMap<>();
+
+        while(r < n){
+            map.put(fruits[r], map.getOrDefault(fruits[r],0)+1);
+
+            if(map.size() > 2){
+                map.put(fruits[l], map.get(fruits[l])-1);
+                if(map.get(fruits[l]) == 0) map.remove(fruits[l]);
+                l++;
+            }
+            if(map.size() <= 2){
+                maxLen = Math.max(maxLen, r-l+1);
+            }
+            r++;
+        }
+        return maxLen;
+    }
+}
