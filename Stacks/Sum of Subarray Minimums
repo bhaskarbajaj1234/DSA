@@ -1,0 +1,87 @@
+#Approach:
+
+Approach:
+Ye code har element ka contribution nikalta hai as minimum of subarrays.
+
+1. Har arr[i] ke liye do cheeze nikaali gayi hain:
+   - PSE = Previous Smaller Element ka index
+   - NSE = Next Smaller Element ka index
+2. In dono se pata chalta hai ki arr[i] kitne subarrays me minimum ban sakta hai.
+3. Left choices = i - pse[i]
+   Right choices = nse[i] - i
+4. Total subarrays jisme arr[i] minimum hoga:
+   left * right
+5. To arr[i] ka contribution:
+   arr[i] * left * right
+6. Sab elements ka contribution add karke final answer milta hai.
+
+Main idea:
+Har subarray alag se generate nahi kar rahe.
+Bas ye count kar rahe hain ki koi element minimum kitni baar ban raha hai.
+
+Important edge point:
+- PSE me '>' use kiya hai
+- NSE me '>=' use kiya hai
+Ye duplicate elements ke case me double counting avoid karne ke liye kiya gaya hai.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public int sumSubarrayMins(int[] arr) {
+
+        int[] pse = findPse(arr);
+        int[] nse = findNse(arr);
+        long total = 0;
+        int mod = (int)(1e9 + 7);
+
+        for(int i=0; i<arr.length; i++){
+            int left = i - pse[i];
+            int right = nse[i] - i;
+            long contri = (right * left) % mod;
+            contri = (contri * arr[i]) % mod;
+
+            total = (total + contri) % mod;
+        }
+
+        return (int)total;
+    }
+
+    private int[] findNse(int[] arr){
+        Deque<Integer> stack = new ArrayDeque<>();
+        int n = arr.length;
+        int[] nse = new int[n];
+
+        for(int i=n-1; i>=0; i--){
+            while(!stack.isEmpty() && arr[stack.peek()] >= arr[i]){
+                stack.pop();
+            }
+
+            nse[i] = stack.isEmpty() ? n : stack.peek();
+            stack.push(i);
+        }
+        return nse;
+    }
+
+    private int[] findPse(int[] arr){
+        Deque<Integer> stack = new ArrayDeque<>();
+        int n = arr.length;
+        int[] pse = new int[n];
+
+        for(int i=0; i<n; i++){
+            //Why there is no = sign in while condition ?
+            // Because of an edge case where elements are same say 1,1. In this case
+            // the 1st index element 1 will duplicate a subarray that has already been calculated as a result 
+            // to eliminate this edge case, we didn't use = sign
+            while(!stack.isEmpty() && arr[stack.peek()] > arr[i]){
+                stack.pop();
+            }
+
+            pse[i] = stack.isEmpty() ? -1 : stack.peek();
+            stack.push(i);
+        }
+        return pse;
+    }
+}
