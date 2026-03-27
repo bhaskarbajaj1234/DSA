@@ -1,0 +1,207 @@
+#Approach:
+
+Approach (Hinglish) – Smart Keypad Problem (Backtracking)
+
+Is problem mein hume phone keypad ke digits diye gaye hain (2–9),
+aur hume un digits se possible saare letter combinations generate karne hain.
+
+Jaise old mobile keypad hota tha:
+2 -> abc
+3 -> def
+4 -> ghi
+5 -> jkl
+6 -> mno
+7 -> pqrs
+8 -> tuv
+9 -> wxyz
+
+Agar input = "23"
+To combinations honge:
+a + d,e,f
+b + d,e,f
+c + d,e,f
+=> ad, ae, af, bd, be, bf, cd, ce, cf
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Har digit ke paas kuch letters mapped hote hain.
+Har digit ke letters me se ek choose karna hai,
+aur next digit ke letters ke saath combine karna hai.
+
+Ye basically combinations generate karna hai,
+isliye Backtracking use hota hai.
+
+--------------------------------------------------
+Mapping Array
+--------------------------------------------------
+String[] map = {
+ "", "", "abc", "def", "ghi", "jkl",
+ "mno", "pqrs", "tuv", "wxyz"
+};
+
+Index = digit
+Value = us digit ke letters
+
+Example:
+digit '2' -> map[2] = "abc"
+
+--------------------------------------------------
+Recursive Function Meaning
+--------------------------------------------------
+smartKeypadHelper(digits, map, i, curr, ans)
+
+digits = input string
+i = current digit index
+curr = abhi tak bana hua combination
+ans = final answer list
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar i == digits.length()
+-> Matlab humne sab digits process kar liye
+-> curr ek complete combination ban gaya
+-> ise ans mein add kar do
+
+--------------------------------------------------
+Recursive Logic
+--------------------------------------------------
+1. Current digit nikalo:
+int smartKeypadNumber = digits.charAt(i) - '0';
+
+2. Us digit ke letters nikalo:
+String smartKeypadString = map[smartKeypadNumber];
+
+3. Ab har letter ke liye recursion call karo:
+
+for each character in smartKeypadString:
+    curr + character
+    recursion for next digit (i+1)
+    backtrack
+
+--------------------------------------------------
+Backtracking Step
+--------------------------------------------------
+curr = curr + letter
+recursive call
+curr = curr.substring(0, curr.length()-1)
+
+Ye last wala step backtracking hai.
+Isse curr string wapas previous state mein aa jaati hai
+taaki next letter try kar sake.
+
+Pattern:
+choose -> recurse -> undo
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+digits = "23"
+
+Step 1:
+Digit '2' -> "abc"
+
+Step 2:
+For 'a'
+Digit '3' -> "def"
+=> ad, ae, af
+
+For 'b'
+=> bd, be, bf
+
+For 'c'
+=> cd, ce, cf
+
+--------------------------------------------------
+Recursion Tree
+--------------------------------------------------
+            ""
+         /    |    \
+        a     b     c
+      / | \  / | \  / | \
+     d  e  f d e f d e f
+
+So combinations:
+ad, ae, af, bd, be, bf, cd, ce, cf
+
+--------------------------------------------------
+Why sorted order automatically milta hai?
+--------------------------------------------------
+Kyuki map array mein letters already sorted hain
+aur recursion left to right chal raha hai,
+isliye combinations automatically lexicographical order mein generate hote hain.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Har digit ke approx 3–4 letters hote hain.
+Agar total digits = n,
+to combinations ≈ 4^n
+
+So Time = O(4^n)
+
+Constraints mein n <= 4 hai,
+isliye manageable hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+Answer list = O(4^n * n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har digit ke letters me se ek choose karo,
+next digit ke letters ke saath combine karo,
+aur backtracking se saare combinations generate karo.
+
+Quick Revision – Smart Keypad
+
+1. Digit -> letters mapping use karo
+2. Har digit ke letters me se ek choose karo
+3. Recursively next digit ke liye call karo
+4. Backtracking se next letter try karo
+5. Jab i == digits.length() -> combination ready
+
+Concept:
+Backtracking (Combinations)
+
+Time: O(4^n)
+Space: O(n)
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public List<String> letterCombinations(String digits) {
+        //You can code here
+
+      String[] map = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+
+      ArrayList<String> ans = new ArrayList<>();
+
+      smartKeypadHelper(digits, map, 0, "", ans);
+
+      return ans;      
+    }
+
+    public void smartKeypadHelper(String digits, String[] map, int i, String curr, ArrayList<String> ans){
+      //Base case
+      if(i == digits.length()){
+        ans.add(curr);
+        return;
+      }
+
+      int smartKeypadNumber = digits.charAt(i) - '0';
+      String smartKeypadString = map[smartKeypadNumber];
+
+      for(int j=0; j<smartKeypadString.length(); j++){
+        curr = curr + smartKeypadString.charAt(j);
+        smartKeypadHelper(digits, map, i+1, curr, ans);
+        curr = curr.substring(0, curr.length()-1);
+      }
+    }
+}
