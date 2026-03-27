@@ -1,0 +1,53 @@
+#Approach:
+
+Approach:
+Ye code try karta hai ki k cards me kitne front se aur kitne back se lene chahiye
+taaki maximum sum mile.
+
+1. Pehle k cards ka sum left side se nikaal liya gaya hai.
+   Isse ek initial answer mil gaya.
+2. Ab step by step:
+   - left side se ek card hata rahe hain
+   - right side se ek card add kar rahe hain
+3. Har step par check karte hain ki
+   current combination ka sum pehle wale max se bada hai ya nahi.
+4. Is tarah saare possible combinations cover ho jaate hain:
+   - k from left, 0 from right
+   - k-1 from left, 1 from right
+   - k-2 from left, 2 from right
+   - ...
+   - 0 from left, k from right
+
+Main idea:
+Exact k cards lene hain sirf ends se,
+to bas front/back split ke saare possibilities check kar lo.
+
+Time Complexity: O(k)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int maxScore(int[] cardPoints, int k) {
+        int lSum = 0;
+        int rSum = 0;
+        int maxSum = 0;
+        int n = cardPoints.length;
+
+        for(int i=0; i<=k-1; i++){
+            lSum += cardPoints[i];
+        }
+        maxSum = lSum;
+
+        //now front se ek hatao aur back se add krte rho
+        int rIdx = n-1;
+        for(int i=k-1; i>=0; i--){
+            lSum -= cardPoints[i];
+            rSum += cardPoints[rIdx];
+            maxSum = Math.max(maxSum, lSum + rSum);
+            rIdx = rIdx - 1;
+        }
+
+        return maxSum;
+    }
+}
