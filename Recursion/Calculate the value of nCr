@@ -1,0 +1,111 @@
+#Approach:
+
+Approach (Hinglish) – Calculate nCr using Recursion
+
+nCr ka formula hota hai:
+nCr = n! / (r! * (n-r)!)
+
+Lekin recursion mein factorial use karne ki zaroorat nahi hoti.
+Hum Pascal’s Triangle wali identity use karte hain:
+
+nCr = (n-1)C(r-1) + (n-1)Cr
+
+Ye identity isliye kaam karti hai kyuki
+combination ka matlab hota hai selection.
+Har element ke liye do choices hoti hain:
+1. Ya to current element include karo -> (n-1)C(r-1)
+2. Ya current element include mat karo -> (n-1)Cr
+
+Dono cases ka sum = total combinations.
+
+--------------------------------------------------
+Base Cases
+--------------------------------------------------
+1. Agar r > n -> possible hi nahi -> return 0
+2. Agar r == 0 -> kuch choose nahi karna -> 1 way
+3. Agar r == n -> sab choose karne hain -> 1 way
+
+Isliye:
+if(n == r || r == 0) return 1
+if(n < r) return 0
+
+--------------------------------------------------
+Recursion Flow
+--------------------------------------------------
+Function call:
+nCr(n, r)
+= nCr(n-1, r-1) + nCr(n-1, r)
+
+Har step par problem size chhoti ho jaati hai
+aur base case par pahunch jaati hai.
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+n = 3, r = 2
+
+3C2
+= 2C1 + 2C2
+= (1C0 + 1C1) + 1
+= (1 + 1) + 1
+= 3
+
+--------------------------------------------------
+Recursion Tree Idea
+--------------------------------------------------
+3C2
+/     \
+2C1   2C2
+/  \
+1C0 1C1
+
+Base cases par 1 milta hai,
+sab add ho jaate hain.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Recursive calls bahut zyada hoti hain
+almost Fibonacci tree jaisa ban jata hai.
+
+Time ≈ O(2^n)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack ≈ O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har element ke liye decide karo include karna hai ya nahi,
+isliye nCr = (n-1)C(r-1) + (n-1)Cr recursion se solve hota hai.
+
+Quick Revision – nCr Recursion
+
+nCr = (n-1)C(r-1) + (n-1)Cr
+
+Base cases:
+r == 0 -> 1
+r == n -> 1
+r > n -> 0
+
+Time: O(2^n)
+Space: O(n)
+
+#Code:
+
+public class Solution {
+   public static int nCr(int n, int r) {
+        //You can code here
+        if(n<r){
+            return 0;
+        }
+        //base case
+        if(n==r || r==0){
+            return 1;
+        }
+        return nCr(n-1, r-1) + nCr(n-1, r);
+   }
+        
+}
