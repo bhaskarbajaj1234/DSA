@@ -1,0 +1,23 @@
+#Code:
+
+class Solution {   
+    public boolean palindromeCheck(String s) {
+        //your code goes here
+        boolean result = helper(s, 0);
+        return result;
+    }
+
+    private boolean helper(String s, int i){
+        //base case
+        if(i >= s.length()/2){
+            return true;
+        }
+
+        if(s.charAt(i) != s.charAt(n-i-1)){
+            return false;
+        }
+
+        //Recursive call
+        helper(s, i+1);
+    }
+}
