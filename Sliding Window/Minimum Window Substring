@@ -1,0 +1,64 @@
+#Approach:
+
+Approach:
+Ye code sliding window + frequency array use karta hai minimum valid substring nikalne ke liye.
+
+1. Pehle t ke sab characters ko hash array me store kar dete hain.
+   Ye batata hai ki kis character ki kitni need hai.
+2. Right pointer se window expand karte hain.
+3. Agar current character abhi needed tha (hash > 0),
+   to cnt increase kar dete hain.
+4. Har baar current character ko include karke hash value decrease kar dete hain.
+5. Jab cnt == m ho jaata hai,
+   matlab current window me t ke saare characters aa gaye hain.
+6. Ab left pointer se window ko shrink karte hain
+   taaki minimum valid window mil sake.
+7. Shrink karte waqt agar koi needed character remove ho jaaye,
+   to cnt kam kar dete hain aur window invalid ho jaati hai.
+8. Har valid stage par minLen aur start index update karte rehte hain.
+
+Main idea:
+Window ko pehle valid banao, phir usse chhota karte jao
+jab tak valid rahe, taaki minimum substring mil sake.
+
+Time Complexity: O(n + m)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public String minWindow(String s, String t) {
+
+        int left = 0;
+        int right = 0;
+        int cnt = 0;
+        int minLen = Integer.MAX_VALUE;
+        int sIndex = -1;
+        int n = s.length();
+        int m = t.length();
+        int[] hash = new int[256];
+        Arrays.fill(hash, 0);
+        //Pre insert all the t string characters
+        for(int i=0; i<m; i++){
+            hash[t.charAt(i)]++;
+        }
+        while(right < n){
+            //meaning pre inserted
+            if(hash[s.charAt(right)] > 0) cnt++;
+            hash[s.charAt(right)]--;
+
+            //if cnt == m hogya to jab tk iski value equal rhegi tab tak hum choti window dhundte rhenge
+            while(cnt == m){
+                if((right - left + 1) < minLen){
+                    minLen = (right - left + 1);
+                    sIndex = left;
+                }
+                hash[s.charAt(left)]++;
+                if(hash[s.charAt(left)] > 0) cnt--;
+                left++;
+            }
+            right++;
+        }
+        return (sIndex == -1) ? "" : s.substring(sIndex, sIndex + minLen);
+    }
+}
