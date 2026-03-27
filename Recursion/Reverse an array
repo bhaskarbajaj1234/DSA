@@ -1,0 +1,21 @@
+#Code:
+
+class Solution {
+    public void reverse(int[] arr, int n) {
+        helper(arr, n, 0);
+    }
+
+    private void helper(int[] arr, int n, int i){
+        //Base case
+        if(i >= n/2){
+            return;
+        }
+        //swap
+        int temp = arr[i];
+        arr[i] = arr[n-i-1];
+        arr[n-i-1] = temp;
+
+        //recursive call
+        helper(arr, n, i+1);
+    }
+}
