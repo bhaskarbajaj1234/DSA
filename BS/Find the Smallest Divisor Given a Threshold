@@ -1,0 +1,125 @@
+#Approach:
+
+Approach (Hinglish) – Find the Smallest Divisor Given a Threshold (Binary Search on Answer)
+
+Is question mein hume smallest divisor find karna hai
+aisa ki array ke har element ko us divisor se divide karke
+un sabka ceil value ka sum threshold se chhota ya equal ho.
+
+Brute force mein hum har divisor try kar sakte hain,
+lekin range badi ho sakti hai,
+isliye Binary Search on Answer use karenge.
+
+Key Idea:
+Divisor ki range:
+minimum divisor = 1
+maximum divisor = max(nums)
+
+Agar divisor chhota hoga,
+to division ke baad values badi aayengi,
+aur total sum bhi zyada hoga.
+
+Agar divisor bada hoga,
+to division ke baad values chhoti aayengi,
+aur total sum kam hoga.
+
+Matlab:
+Jaise-jaise divisor badhega, total sum ghatta jayega.
+Yeh monotonic behavior hai,
+isliye binary search lag sakti hai.
+
+How helper works:
+Har element ke liye:
+ceil(nums[i] / mid)
+
+Fir sabka sum nikalte hain.
+
+Example:
+nums[i] = 7, divisor = 3
+ceil(7/3) = 3
+
+nums[i] = 10, divisor = 2
+ceil(10/2) = 5
+
+Agar total sum <= threshold hai,
+to current divisor valid hai.
+Lekin hume smallest valid divisor chahiye,
+isliye left side search karenge.
+
+Agar total sum > threshold hai,
+to divisor chhota hai,
+hume divisor bada karna padega.
+Isliye right side search karenge.
+
+Steps:
+1. low = 1, high = maximum element in array
+2. mid = (low + high) / 2
+3. helper se total sum nikalo using ceil(nums[i] / mid)
+4. Agar sum <= threshold
+   -> divisor valid hai
+   -> smaller divisor dhoondo
+   -> high = mid - 1
+5. Else
+   -> divisor small hai
+   -> bada divisor chahiye
+   -> low = mid + 1
+
+Loop ke end par low smallest valid divisor hota hai.
+
+Why return low?
+Kyuki binary search ke baad low first aisa divisor hota hai
+jiske liye total sum threshold ke andar aa jata hai.
+
+Time Complexity:
+maxi() -> O(n)
+helper() -> O(n)
+Binary Search -> O(log(max element))
+Total -> O(n * log(max element))
+
+Space Complexity:
+O(1)
+
+One line intuition:
+Aisa smallest divisor find karna hai jisse ceil divisions ka total sum threshold ke andar aa jaye,
+isliye answer space par binary search lagate hain.
+
+#Code:
+
+class Solution {
+
+    public int maxi(int[] nums){
+        int n = nums.length;
+        int maxVal = Integer.MIN_VALUE;
+        for(int i=0; i<n; i++){
+            maxVal = Math.max(maxVal, nums[i]);
+        }
+        return maxVal;
+    }
+
+    public int helper(int[] nums, int mid){
+        int sum = 0;
+        int n = nums.length;
+        for(int i=0; i<n; i++){
+            sum += Math.ceil((double)nums[i] / mid);
+        }
+        return sum;
+    }
+
+    public int smallestDivisor(int[] nums, int threshold) {
+        int low = 1;
+        int high = maxi(nums);
+
+        while(low <= high){
+            int mid = (low+high)/2;
+            int val = helper(nums, mid);
+
+            if(val <= threshold){
+                high = mid-1;
+            }
+            else{
+                low = mid+1;
+            }
+        }
+        return low;
+    }
+}
