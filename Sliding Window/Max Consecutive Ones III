@@ -1,0 +1,50 @@
+#Approach:
+
+Approach:
+Ye code sliding window use karta hai maximum length nikalne ke liye
+jisme at most k zeros ho sakte hain.
+
+1. Do pointers liye hain:
+   - l = window start
+   - r = window end
+2. Jaise-jaise r aage badhta hai, agar nums[r] = 0 ho to zeros count badha dete hain.
+3. Agar zeros > k ho jaaye, to window invalid ho jaati hai,
+   isliye left pointer ko aage badhate hain.
+   Aur agar left par 0 tha to zeros count kam kar dete hain.
+4. Jab tak zeros <= k hai, window valid hai,
+   to uski length se maxLen update karte rehte hain.
+
+Main idea:
+Hume longest subarray chahiye jisme maximum k zeros ho,
+kyuki unhi zeros ko flip karke saare 1 bana sakte hain.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int longestOnes(int[] nums, int k) {
+        int l = 0;
+        int r = 0;
+        int maxLen = 0;
+        int n = nums.length;
+        int zeros = 0;
+
+        while(r < n){
+            if(nums[r] == 0) zeros++;
+
+            if(zeros > k){
+                if(nums[l] == 0) zeros--;
+                l++;
+            }
+
+            if(zeros <= k){
+                maxLen = Math.max(maxLen, r-l+1);
+            }
+            r++;
+        }
+
+        return maxLen;
+    }
+}
