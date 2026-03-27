@@ -1,0 +1,139 @@
+#Approach:
+
+Approach (Hinglish) – Check if subsequence with sum K exists
+
+Is question mein hume count nahi karna,
+sirf check karna hai ki koi bhi subsequence exist karti hai ya nahi
+jiska sum = k ho.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Har element ke paas 2 choices:
+1. Include karo
+2. Exclude karo
+
+Aur jaise hi koi subsequence mil jaye jiska sum = k ho,
+hum turant true return kar denge.
+Hume saari subsequences explore karne ki zarurat nahi hai.
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(nums, index, sum, k)
+
+index = current position
+sum = ab tak ka subsequence sum
+k = target sum
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar index == nums.length
+-> saare elements process ho gaye
+-> check karo sum == k ?
+
+Agar equal hai → true
+Else → false
+
+--------------------------------------------------
+Recursive Choices
+--------------------------------------------------
+1. Take current element
+   sum + nums[index]
+
+2. Do not take current element
+   sum same rahega
+
+Agar in dono me se kisi se bhi answer true aata hai,
+to hum true return kar denge.
+
+--------------------------------------------------
+Important Optimization (Early Stop)
+--------------------------------------------------
+Is line ko dhyan se dekho:
+
+if (helper(nums, index + 1, sum + nums[index], k)) {
+    return true;
+}
+
+Jaise hi ek valid subsequence milti hai,
+recursion wahi ruk jaata hai.
+
+Isliye ye problem count wali problem se fast hai.
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+nums = [1,2,3,4,5], k = 8
+
+Possible subsequences:
+[1,2,5]
+[1,3,4]
+[3,5]
+
+To function true return karega.
+
+--------------------------------------------------
+Recursion Tree
+--------------------------------------------------
+Har element → take / not take
+Jab bhi sum == k mile → true return → recursion stop
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case: O(2^n)
+But practically faster due to early stopping.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har element ko include/exclude karke subsequences banao
+aur jaise hi sum == k mile, turant true return kar do.
+
+Quick Revision – Exists Subsequence Sum K
+
+1. Har element → take / not take
+2. Running sum maintain karo
+3. Base case par check sum == k
+4. Jaise hi mil jaye → true return
+5. Nahi mila → false
+
+Time: O(2^n)
+Space: O(n)
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+
+    public boolean checkSubsequenceSum(int[] nums, int k) {
+        return helper(nums, 0, 0, k);
+    }
+
+    public boolean helper(int[] nums, int index, int sum, int k) {
+        // Base case
+        if (index == nums.length) {
+            return sum == k;
+        }
+
+        // Take current element
+        if (helper(nums, index + 1, sum + nums[index], k)) {
+            return true;
+        }
+
+        // Do not take current element
+        if (helper(nums, index + 1, sum, k)) {
+            return true;
+        }
+
+        return false;
+    }
+}
