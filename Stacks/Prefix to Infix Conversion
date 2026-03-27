@@ -1,0 +1,62 @@
+#Approach:
+
+Approach:
+Ye code prefix ko infix me convert karne ke liye reverse traversal + stack of strings use karta hai.
+
+1. Prefix expression ko reverse kar dete hain,
+   kyuki prefix me operator pehle hota hai aur hume operands pehle process karne hain.
+2. Ab reversed string ko left se right traverse karte hain.
+3. Agar operand mile, to usse string bana ke stack me push kar do.
+4. Agar operator mile, to stack se top ke 2 expressions pop karo:
+   - first pop = left operand/expression
+   - second pop = right operand/expression
+5. Fir new infix expression banao:
+   '(' + first + operator + second + ')'
+6. Is new expression ko stack me wapas push kar do.
+7. End me stack ka top hi final infix answer hoga.
+
+Main idea:
+Prefix me operator apne operands se pehle hota hai,
+isliye reverse karke usse postfix jaisa treat karte hain aur stack se combine karte chalte hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+
+    public boolean isOperator(Character a){
+        if((a == '+') || (a == '-') || (a == '*') || (a == '/')){
+            return true;
+        }
+        return false;
+    }
+
+    public String prefixToInfix(String s) {
+        // Your code goes here
+        StringBuilder sb = new StringBuilder(s);
+        sb.reverse();
+        int n = sb.length();
+        int i = 0;
+        ArrayDeque<String> stack = new ArrayDeque<>();
+
+        while(i < n){
+            char ch = sb.charAt(i);
+
+            //if ch is an operator
+            if(isOperator(ch)){
+                String first = stack.pop();
+                String second = stack.pop();
+                String temp = '(' + first + ch + second + ')';
+                stack.push(temp);
+            }
+            //if ch is an operand
+            else{
+                stack.push(Character.toString(ch));
+            }
+            i++;
+        }
+        return stack.peek();
+    }
+}
