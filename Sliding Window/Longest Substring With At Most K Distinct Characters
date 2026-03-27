@@ -1,0 +1,55 @@
+#Approach:
+
+Approach:
+Ye problem sliding window + HashMap se solve hoti hai.
+
+1. Window [left ... right] maintain karte hain.
+2. Right pointer ko aage badhate hue current character ki frequency map me store karte hain.
+3. Agar map.size() > k ho jaaye,
+   matlab window me k se zyada distinct characters aa gaye,
+   to left pointer aage badha ke window shrink karte hain.
+4. Shrink karte time left character ki frequency kam karte hain,
+   aur agar frequency 0 ho jaaye to map se remove kar dete hain.
+5. Har valid window (map.size() <= k) ke liye maxLen update karte rehte hain.
+
+Main idea:
+Hume longest substring chahiye jisme at most k distinct characters ho,
+isliye window ko expand bhi karte hain aur invalid hote hi shrink bhi karte hain.
+
+Time Complexity: O(n)
+Space Complexity: O(k) / O(Alphabet)
+
+#Code:
+
+import java.util.*;
+
+class Solution {
+    public int kDistinctChar(String s, int k) {
+        if (k == 0) return 0;
+
+        int n = s.length();
+        int left = 0, right = 0;
+        int maxLen = 0;
+        HashMap<Character, Integer> map = new HashMap<>();
+
+        while (right < n) {
+            char ch = s.charAt(right);
+            map.put(ch, map.getOrDefault(ch, 0) + 1);
+
+            while (map.size() > k) {
+                char leftChar = s.charAt(left);
+                map.put(leftChar, map.get(leftChar) - 1);
+
+                if (map.get(leftChar) == 0) {
+                    map.remove(leftChar);
+                }
+                left++;
+            }
+
+            maxLen = Math.max(maxLen, right - left + 1);
+            right++;
+        }
+
+        return maxLen;
+    }
+}
