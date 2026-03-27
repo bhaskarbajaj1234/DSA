@@ -1,0 +1,167 @@
+#Approach:
+
+Approach (Hinglish) – Count all subsequences with sum K (Recursion / Backtracking)
+
+Is question mein hume count karna hai ki kitni non-empty subsequences ka sum exactly k ke equal hai.
+
+Subsequence ka matlab:
+Har element ke paas 2 choices hain:
+1. Include karo
+2. Exclude karo
+
+Hume saari possible subsequences check karni hain
+aur count karna hai jo sum k ke equal deti hain.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Har index par 2 recursive choices lenge:
+
+1. Current element ko le lo
+   -> sum mein nums[index] add hoga
+
+2. Current element ko mat lo
+   -> sum same rahega
+
+End mein agar subsequence non-empty hai
+aur sum == k hai,
+to usse 1 count karenge.
+
+--------------------------------------------------
+Why "taken" boolean use kiya?
+--------------------------------------------------
+Question mein non-empty subsequences maangi gayi hain.
+
+Agar hum taken boolean na rakhein,
+to empty subsequence bhi count ho sakti hai
+jab k = 0 ho.
+
+Isliye:
+taken = true means at least ek element subsequence mein liya gaya hai
+
+Base case par:
+if(taken && sum == k) return 1;
+else return 0;
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(nums, index, sum, k, taken)
+
+nums = given array
+index = current position
+sum = ab tak selected elements ka total sum
+k = target sum
+taken = kya ab tak koi element select hua hai ya nahi
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar index == nums.length
+-> saare elements consider ho chuke hain
+
+Ab check karenge:
+1. subsequence empty nahi honi chahiye
+2. sum exactly k hona chahiye
+
+Agar dono true hain:
+-> 1 return karo
+warna 0
+
+--------------------------------------------------
+Recursive Choices
+--------------------------------------------------
+1. Take current element:
+take = helper(nums, index + 1, sum + nums[index], k, true)
+
+2. Do not take current element:
+notTake = helper(nums, index + 1, sum, k, taken)
+
+Final answer:
+take + notTake
+
+Kyuki hume total count chahiye.
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+nums = [4, 9, 2, 5, 1], k = 10
+
+Possible valid subsequences:
+[9, 1]
+[4, 5, 1]
+
+So answer = 2
+
+Recursion har element ko include/exclude karke
+saari possibilities explore karegi.
+
+--------------------------------------------------
+Recursion Tree Intuition
+--------------------------------------------------
+For each element:
+branch 1 -> include
+branch 2 -> exclude
+
+Is tarah total 2^n subsequences banti hain.
+
+Har leaf par check hota hai:
+sum == k and non-empty ?
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Har element ke 2 choices hain:
+Total recursive calls ≈ O(2^n)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack depth = O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har element ko lo ya mat lo,
+aur recursion ke end par count karo ki kitni non-empty subsequences ka sum exactly k hai.
+
+Quick Revision – Count Subsequences with Sum K
+
+1. Har element ke 2 choices:
+   take / not take
+2. Running sum maintain karo
+3. End par check:
+   non-empty hai?
+   sum == k hai?
+4. Count return karo
+5. Final answer = take + notTake
+
+Time: O(2^n)
+Space: O(n)
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+
+    public int countSubsequenceWithSumK(int[] nums, int k) {
+        return helper(nums, 0, 0, k, false);
+    }
+
+    public int helper(int[] nums, int index, int sum, int k, boolean taken) {
+        // Base case
+        if (index == nums.length) {
+            if (taken && sum == k) return 1;
+            return 0;
+        }
+
+        // Take current element
+        int take = helper(nums, index + 1, sum + nums[index], k, true);
+
+        // Do not take current element
+        int notTake = helper(nums, index + 1, sum, k, taken);
+
+        return take + notTake;
+    }
+}
