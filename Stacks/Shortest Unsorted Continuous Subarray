@@ -1,0 +1,83 @@
+#Approach:
+
+Approach:
+Ye code shortest unsorted continuous subarray ka left aur right boundary stack ki help se nikalta hai.
+
+1. Pehle left boundary find karte hain:
+   - Left se right traverse karte hain.
+   - Stack me indices store hote hain in increasing order.
+   - Jab current element stack top se chhota milta hai,
+     to matlab sorting yahin se break hui hai.
+   - Tab left ko update karte hain.
+
+2. Phir right boundary find karte hain:
+   - Right se left traverse karte hain.
+   - Is baar stack ki help se check karte hain ki kahaan bada element galat position par hai.
+   - Jahan descending issue milta hai, right update hota hai.
+
+3. Agar left >= right ho, to array already sorted hai → answer 0.
+4. Warna unsorted subarray ki length = right - left + 1.
+
+Main idea:
+Jahaan order break hota hai, wahi actual unsorted region ka part hota hai.
+Stack se efficiently first wrong left boundary aur last wrong right boundary mil jaate hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int findUnsortedSubarray(int[] nums) {
+        //You can code here
+
+        Deque<Integer> stack = new ArrayDeque<>();
+        int left = nums.length - 1;
+        //Figuring out left
+        for(int i=0; i<nums.length;){
+          if(stack.isEmpty()){
+            stack.push(i);
+            i++;
+          }
+          else{
+            //if not empty then check if top element is showing dip
+            if(nums[stack.peek()] > nums[i]){
+              left = Math.min(left, stack.peek());
+              stack.pop();
+            }
+            else{
+              stack.push(i);
+              i++;
+            }
+          }
+        }
+
+        //Figuring out right
+        int right = 0;
+        stack.clear();
+
+        for(int i=nums.length - 1; i>=0;){
+          if(stack.isEmpty()){
+            stack.push(i);
+            i--;
+          }
+          else{
+            if(nums[stack.peek()] < nums[i]){
+              right = Math.max(right, stack.peek());
+              stack.pop();
+            }
+            else{
+              stack.push(i);
+              i--;
+            }
+          }
+        }
+
+        if(left >= right) return 0;
+        else{
+          return right - left + 1;
+        }   
+    }
+}
