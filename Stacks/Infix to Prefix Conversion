@@ -1,0 +1,108 @@
+#Approach:
+
+Approach:
+Ye code infix ko prefix me convert karne ke liye reverse + postfix logic use karta hai.
+
+1. Sabse pehle poori string reverse karte hain.
+2. Reverse karne ke baad '(' ko ')' aur ')' ko '(' me change kar dete hain.
+3. Ab is reversed expression par almost infix to postfix wala logic apply karte hain:
+   - operand aaye to answer me add karo
+   - '(' aaye to stack me push karo
+   - ')' aaye to '(' tak sab pop karke answer me add karo
+   - operator aaye to precedence ke according stack handle karo
+4. End me stack ke bache operators answer me add kar do.
+5. Jo answer mila hai wo reversed prefix hota hai, isliye last me usse reverse kar dete hain.
+
+Main idea:
+Infix → Prefix directly karna thoda tricky hota hai,
+isliye code pehle expression reverse karta hai, phir postfix jaisa process chala ke final answer reverse kar deta hai.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+
+    public int priority(Character a){
+        if(a == '^'){
+            return 2;
+        }
+        else if(a == '*' || a == '/'){
+            return 1;
+        }
+        else if(a == '+' || a == '-'){
+            return 0;
+        }
+        else{
+            return -1;
+        }
+    }
+
+    public String infixToPrefix(String s) {
+        // Your code goes here
+        StringBuilder sb = new StringBuilder(s);
+        StringBuilder ans = new StringBuilder();
+
+        //Step 1: reverse the string and make the opeining bracket as closing and vice versa
+        sb.reverse();
+
+        for(int i=0; i<sb.length(); i++){
+            char ch = sb.charAt(i);
+            if(ch == '('){
+                sb.setCharAt(i, ')');
+            }
+            else if(ch == ')'){
+                sb.setCharAt(i, '(');
+            }
+        }
+
+        int i = 0;
+        int n = sb.length();
+        ArrayDeque<Character> stack = new ArrayDeque<>();
+
+        while(i<n){
+
+            
+            char ch = sb.charAt(i);
+            //If space
+            if(sb.charAt(i) == ' '){
+                continue;
+            }
+            //if i is an operand
+            else if((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')){
+                ans.append(sb.charAt(i));
+            }
+
+            //if i is an opening bracket
+            else if(ch == '('){
+                stack.push(sb.charAt(i));
+            }
+
+            //if i is a closing bracket
+            else if(ch == ')'){
+                while(!stack.isEmpty() && stack.peek() != '('){
+                    ans.append(stack.pop());
+                }
+                stack.pop();
+            }
+            //if i is an operator
+            else{
+                while(!stack.isEmpty() && priority(sb.charAt(i)) < priority(stack.peek())){
+                    ans.append(stack.pop());
+                }
+                stack.push(sb.charAt(i));
+            }
+            i++;
+        }
+
+        while(!stack.isEmpty()){
+            ans.append(stack.pop());
+        }
+
+        ans.reverse();
+        return ans.toString();
+
+
+    }
+}
