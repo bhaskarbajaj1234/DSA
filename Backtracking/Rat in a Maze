@@ -1,0 +1,245 @@
+#Approach:
+
+Approach (Hinglish) – Rat in a Maze (Backtracking)
+
+Is question mein hume rat ko top-left cell (0,0) se bottom-right cell (n-1,n-1) tak pahunchana hai.
+Rat sirf un cells par ja sakta hai jahan value 1 ho.
+Agar cell 0 hai, to waha jaana allowed nahi hai.
+
+Hume saare possible paths return karne hain
+using directions:
+D = Down
+L = Left
+R = Right
+U = Up
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Ye classic Backtracking problem hai.
+
+Har cell par rat ke paas 4 possible moves hote hain:
+1. Down
+2. Left
+3. Right
+4. Up
+
+Hum recursively har valid direction mein move karte hain,
+aur jab destination tak pahunch jaate hain,
+to current path answer list mein add kar dete hain.
+
+Kyuki ek cell par multiple directions explore karni hoti hain,
+isliye recursion + backtracking use hota hai.
+
+--------------------------------------------------
+Starting Condition
+--------------------------------------------------
+Agar starting cell hi blocked ho:
+arr[0][0] == 0
+-> rat start hi nahi kar sakta
+-> empty result return kar do
+
+--------------------------------------------------
+Visited Array ka Use
+--------------------------------------------------
+Hum ek boolean visited matrix rakhte hain
+taaki rat same cell par baar-baar na aaye,
+warna cycle ban sakta hai.
+
+Example:
+Agar visited use na karein,
+to rat right jaake left wapas aa sakta hai,
+fir left se right, aur infinite loop ho sakta hai.
+
+Isliye:
+1. Move karne se pehle cell ko visited mark karo
+2. Recursive call ke baad visited unmark karo
+
+Yehi backtracking hai.
+
+--------------------------------------------------
+isValid Function
+--------------------------------------------------
+Ye function check karta hai ki next cell valid hai ya nahi.
+
+Valid hone ke liye:
+1. Cell matrix ke andar ho
+2. Cell ki value 1 ho
+3. Cell pehle visit na hua ho
+
+Agar ye teeno conditions true hain,
+to rat waha move kar sakta hai.
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar rat destination par pahunch gaya:
+i == n-1 && j == n-1
+
+To current path complete ho gaya,
+use result mein add kar do.
+
+--------------------------------------------------
+Backtracking Flow
+--------------------------------------------------
+Current cell se 4 directions try karte hain in this order:
+1. Down
+2. Left
+3. Right
+4. Up
+
+Har direction ke liye:
+1. Check karo valid hai ya nahi
+2. visited mark karo
+3. Recursive call karo with updated path
+4. Wapas aake visited unmark karo
+
+Ye unmark step zaroori hai,
+taaki doosre paths ke liye cell dubara use ho sake.
+
+--------------------------------------------------
+Why path string pass kar rahe hain?
+--------------------------------------------------
+Path string current route store karti hai.
+
+Example:
+Agar rat Down fir Right move karta hai,
+to path = "DR"
+
+Jab destination milta hai,
+to wahi path answer hota hai.
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+Suppose matrix:
+
+1 0 0
+1 1 0
+1 1 1
+
+Possible path:
+(0,0) -> (1,0) -> (2,0) -> (2,1) -> (2,2)
+
+Moves:
+D D R R
+
+So answer list mein "DDRR" add hoga.
+
+--------------------------------------------------
+Why backtracking needed?
+--------------------------------------------------
+Kyuki ek path try karne ke baad
+hume wapas aakar doosre possible paths bhi explore karne hote hain.
+
+Isliye:
+visit -> recurse -> unvisit
+
+Yehi backtracking ka core pattern hai.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case mein har cell se 4 directions try ho sakti hain,
+to complexity exponential ho sakti hai.
+
+Commonly likhte hain:
+O(4^(n*n)) in worst case
+
+Practical understanding:
+Kyuki saare possible paths generate ho rahe hain,
+isliye exponential behavior aata hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Visited matrix = O(n^2)
+Recursion stack = O(path length), worst case O(n^2)
+
+Total auxiliary space ≈ O(n^2)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har cell se 4 directions try karo,
+valid cell par jao, path banao,
+destination par path store karo,
+aur backtracking se baaki saare paths explore karo.
+
+Quick Revision – Rat in a Maze
+
+1. Agar start blocked hai -> empty answer
+2. Har cell se D, L, R, U try karo
+3. Sirf valid aur unvisited cell par move karo
+4. Destination par path store karo
+5. Recursive call ke baad visited unmark karo
+
+Concept:
+Recursion + Backtracking
+
+Time: Exponential
+Space: O(n^2)
+
+#Code:
+
+import java.util.*;
+public class Solution {
+
+    public static ArrayList < String > findPath(int[][] arr, int n) {
+        //You can code here
+
+        ArrayList<String> result = new ArrayList<>();
+        if (arr[0][0] == 0) return result; //if starting point mei hi khot hai to vhi ruk jaega
+        // matrix is of n X n
+        boolean[][] vis = new boolean[n][n];
+        vis[0][0] = true;
+
+        ratInAMaze(arr, 0, 0, vis, n, result, ""); 
+        return result;     
+    }
+
+    public static boolean isValid(int[][] mat, int i, int j, boolean[][] vis, int n){
+        if(i < n && i >= 0 && j < n && j >= 0 && mat[i][j] == 1 && vis[i][j] == false){
+            return true;
+        }
+        return false;
+    }
+
+    public static ArrayList < String > ratInAMaze(int[][] mat, int i, int j, boolean[][] vis, int n, ArrayList <String> result, String path){
+
+        //Base case
+        if(i == n-1 && j == n-1){
+            result.add(path);
+            return result;
+        }
+
+        //Down
+        if(isValid(mat, i+1, j, vis, n)){
+            vis[i+1][j] = true;
+            ratInAMaze(mat, i+1, j, vis, n, result, path+'D');
+            vis[i+1][j] = false;
+        }
+
+        //Left
+        if(isValid(mat, i, j-1, vis, n)){
+            vis[i][j-1] = true;
+            ratInAMaze(mat, i, j-1, vis, n, result, path+'L');
+            vis[i][j-1] = false;
+        }
+
+        //Right
+        if(isValid(mat, i, j+1, vis, n)){
+            vis[i][j+1] = true;
+            ratInAMaze(mat, i, j+1, vis, n, result, path+'R');
+            vis[i][j+1] = false;
+        }
+
+        //Up
+        if(isValid(mat, i-1, j, vis, n)){
+            vis[i-1][j] = true;
+            ratInAMaze(mat, i-1, j, vis, n, result, path+'U');
+            vis[i-1][j] = false;
+        }
+        return result;
+    }
+}
