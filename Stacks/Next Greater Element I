@@ -1,0 +1,64 @@
+#Approach:
+
+Approach:
+Ye code har element of nums1 ke liye nums2 me uska Next Greater Element nikal raha hai.
+
+1. nextGreat() function nums2 par right se left traverse karta hai.
+2. Monotonic decreasing stack use hota hai:
+   - current se chhote ya equal elements pop kar do
+   - jo top bachega wahi next greater hoga
+3. Har element ka NGE ek HashMap me store kar diya jata hai.
+4. Fir target element ka answer map se return kar diya jata hai.
+5. Main function me nums1 ke har element ke liye nextGreat() call karke ans array fill kar diya gaya hai.
+
+Main idea:
+nums2 ke elements ka NGE stack se efficiently nikala ja raha hai,
+aur map me store karke target ka answer liya ja raha hai.
+
+Important point:
+Is code me problem ye hai ki har nums1[i] ke liye nextGreat() dobara poora nums2 traverse kar raha hai.
+Matlab same NGE map baar-baar ban raha hai.
+
+Time Complexity of this code: O(nums1.length * nums2.length)
+Space Complexity: O(nums2.length)
+
+Better idea:
+Ek baar nums2 ka pura NGE map bana lo, fir nums1 ke sab answers O(1) lookup se nikaal lo.
+
+#Code:
+
+class Solution {
+
+    private int nextGreat(int[] nums2, int target){
+        Deque<Integer> stack = new ArrayDeque<>();
+        HashMap<Integer, Integer> ngeMap = new HashMap<>();
+        //Step-1: Find NGE for all the elements
+        for(int i=nums2.length-1; i>=0; i--){
+            while(!stack.isEmpty() && stack.peek() <= nums2[i]){
+                stack.pop();
+            }
+
+            if(stack.isEmpty()){
+                ngeMap.put(nums2[i], -1);
+            }else{
+                ngeMap.put(nums2[i], stack.peek());
+            }
+            stack.push(nums2[i]);
+        }
+        int ans = ngeMap.get(target);
+        return ans;
+
+    }
+
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        int[] ans = new int[nums1.length];
+
+        //Step-1: sbhi elements mei ghumenge and unke next greater nikalkr current element ka check krenge
+        for(int i=0; i<nums1.length; i++){
+            int result = nextGreat(nums2, nums1[i]);
+            ans[i] = result;
+        }
+
+        return ans;
+    }
+}
