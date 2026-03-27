@@ -1,0 +1,48 @@
+#Approach:
+
+Approach:
+Ye code sliding window + hashing use karta hai longest substring without repeating characters ke liye.
+
+1. Do pointers use hue hain:
+   - l = window ka left
+   - r = window ka right
+2. hash array me har character ka last seen index store hota hai.
+3. Jab current character repeat milta hai aur uska last index current window ke andar hai,
+   to left pointer ko uske next position par shift kar dete hain.
+4. Isse window me duplicate character nahi rehta.
+5. Har step par current window length = r - l + 1 nikaal kar maxLen update karte hain.
+6. Fir current character ka latest index hash me update kar dete hain.
+
+Main idea:
+Window ko continuously expand karte hain,
+aur jaise hi duplicate aaye, left ko jump kara dete hain
+taaki substring unique bani rahe.
+
+Time Complexity: O(n)
+Space Complexity: O(1)   // fixed hash array
+
+#Code:
+
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        int[] hash = new int[256];
+        Arrays.fill(hash, -1);
+        int n = s.length();
+
+        int maxLen = 0;
+        int l = 0;
+        int r = 0;
+
+        while(r < n){
+            if(hash[s.charAt(r)] != -1){
+                if(hash[s.charAt(r)] >= l){
+                    l = hash[s.charAt(r)] + 1;
+                }
+            }
+            maxLen = Math.max(maxLen, r-l+1);
+            hash[s.charAt(r)] = r;
+            r++;
+        }
+        return maxLen;
+    }
+}
