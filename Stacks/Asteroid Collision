@@ -1,0 +1,68 @@
+#Approach:
+
+Approach:
+Ye code asteroid collisions ko stack se simulate karta hai.
+
+1. Agar asteroid positive hai, to usse stack me push kar dete hain,
+   kyuki wo right direction me ja raha hai.
+2. Agar asteroid negative hai, tab collision tabhi hoga
+   jab stack top positive ho (matlab saamne se aa raha ho).
+3. While loop me chhote positive asteroids ko pop kar dete hain
+   agar unka size current negative asteroid se chhota ho.
+4. Agar dono same size ke mil gaye, to dono destroy ho jaate hain,
+   isliye stack top pop karke current ko bhi skip kar dete hain.
+5. Agar stack empty ho gaya ya top negative hai,
+   to current negative asteroid safe hai, so push kar do.
+6. End me stack me jo bache hain wahi final surviving asteroids hain.
+
+Main idea:
+Collision sirf tab hota hai jab left me positive aur current negative ho.
+Stack already surviving asteroids ko maintain karta hai.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public int[] asteroidCollision(int[] asteroids) {
+
+        Deque<Integer> stack = new ArrayDeque<>();
+        int n = asteroids.length;
+
+        for(int i=0; i<n; i++){
+            //if positive krdo push kyuki agr pehle se negative vala bhi hua to bhi dikkt nahi kyuki direction opp hai
+            if(asteroids[i] > 0){
+                stack.push(asteroids[i]);
+            }
+            //Negative value
+            else{
+                while(!stack.isEmpty() && stack.peek() > 0 && stack.peek() < Math.abs(asteroids[i])){
+                    stack.pop();
+                }
+
+                if(!stack.isEmpty() && stack.peek() == Math.abs(asteroids[i])){
+                    stack.pop();
+                }
+
+                else if(stack.isEmpty() || stack.peek() < 0){
+                    stack.push(asteroids[i]);
+                }
+            }
+        }
+        List<Integer> ans = new ArrayList<>();
+        while(!stack.isEmpty()){
+            ans.add(stack.pop());
+        }
+
+        Collections.reverse(ans);
+        int m = ans.size();
+        int[] result = new int[m];
+        for(int i=0; i<m; i++){
+            result[i] = ans.get(i);
+        }
+
+        return result;
+        
+    }
+}
