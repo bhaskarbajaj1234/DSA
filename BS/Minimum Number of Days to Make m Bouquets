@@ -1,0 +1,159 @@
+#Approach:
+
+Approach (Hinglish) – Minimum Number of Days to Make m Bouquets (Binary Search on Answer)
+
+Is question mein hume minimum day find karna hai
+jisme hum m bouquets bana sakein,
+aur har bouquet ke liye k adjacent flowers chahiye.
+
+Brute force mein hum har day check kar sakte hain,
+lekin bloomDay[i] bahut bada ho sakta hai,
+isliye Binary Search on Answer use karenge.
+
+Key Idea:
+Answer hamesha minimum bloom day se maximum bloom day ke beech hoga.
+
+Agar kisi day "mid" tak hum m ya usse zyada bouquets bana sakte hain,
+to ho sakta hai answer usse bhi chhota ho.
+Isliye left side search karenge.
+
+Agar kisi day "mid" tak m bouquets nahi ban paa rahe,
+to aur zyada days wait karna padega.
+Isliye right side search karenge.
+
+Important impossible case:
+Agar total required flowers = m * k
+aur wo garden ke total flowers se zyada hain,
+to answer kabhi possible hi nahi hoga.
+Isliye directly -1 return kar do.
+
+How helper works:
+Helper check karta hai ki given day "mid" tak
+kya hum m bouquets bana sakte hain ya nahi.
+
+Logic:
+1. Array traverse karo
+2. Agar bloomDay[i] <= mid hai,
+   matlab flower bloom ho chuka hai -> cnt++
+3. Agar bloomDay[i] > mid hai,
+   matlab sequence break ho gaya
+   -> cnt / k jitne bouquets ban sakte the wo add karo
+   -> cnt = 0
+4. Loop ke end par bhi cnt / k add karna zaroori hai
+5. Agar total bouquets >= m
+   -> possible
+   else -> not possible
+
+Why cnt / k?
+Kyuki hume k adjacent flowers chahiye.
+Agar consecutive bloomed flowers ka count cnt hai,
+to unse cnt / k bouquets ban sakte hain.
+
+Example:
+cnt = 7, k = 3
+To bouquets = 7 / 3 = 2
+
+Steps:
+1. Agar (long)m * k > bloomDay.length
+   -> return -1
+
+2. low = minimum bloom day
+   high = maximum bloom day
+
+3. mid = (low + high) / 2
+
+4. Check karo mid day tak bouquets possible hain ya nahi
+
+5. Agar possible hai
+   -> aur minimum day chahiye
+   -> high = mid - 1
+
+6. Else
+   -> aur zyada days chahiye
+   -> low = mid + 1
+
+Loop ke end par low minimum valid day hota hai.
+
+Why return low?
+Kyuki binary search ke baad low first aisa day hota hai
+jahan m bouquets banana possible hota hai.
+
+Time Complexity:
+mini() -> O(n)
+maxi() -> O(n)
+helper() -> O(n)
+Binary Search -> O(log(maxDay - minDay))
+Total -> O(n * log(maxDay - minDay))
+
+Space Complexity:
+O(1)
+
+One line intuition:
+Minimum aisa day find karna hai jahan tak enough adjacent bloomed flowers mil jaayein
+taaki m bouquets ban sakein, isliye answer space par binary search lagate hain.
+
+#Code:
+
+class Solution {
+
+    public int mini(int[] bloomDay){
+        int n = bloomDay.length;
+        int minVal = Integer.MAX_VALUE;
+        for(int i=0; i<n; i++){
+            minVal = Math.min(minVal, bloomDay[i]);
+        }
+        return minVal;
+    }
+    public int maxi(int[] bloomDay){
+        int n = bloomDay.length;
+        int maxVal = Integer.MIN_VALUE;
+        for(int i=0; i<n; i++){
+            maxVal = Math.max(maxVal, bloomDay[i]);
+        }
+        return maxVal;
+    }
+
+    public int helper(int[] bloomDay, int m, int k, int mid){
+        int cnt = 0;
+        int noOfBouquet = 0;
+        int n = bloomDay.length;
+        for(int i=0; i<n; i++){
+            if(bloomDay[i] <= mid){
+                cnt++;
+            }
+            else{
+                noOfBouquet += cnt/k;
+                cnt = 0;
+            }
+        }
+        //check if there is any possibility of becoming a bouquet
+        noOfBouquet += cnt/k;
+        if(noOfBouquet >= m){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+
+    public int minDays(int[] bloomDay, int m, int k) {
+        
+        if((long)m*k > bloomDay.length) return -1;
+        int low = mini(bloomDay);
+        int high = maxi(bloomDay);
+
+        while(low <= high){
+            int mid = (low + high)/2;
+            int val = helper(bloomDay, m, k, mid);
+
+            if(val == 1){
+                high = mid-1;
+            }
+            else{
+                low = mid+1;
+            }
+        }
+        return low;
+
+        
+    }
+}
