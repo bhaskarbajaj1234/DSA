@@ -1,0 +1,187 @@
+#Approach:
+
+Approach (Hinglish) – Subsets of a String (Recursion)
+
+Is question mein hume string ke saare non-empty subsets nikalne hain
+aur unhe lexicographical order mein return karna hai.
+
+Note:
+Question mein "substring" likha hai,
+lekin example se clear hai ki yaha actually "subsets / subsequences" chahiye,
+kyuki "ac" output mein hai aur wo substring nahi hai.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Har character ke paas 2 choices hoti hain:
+
+1. Include karo current subset mein
+2. Exclude karo current subset se
+
+To har index par hum 2 recursive calls lagate hain.
+Isi tarah saare possible subsets generate ho jaate hain.
+
+--------------------------------------------------
+Helper Function
+--------------------------------------------------
+findSubstringsHelper(s, i, curr, result)
+
+Yaha:
+s = original string
+i = current index
+curr = abhi tak bana hua subset
+result = final answer list
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar i string ki length tak pahunch gaya:
+-> matlab humne har character ke liye decide kar liya
+-> jo curr bana hai usko result mein add kar do
+
+if(i == s.length()){
+    result.add(curr);
+    return;
+}
+
+--------------------------------------------------
+Recursive Choices
+--------------------------------------------------
+Har character s.charAt(i) ke liye 2 options:
+
+1. Include:
+findSubstringsHelper(s, i+1, curr + s.charAt(i), result)
+
+2. Exclude:
+findSubstringsHelper(s, i+1, curr, result)
+
+Isse recursion tree banega
+aur saare possible subsets generate ho jayenge.
+
+--------------------------------------------------
+Why remove empty string?
+--------------------------------------------------
+Recursion saare subsets generate karta hai,
+including empty subset "".
+
+Lekin question mein bola hai empty subset nahi chahiye.
+Isliye baad mein:
+result.remove("");
+
+--------------------------------------------------
+Why sort at the end?
+--------------------------------------------------
+Recursion subsets generate to kar deta hai,
+lekin zaroori nahi ki wo lexicographical order mein aayein.
+
+Isliye final result ko:
+Collections.sort(result);
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+s = "abc"
+
+Choices:
+a include / exclude
+b include / exclude
+c include / exclude
+
+Generated subsets:
+abc, ab, ac, a, bc, b, c, ""
+
+Empty string hata denge,
+fir sort karenge:
+
+[a, ab, abc, ac, b, bc, c]
+
+--------------------------------------------------
+Recursion Tree Intuition
+--------------------------------------------------
+For "ab":
+
+Start with ""
+At 'a':
+-> include -> "a"
+-> exclude -> ""
+
+From "a" at 'b':
+-> include -> "ab"
+-> exclude -> "a"
+
+From "" at 'b':
+-> include -> "b"
+-> exclude -> ""
+
+So total:
+["ab", "a", "b", ""]
+
+Remove ""
+Sort:
+["a", "ab", "b"]
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Har character ke 2 choices hain,
+to total subsets = 2^n
+
+Har subset banane mein string concatenation bhi hoti hai,
+to overall approx:
+O(n * 2^n)
+
+Sorting bhi lagegi:
+O(2^n * log(2^n))
+
+Overall commonly likh sakte ho:
+O(n * 2^n + 2^n log(2^n))
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+Result list mein total subsets store honge = O(2^n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har character ko include ya exclude karke saare subsets banao,
+empty string hatao, fir lexicographically sort kar do.
+
+Quick Revision – Subsets of a String
+
+1. Har character ke 2 choices:
+   include / exclude
+2. Recursion se saare subsets generate karo
+3. Base case par curr ko result mein add karo
+4. Empty string remove karo
+5. Result ko sort karo
+
+Time: O(n * 2^n)
+Space: O(2^n)
+
+#Code:
+
+import java.util.*;
+public class Solution {
+
+    public static List<String> findSubstrings(String s) {
+        //You can code here
+        List<String> result = new ArrayList<>(); // empty array list mei dalega answer
+        findSubstringsHelper(s, 0, "", result);
+        result.remove(""); //aur jab saara taam jham hojaega saare subsets honge then we will remove empty substring
+        Collections.sort(result);
+        return result;
+    }
+
+    static void findSubstringsHelper(String s, int i, String curr, List<String> result){
+        //Base Case
+        if(i==s.length()){
+          result.add(curr);
+          return;
+        }
+        findSubstringsHelper(s, i+1, curr+s.charAt(i), result); //ek baari character add krenge 
+        findSubstringsHelper(s, i+1, curr, result); // ek baari nahi krenge
+
+    }
+}
