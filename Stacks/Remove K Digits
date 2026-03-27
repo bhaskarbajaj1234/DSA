@@ -1,0 +1,65 @@
+#Approach:
+
+Approach:
+Ye code smallest number banane ke liye monotonic increasing stack use karta hai.
+
+1. Number ke digits ko left se right traverse karte hain.
+2. Jab current digit stack ke top se chhota hota hai aur k > 0 hota hai,
+   tab stack se bada digit pop kar dete hain.
+   Kyuki left side par bada digit rehne se number bada banega.
+3. Fir current digit ko stack me push kar dete hain.
+4. Agar traverse ke baad bhi k bacha ho,
+   to end ke digits pop kar dete hain, kyuki wo sabse less important hote hain.
+5. Stack ke digits se final number banate hain.
+6. Starting ke leading zeros hata dete hain.
+7. Agar sab remove ho gaya ya sirf zeros bache, to answer "0" return karte hain.
+
+Main idea:
+Chhota number banane ke liye left side par possible minimum digit rakhna hota hai.
+Isliye jab bhi koi smaller digit milta hai, usse pehle ke bigger digits hata dete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque;
+
+public class Solution {
+    public String removeKdigits(String num, int k) {
+        //You can code here
+
+        int n = num.length();
+        Deque<Integer> stack = new ArrayDeque<>();
+        for(int i=0; i<n; i++){
+          //case 1 if string digit is smaller than stack's peak element
+          while(!stack.isEmpty() && k > 0 && (stack.peek() > (num.charAt(i) - '0'))){
+            stack.pop();
+            k = k - 1;
+          }
+          //otherwise we just add that element in the stack
+          stack.push(num.charAt(i) - '0');
+        }
+
+        while(k > 0){
+          stack.pop();
+          k = k - 1;
+        }
+
+        if(stack.isEmpty()) return "0";
+
+        StringBuilder res = new StringBuilder();
+        while(!stack.isEmpty()){
+          res.append(stack.pop());
+        }
+        res.reverse();
+
+        int idx = 0;
+        while (idx < res.length() && res.charAt(idx) == '0') idx++;
+
+        String ans = res.substring(idx);
+        return ans.length() == 0 ? "0" : ans;
+      
+    }
+}
