@@ -1,0 +1,71 @@
+#Approach:
+
+Sum of Beauty of All Substrings – Brute Force with Frequency Array
+
+Is problem me hume har substring ki beauty nikalni hai
+aur sabka total sum return karna hai.
+
+Beauty ka matlab hota hai:
+substring me sabse zyada frequency wale character ki frequency
+minus
+sabse kam frequency wale present character ki frequency.
+
+Approach:
+Har index i ko substring ka starting point maan lo.
+Ab i se end tak substring extend karte jao using j.
+
+Har naye j par ek frequency array maintain karte hain
+jisme current substring ke characters ki count store hoti hai.
+
+Ab current substring ke liye:
+maximum frequency nikaalo
+minimum non-zero frequency nikaalo
+beauty = max - min
+aur ise total sum me add kar do.
+
+Important:
+Minimum nikalte waqt sirf un characters ko consider karna hai
+jo substring me present hain, yani jinki frequency 0 nahi hai.
+
+Is tarah hum saari substrings ka beauty calculate kar lete hain.
+
+Time Complexity: O(n^2 * 26)
+Space Complexity: O(26) = O(1)
+
+#Code:
+
+class Solution {
+
+    public int getMax(int[] freq){
+        int maxi = Integer.MIN_VALUE;
+        int n = freq.length;
+        for(int i=0; i<n; i++){
+            maxi = Math.max(maxi, freq[i]);
+        }
+        return maxi;
+    }
+
+    public int getMin(int[] freq){
+        int mini = Integer.MAX_VALUE;
+        int n = freq.length;
+        for(int i=0; i<n; i++){
+            if(freq[i] != 0){
+                mini = Math.min(mini, freq[i]);
+            }
+        }
+        return mini;
+    }
+
+    public int beautySum(String s) {
+        int sum = 0;
+        for(int i=0; i<s.length(); i++){
+            int[] freq = new int[26];
+            for(int j=i; j<s.length(); j++){
+                freq[s.charAt(j) - 'a']++;
+                int beauty = getMax(freq) - getMin(freq);
+                sum += beauty;
+            }
+        }
+        return sum;
+    }
+}
