@@ -1,0 +1,71 @@
+#Approach:
+
+Search in Rotated Sorted Array – Modified Binary Search Approach
+
+Is problem me array sorted hai, but rotate ho chuka hai.
+Normal binary search directly kaam nahi karega,
+isliye har step par ye identify karna hota hai ki kaunsa half sorted hai.
+
+Hum binary search ki tarah low, high aur mid use karte hain.
+
+Sabse pehle agar nums[mid] == target ho,
+to mid return kar dete hain.
+
+Ab check karte hain:
+Agar nums[low] <= nums[mid], to left half sorted hai.
+
+Agar left half sorted hai, to check karo ki target left range me aata hai ya nahi:
+Agar nums[low] <= target <= nums[mid],
+to target left side me hoga, isliye high = mid - 1
+warna right side me hoga, isliye low = mid + 1
+
+Agar left half sorted nahi hai, to right half sorted hoga.
+
+Agar right half sorted hai, to check karo ki target right range me aata hai ya nahi:
+Agar nums[mid] <= target <= nums[high],
+to target right side me hoga, isliye low = mid + 1
+warna left side me hoga, isliye high = mid - 1
+
+Is tarah har step par ek sorted half identify karke search space half kar dete hain,
+isliye time complexity O(log n) rehti hai.
+
+Time Complexity: O(log n)
+Space Complexity: O(1)
+
+
+#Code:
+
+class Solution {
+    public int search(int[] nums, int target) {
+        int low = 0;
+        int high = nums.length - 1;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+
+            if(nums[mid] == target){
+                return mid;
+            }
+
+            //if left portion is sorted
+            else if(nums[low] <= nums[mid]){
+                if(nums[low] <= target && target <= nums[mid]){
+                    high = mid-1;
+                }
+                else{
+                    low = mid+1;
+                }
+            }
+
+            //if right portion is sorted
+            else{
+                if(nums[mid] <= target && target <= nums[high]){
+                    low = mid+1;
+                }else{
+                    high = mid-1;
+                }
+            }
+        }
+        return -1;
+    }
+}
