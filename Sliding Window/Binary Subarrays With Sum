@@ -1,0 +1,61 @@
+#Approach:
+
+Approach:
+Ye code exact sum = goal wale subarrays ko directly count nahi karta,
+balki formula use karta hai:
+
+Exact(goal) = AtMost(goal) - AtMost(goal - 1)
+
+1. helper(nums, goal) function count karta hai kitne subarrays ka sum at most goal hai.
+2. Sliding window use hoti hai:
+   - right se sum badhate hain
+   - agar sum > goal ho jaaye, to left aage badha ke sum kam karte hain
+3. Har step par current valid window se
+   (right - left + 1) subarrays milte hain.
+4. Fir:
+   - val1 = at most goal
+   - val2 = at most goal-1
+   - inka difference = exactly goal
+
+Main idea:
+Binary array me sliding window se “at most sum” easily nikal sakte hain,
+aur exact sum uske difference se mil jaata hai.
+
+Important:
+Agar goal < 0 ho jaaye, to answer 0 hoga,
+isliye helper me us case ko handle kiya gaya hai.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+
+    public int helper(int[] nums, int goal){
+        if(goal < 0) return 0;
+        int left = 0;
+        int right = 0;
+        int cnt = 0;
+        int sum = 0;
+
+        while(right < nums.length){
+            sum += nums[right];
+
+            while(sum > goal){
+                sum -= nums[left];
+                left++;
+            }
+            cnt += (right - left + 1);
+            right++;
+        }
+        return cnt;
+    }
+
+    public int numSubarraysWithSum(int[] nums, int goal) {
+        int val1 = helper(nums, goal);
+        int val2 = helper(nums, goal-1);
+        int result = val1 - val2;
+        return result;
+    }
+}
