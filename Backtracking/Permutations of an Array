@@ -1,0 +1,218 @@
+#Approach:
+
+Approach (Hinglish) – Permutations of an Array (Backtracking + Swapping)
+
+Is code ka goal hai array ke saare possible permutations generate karna.
+
+Permutation ka matlab:
+Array ke elements ko har possible order mein arrange karna.
+
+Example:
+[1,2,3] ke permutations:
+[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,2,1], [3,1,2]
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Hum array ko position by position fill karte hain.
+
+Har index l par:
+- Jo bhi element bacha hai, usse current position par la sakte hain
+- Isliye l se r tak har element ko l ke saath swap karte hain
+- Fir next position ke liye recursion chalate hain
+
+Yehi backtracking + swapping approach hai.
+
+--------------------------------------------------
+Function Meaning
+--------------------------------------------------
+permutation(nums, l, r, result)
+
+Yaha:
+nums = current array
+l = current index jise fix karna hai
+r = last index
+result = final permutations list
+
+Matlab:
+0 se l-1 tak positions already fixed hain
+ab l-th position ke liye choices try karni hain
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar l == r
+-> Matlab saari positions fix ho chuki hain
+-> Current arrangement ek complete permutation hai
+-> Isse result mein add kar do
+
+Important:
+Direct nums add nahi kar sakte,
+kyuki baad mein swaps se array change hota rahega.
+Isliye ek nayi ArrayList bana kar usme values copy karte hain.
+
+--------------------------------------------------
+Recursive Logic
+--------------------------------------------------
+for(int i = l; i <= r; i++)
+
+Iska matlab:
+Current position l par hum
+l se r tak kisi bhi element ko rakhne ki koshish kar rahe hain.
+
+Steps:
+1. swap(nums, i, l)
+   -> i-th element ko current fixed position l par le aao
+
+2. permutation(nums, l+1, r, result)
+   -> Ab next position ke liye permutations nikalo
+
+3. swap(nums, i, l)
+   -> Wapas original state mein lao
+   -> Ye backtracking step hai
+
+--------------------------------------------------
+Why backtracking needed?
+--------------------------------------------------
+Agar swap karke recursion ke baad array wapas restore nahi karenge,
+to next choices galat array state se start hongi.
+
+Isliye:
+choose -> recurse -> undo
+
+Yehi backtracking ka main pattern hai.
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+nums = [1,2,3]
+
+Start:
+l = 0
+
+i = 0
+swap(0,0) -> [1,2,3]
+recurse for l = 1
+
+    i = 1
+    swap(1,1) -> [1,2,3]
+    recurse -> [1,2,3]
+
+    i = 2
+    swap(2,1) -> [1,3,2]
+    recurse -> [1,3,2]
+
+Backtrack to [1,2,3]
+
+i = 1
+swap(1,0) -> [2,1,3]
+recurse -> gives [2,1,3], [2,3,1]
+
+i = 2
+swap(2,0) -> [3,2,1]
+recurse -> gives [3,2,1], [3,1,2]
+
+Total 6 permutations mil jaate hain.
+
+--------------------------------------------------
+Why final sorting kiya hai?
+--------------------------------------------------
+Backtracking se permutations generate ho jaate hain,
+lekin zaroori nahi ki wo lexicographical order mein aayein.
+
+Isliye result ko baad mein sort kiya gaya hai using custom comparator,
+jo list ke elements ko one by one compare karta hai.
+
+Example:
+[1,2,3] < [1,3,2] kyuki second position par 2 < 3
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Total permutations = n!
+
+Har permutation ko copy karne mein O(n) lagta hai
+
+So total:
+O(n * n!)
+
+Sorting bhi extra lagegi,
+lekin dominant generation cost already factorial hoti hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+Result store karne ke liye = O(n * n!)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har position par har possible element ko swap karke fix karo,
+baaki array ke permutations recursively nikalo,
+fir swap undo karke next choice try karo.
+
+Quick Revision – Permutations
+
+1. Current index l ko fix karna hai
+2. l se r tak har element ko l ke saath swap karo
+3. Recursively next index ke permutations nikalo
+4. Swap undo karo (backtracking)
+5. l == r par current array result mein add karo
+
+Concept:
+Backtracking + Swapping
+
+Time: O(n * n!)
+Space: O(n) recursion + result space
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public List<List<Integer>> permute(int[] nums) {
+        //You can code here
+      List<List<Integer>> result = new ArrayList<>();
+      permutation(nums, 0, nums.length - 1, result);
+
+      //This is the method to sort in lexicographical method in List of List
+      Collections.sort(result, (a, b) -> {
+            for (int i = 0; i < a.size(); i++) {
+                if (!a.get(i).equals(b.get(i))) {
+                    return a.get(i) - b.get(i);
+                }
+            }
+            return 0;
+      });
+      return result;
+    }
+
+    public static void swap(int[] nums, int i, int l){
+      int temp = nums[i];
+      nums[i] = nums[l];
+      nums[l] = temp;
+    }
+
+
+    public List<List<Integer>> permutation(int[] nums, int l, int r, List<List<Integer>> result){
+      //Base case
+      if(l == r){
+        //make nums a new arraylist and then you can add
+        ArrayList<Integer> temp = new ArrayList<>();
+        for(int x : nums){
+          temp.add(x);
+        }
+        result.add(temp);
+        return result;
+      }
+
+      for(int i=l; i<=r; i++){
+        swap(nums, i, l);
+        permutation(nums, l+1, r, result);
+        swap(nums, i, l);
+      }
+
+      return result;
+    }  
+}
