@@ -1,0 +1,83 @@
+#Approach:
+
+Approach:
+Ye code postfix expression ko evaluate karne ke liye stack use karta hai.
+
+1. Array ke har token ko ek-ek karke traverse karte hain.
+2. Agar token number hai, to usse integer me convert karke stack me push kar do.
+3. Agar token operator hai, to stack se top ke 2 numbers nikaalte hain:
+   - second pop = second operand
+   - first pop = first operand
+4. Fir operator ke according result nikaalte hain:
+   - + → addition
+   - - → subtraction
+   - * → multiplication
+   - / → division
+   - ^ → power
+5. Jo result aata hai, usse dobara stack me push kar dete hain.
+6. End me stack me jo last value bachegi wahi final answer hota hai.
+
+Main idea:
+Postfix me operator hamesha apne operands ke baad aata hai,
+isliye operator milte hi stack ke top ke 2 values par operation perform kar dete hain.
+
+Important:
+Operand order maintain karna bahut zaroori hai:
+first operator second
+isliye pehla pop second operand hota hai aur doosra pop first operand.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque;
+import java.util.*;
+
+public class Solution
+{
+
+    public boolean isOperator(String s){
+      return s.equals("+") || s.equals("-") || s.equals("*") || s.equals("/") || s.equals("^");
+    }
+
+    public int evalPostfix(String[] A)
+    {
+        //You can code here
+        
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+
+        for(String token : A){
+          if(isOperator(token)){
+            int second = stack.pop();
+            int first = stack.pop();
+            int result = 0;
+
+            switch(token){
+              case "+":
+                result = first + second;
+                break;
+              case "-":
+                result = first - second;
+                break;
+              case "*":
+                result = first * second;
+                break;
+              case "/":
+                result = first / second;
+                break;
+              case "^":
+                result = (int)Math.pow(first, second);
+                break;
+            }
+            stack.push(result);
+          }
+          else{
+            //else it is an operand: a number
+            stack.push(Integer.parseInt(token));
+          }
+        }
+        return stack.pop();
+    }
+}
