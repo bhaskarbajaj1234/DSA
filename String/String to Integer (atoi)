@@ -1,0 +1,60 @@
+#Approach:
+
+String to Integer (atoi) – Simulation Approach
+
+Is problem me hume string ko integer me convert karna hai,
+lekin kuch rules follow karne hote hain jaise spaces, sign, overflow, non-digit characters.
+
+Step 1: Sabse pehle string ke starting ke extra spaces remove karte hain (trim).
+Step 2: Check karte hain ki next character '-' hai ya '+'.
+Agar '-' hai to sign negative kar dete hain, agar '+' hai to positive hi rehta hai.
+Step 3: Ab digits read karna start karte hain.
+Har digit ko result = result * 10 + digit se number banate hain.
+Step 4: Har step par overflow check karte hain.
+Agar number Integer.MAX_VALUE se bada ho jaye to MAX_VALUE return kar dete hain.
+Agar Integer.MIN_VALUE se chhota ho jaye to MIN_VALUE return kar dete hain.
+Step 5: Jaise hi non-digit character milta hai, reading stop kar dete hain.
+Step 6: End me result ko sign se multiply karke return kar dete hain.
+
+Is tarah hum string ko integer me safely convert kar lete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int myAtoi(String s) {
+        long result = 0;
+        int sign = 1;
+        int i = 0;
+
+        //remove extra blank spaces
+        s = s.trim();
+        int n = s.length();
+        // Checking if string is empty
+        if(n == i){
+            return 0;
+        }
+
+        //checking for optional + or - sign
+        if(s.charAt(i) == '-'){
+            sign = -1;
+            i++;
+        }else if(s.charAt(i) == '+'){
+            i++;
+        }
+
+        // main logic 
+        while(i < n && Character.isDigit(s.charAt(i))){
+            int digit = s.charAt(i) - '0';
+            result = result*10 + digit;
+
+            if (sign * result > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+            if (sign * result < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+
+            i++;
+        }
+        return (int)(result * sign);
+    }
+}
