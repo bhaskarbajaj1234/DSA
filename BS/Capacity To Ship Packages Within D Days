@@ -1,0 +1,148 @@
+#Approach:
+
+Approach (Hinglish) – Capacity To Ship Packages Within D Days (Binary Search on Answer)
+
+Is question mein hume ship ki minimum capacity find karni hai
+aisi ki saare packages given order mein "days" ke andar ship ho jaayein.
+
+Brute force mein hum har possible capacity check kar sakte hain,
+lekin efficient solution ke liye Binary Search on Answer use karenge.
+
+Key Idea:
+Ship capacity ki range:
+minimum capacity = max(weights)
+maximum capacity = sum(weights)
+
+Minimum capacity max(weights) kyu?
+Kyuki ship ko kam se kam sabse heavy package uthana hi padega.
+Usse kam capacity hui to wo package kabhi ship hi nahi hoga.
+
+Maximum capacity sum(weights) kyu?
+Kyuki agar ship ki capacity saare packages ke total sum ke equal ho,
+to sab packages ek hi din mein ship ho sakte hain.
+
+Agar kisi capacity "mid" par hum saare packages
+days ya usse kam dinon mein ship kar pa rahe hain,
+to ho sakta hai aur chhoti capacity bhi valid ho.
+Isliye left side search karenge.
+
+Agar kisi capacity "mid" par hume days se zyada din lag rahe hain,
+to capacity chhoti hai,
+isliye right side search karenge.
+
+How helper works:
+Helper batata hai ki given ship capacity "mid" par
+saare packages ship karne mein kitne days lagenge.
+
+Logic:
+1. Packages ko given order mein hi load karna hai
+2. Ek current day ka load maintain karo
+3. Agar next package add karne se load capacity se exceed ho jaye,
+   to naya day start karo
+4. Naye day mein load = current package se start hoga
+5. End mein total noOfDays return kar do
+
+Example:
+weights = [1,2,3,4,5], capacity = 5
+
+Day 1 -> 1 + 2 = 3, next 3 add karenge to 6 ho jayega, so stop
+Day 2 -> 3
+Day 3 -> 4
+Day 4 -> 5
+
+Total days = 4
+
+Steps:
+1. low = max(weights)
+2. high = sum(weights)
+
+3. mid = (low + high) / 2
+
+4. helper se calculate karo ki mid capacity par kitne days lagenge
+
+5. Agar required days <= given days
+   -> capacity valid hai
+   -> aur minimum chahiye
+   -> high = mid - 1
+
+6. Else
+   -> capacity kam hai
+   -> bada capacity chahiye
+   -> low = mid + 1
+
+Loop ke end par low minimum valid capacity hoti hai.
+
+Why return low?
+Kyuki binary search ke baad low first aisi capacity hoti hai
+jisme saare packages given days ke andar ship ho jaate hain.
+
+Time Complexity:
+maxi() -> O(n)
+sumation() -> O(n)
+helper() -> O(n)
+Binary Search -> O(log(sum - max))
+Total -> O(n * log(sum(weights) - max(weights)))
+
+Space Complexity:
+O(1)
+
+One line intuition:
+Aisi minimum ship capacity find karni hai jisse packages order maintain karte hue
+days ke andar ship ho jaayein, isliye answer space par binary search lagate hain.
+
+#Code:
+
+class Solution {
+
+    public int maxi(int[] arr){
+        int n = arr.length;
+        int maxVal = Integer.MIN_VALUE;
+        for(int i=0; i<n; i++){
+            maxVal = Math.max(maxVal, arr[i]);
+        }
+        return maxVal;
+    }
+
+    public int sumation(int[] arr){
+        int n = arr.length;
+        int sum = 0;
+        for(int i=0; i<n; i++){
+            sum += arr[i];
+        }
+        return sum;
+    }
+
+    public int helper(int[] arr, int mid){
+        int n = arr.length;
+        int noOfDays = 1;
+        int load = 0;
+        for(int i=0; i<n; i++){
+            if(load + arr[i] > mid){
+                noOfDays++;
+                load = arr[i];
+            }
+            else{
+                load += arr[i];
+            }
+        }
+        return noOfDays;
+    }
+
+    public int shipWithinDays(int[] weights, int days) {
+        int low = maxi(weights);
+        int high = sumation(weights);
+
+        while(low <= high){
+            int mid = (low + high)/2;
+            int val = helper(weights, mid);
+
+            if(val <= days){
+                high = mid-1;
+            }
+            else{
+                low = mid+1;
+            }
+        }
+        return low;
+    }
+}
