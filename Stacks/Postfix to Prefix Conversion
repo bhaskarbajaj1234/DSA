@@ -1,0 +1,61 @@
+#Approach:
+
+Approach:
+Ye code postfix ko prefix me convert karne ke liye stack of strings use karta hai.
+
+1. Expression ko left se right traverse karte hain.
+2. Agar operand mile, to usse string bana ke stack me push kar do.
+3. Agar operator mile, to stack se top ke 2 operands pop karo:
+   - first pop = first operand
+   - second pop = second operand
+4. Prefix expression banane ka rule:
+   operator + second + first
+   (kyuki postfix me order operand operand operator hota hai,
+    aur prefix me operator operand operand hota hai)
+5. Naya string bana ke stack me push kar do.
+6. End me stack ka top hi final prefix expression hoga.
+
+Main idea:
+Postfix: operand operand operator
+Prefix: operator operand operand
+Isliye operator milte hi 2 operands ko nikaal ke unka order change karke new string bana dete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+
+    public boolean isOperator(Character a){
+        if((a == '+') || (a == '-') || (a == '*') || (a == '/')){
+            return true;
+        }
+        return false;
+    }
+
+    public String postToPre(String postfix) {
+        // Your code goes here
+        int n = postfix.length();
+        int i = 0;
+        ArrayDeque<String> stack = new ArrayDeque<>();
+
+        while(i < n){
+            char ch = postfix.charAt(i);
+
+            //ch is an operator: operator second first
+            if(isOperator(ch)){
+                String first = stack.pop();
+                String second = stack.pop();
+                String temp = ch + second + first;
+                stack.push(temp);
+            }
+            //if ch is an operand
+            else{
+                stack.push(Character.toString(ch));
+            }
+            i++;
+        }
+        return stack.peek();
+    }
+}
