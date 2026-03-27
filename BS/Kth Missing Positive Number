@@ -1,0 +1,100 @@
+#Approach:
+
+Approach (Hinglish) – Kth Missing Positive Number (Binary Search)
+
+Is question mein hume kth missing positive number find karna hai
+given sorted strictly increasing array se.
+
+Brute force mein hum ek-ek missing number count kar sakte hain,
+lekin yaha binary search se aur efficient kaam ho jata hai.
+
+Key Idea:
+Agar array perfect hoti without any missing numbers,
+to index 0 par value 1 honi chahiye,
+index 1 par value 2,
+index 2 par value 3, and so on.
+
+Matlab expected value at index mid = mid + 1
+
+Toh kisi bhi index mid par missing numbers count hoga:
+missing = arr[mid] - (mid + 1)
+
+Example:
+arr = [2,3,4,7,11]
+
+Index 0 -> expected = 1, actual = 2
+missing = 2 - 1 = 1
+
+Index 3 -> expected = 4, actual = 7
+missing = 7 - 4 = 3
+
+Iska matlab index 3 tak total 3 numbers missing hain.
+
+Binary Search Idea:
+Hume first aisa index chahiye jahan missing count >= k ho jaye.
+Us point ke just pehle tak missing count k se chhota hoga.
+
+Agar missing < k
+-> Abhi tak k missing numbers complete nahi hue
+-> right side jao
+
+Agar missing >= k
+-> Ho sakta hai answer left side mein ho
+-> left side jao
+
+Why answer = low + k ?
+Binary search ke end par low wo position hoti hai
+jahan tak missing numbers ka count k ya usse zyada ho jata hai.
+
+Us case mein kth missing number = low + k
+
+Example:
+arr = [2,3,4,7,11], k = 5
+
+Binary search ke baad low = 4
+Answer = low + k = 4 + 5 = 9
+
+Steps:
+1. low = 0, high = n - 1
+2. mid calculate karo
+3. missing = arr[mid] - (mid + 1)
+4. Agar missing < k
+   -> right side jao
+   -> low = mid + 1
+5. Else
+   -> left side jao
+   -> high = mid - 1
+6. Loop ke end par answer = low + k
+
+Time Complexity:
+O(log n)
+
+Space Complexity:
+O(1)
+
+One line intuition:
+Har index par count karo ki ab tak kitne positive numbers missing hain,
+aur binary search se first aisa index dhoondo jahan missing count k tak pahunch jaye.
+
+#Code:
+
+class Solution {
+    public int findKthPositive(int[] arr, int k) {
+        int low = 0;
+        int high = arr.length - 1;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+            int missing = arr[mid] - (mid+1);
+
+            if(missing < k){
+                low = mid+1;
+            }
+            else{
+                high = mid-1;
+            }
+        }
+        return low + k;
+        
+    }
+}
