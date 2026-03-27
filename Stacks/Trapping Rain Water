@@ -1,0 +1,54 @@
+#Approach:
+
+Approach:
+Ye code har index par kitna water trap hoga, ye left max aur right max ki help se nikalta hai.
+
+1. left[i] me i tak ka maximum height store kiya gaya hai.
+   Matlab current index ke left side ki highest wall.
+2. right[i] me i se end tak ka maximum height store kiya gaya hai.
+   Matlab current index ke right side ki highest wall.
+3. Ab har index par water store hoga:
+   min(left[i], right[i]) - height[i]
+4. Is value ko sab indices ke liye add karke total trapped water nikal lete hain.
+
+Main idea:
+Kisi bhi position par paani utna hi ruk sakta hai
+jitni chhoti wall left max aur right max me se hogi.
+
+Important:
+- left max boundary batata hai
+- right max boundary batata hai
+- current height hataane par actual trapped water milta hai
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public int trap(int[] height) {
+
+        int n = height.length;
+        int[] left = new int[n];
+        int[] right = new int[n];
+        //left
+        left[0] = height[0];
+        for(int i=1; i<n; i++){
+            left[i] = Math.max(left[i-1], height[i]);
+        }
+
+        right[n-1] = height[n-1];
+        //Right
+        for(int i=n-2; i>=0; i--){
+            right[i] = Math.max(right[i+1], height[i]);
+        }
+
+        int total = 0;
+        for(int i=0; i<n; i++){
+            total += Math.min(left[i], right[i]) - height[i];
+        }
+
+        return total;
+        
+    }
+}
