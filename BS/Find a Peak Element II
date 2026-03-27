@@ -1,0 +1,222 @@
+#Approach:
+
+Approach (Hinglish) – Find a Peak Element II (Binary Search on Columns)
+
+Is question mein hume 2D matrix mein koi bhi ek peak element find karna hai.
+Peak element wo hota hai jo apne
+left, right, top, aur bottom neighbors se strictly greater ho.
+
+Question mein bola gaya hai ki matrix ke bahar ke elements -1 maan sakte hain,
+isliye boundary elements bhi peak ho sakte hain.
+
+Brute force mein har cell check kar sakte hain,
+lekin wo O(n*m) ho jayega.
+Hume O(m log n) ya O(n log m) chahiye,
+isliye Binary Search use karenge.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Is code mein hum columns par binary search kar rahe hain.
+
+Har mid column ke liye:
+1. Us column ka maximum element find karte hain
+2. Fir us maximum element ko sirf left aur right se compare karte hain
+
+Question:
+Top aur bottom se compare kyu nahi karna padta?
+
+Answer:
+Kyuki humne mid column ka maximum element nikala hai,
+to uske upar aur neeche koi element usse bada nahi ho sakta.
+Isliye top/bottom automatically handle ho jaate hain.
+Ab bas left aur right check karna enough hota hai.
+
+--------------------------------------------------
+Helper Function
+--------------------------------------------------
+helper(mat, n, m, mid)
+
+Ye function mid column mein maximum element ka row index return karta hai.
+
+Matlab:
+mid column mein sabse bada element kis row par hai,
+wo index milta hai.
+
+Example:
+Agar mid column = 2 hai,
+aur us column ke values [3, 8, 6, 4] hain,
+to helper row index 1 return karega
+kyuki 8 sabse bada hai.
+
+--------------------------------------------------
+Binary Search Logic
+--------------------------------------------------
+1. low = 0, high = m - 1
+   Yani hum columns ke range par binary search karenge
+
+2. mid = (low + high) / 2
+
+3. helper se mid column ka max element wala row index nikaalo
+
+4. Ab current cell hoga:
+   mat[maxElementAtMid][mid]
+
+5. Iske left aur right neighbors check karo:
+   left = mat[row][mid-1] agar exist karta ho, warna -1
+   right = mat[row][mid+1] agar exist karta ho, warna -1
+
+--------------------------------------------------
+Cases
+--------------------------------------------------
+Case 1:
+Agar current > left aur current > right
+-> current element peak hai
+-> return [row, mid]
+
+Case 2:
+Agar current < left
+-> left side mein bada element hai
+-> peak left half mein milega
+-> high = mid - 1
+
+Case 3:
+Else
+-> right side mein bada element hai
+-> peak right half mein milega
+-> low = mid + 1
+
+--------------------------------------------------
+Why can we move left or right safely?
+--------------------------------------------------
+Agar left neighbor current se bada hai,
+to left direction mein definitely ek higher path exist karta hai
+aur eventually ek peak milega.
+
+Same logic right side ke liye bhi.
+
+Yani hum gradient ki direction mein move kar rahe hain,
+bilkul 1D peak element problem ki tarah,
+bas yaha har mid column mein pehle maximum element choose kiya ja raha hai.
+
+--------------------------------------------------
+Why top and bottom ignore kar sakte hain?
+--------------------------------------------------
+Kyuki helper ne mid column ka maximum element diya hai.
+To same column mein uske upar ya neeche koi bada element ho hi nahi sakta.
+
+Isliye peak verify karne ke liye
+sirf left aur right compare karna enough hai.
+
+--------------------------------------------------
+Dry Run
+--------------------------------------------------
+Suppose matrix:
+
+[
+ [1, 4, 3],
+ [6, 7, 8],
+ [5, 2, 9]
+]
+
+mid = 1
+Column 1 values = [4, 7, 2]
+Maximum = 7 at row = 1
+
+Current = 7
+Left = 6
+Right = 8
+
+7 < 8
+-> Peak right side mein hoga
+-> low = mid + 1
+
+Ab mid = 2
+Column 2 values = [3, 8, 9]
+Maximum = 9 at row = 2
+
+Left = 2
+Right = -1
+9 > 2 and 9 > -1
+-> Peak mil gaya at [2, 2]
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Har binary search step mein ek poora column scan karte hain:
+O(n)
+
+Aur columns par binary search hoti hai:
+O(log m)
+
+Total:
+O(n * log m)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+O(1)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har mid column mein maximum element choose karo,
+fir usse left/right se compare karo;
+jahan bada neighbor ho, us direction mein binary search move karo.
+
+Quick Revision – Find Peak Element II
+
+1. Columns par binary search lagao
+2. Mid column ka maximum element nikalo
+3. Usse left aur right se compare karo
+4. Agar dono se bada hai -> peak mil gaya
+5. Agar left bada hai -> left jao
+6. Else -> right jao
+
+Time: O(n * log m)
+Space: O(1)
+
+#Code:
+
+class Solution {
+
+    public int helper(int[][] mat, int n, int m, int mid){
+        int maxEl = Integer.MIN_VALUE;
+        int idx = -1;
+        for(int i=0; i<n; i++){
+            if(mat[i][mid] > maxEl){
+                maxEl = mat[i][mid];
+                idx = i;
+            }
+        }
+        return idx;
+    }
+
+    public int[] findPeakGrid(int[][] mat) {
+        int n = mat.length;
+        int m = mat[0].length;
+
+        int low = 0;
+        int high = m-1;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+            int maxElementAtMid = helper(mat, n, m, mid);
+
+            //Sorted for Top & bottom. Now looking for left and right
+            int left = mid-1 >= 0 ? mat[maxElementAtMid][mid-1] : -1;
+            int right = mid+1 < m ? mat[maxElementAtMid][mid+1] : -1;
+
+            if(mat[maxElementAtMid][mid] > left && mat[maxElementAtMid][mid] > right){
+                return new int[]{maxElementAtMid, mid};
+            }
+            else if(mat[maxElementAtMid][mid] < left){
+                high = mid-1;
+            }
+            else{
+                low = mid+1;
+            }
+        }
+        return new int[]{-1, -1};
+    }
+}
