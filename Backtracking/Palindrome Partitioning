@@ -1,0 +1,250 @@
+#Approach:
+
+Approach (Hinglish) – Palindrome Partitioning (Backtracking)
+
+Is question mein hume string ko aise parts mein todna hai
+ki har part ek palindrome ho.
+Aur saare possible palindrome partitions return karne hain.
+
+Example:
+s = "aab"
+
+Possible partitions:
+1. "a" | "a" | "b"
+2. "aa" | "b"
+
+Dono valid hain kyuki har piece palindrome hai.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Hum string ko left se right partition karte hain.
+
+Har step par current index se
+alag-alag ending positions try karte hain
+aur dekhte hain ki jo substring ban rahi hai
+wo palindrome hai ya nahi.
+
+Agar palindrome hai:
+-> us substring ko current partition mein add karo
+-> baaki string ke liye recursion chalao
+
+Agar palindrome nahi hai:
+-> us cut ko skip kar do
+
+Ye Backtracking problem hai.
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(s, index, result, curr)
+
+Yaha:
+s = original string
+index = current starting position jahan se next substring choose karni hai
+result = final answer list
+curr = current partition jo ab tak bana hai
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+if(index == s.length())
+
+Matlab:
+Hum string ke end tak pahunch gaye
+aur jo curr partition bana hai wo valid hai.
+
+To:
+result.add(new ArrayList<>(curr));
+
+Current partition ki copy answer mein add kar dete hain.
+
+--------------------------------------------------
+Main Loop Logic
+--------------------------------------------------
+for(int i = index; i <= s.length()-1; i++)
+
+Matlab:
+Current index se leke har possible ending index try karo.
+
+Substring banegi:
+s.substring(index, i+1)
+
+Ab check karo:
+Kya ye substring palindrome hai?
+
+--------------------------------------------------
+Palindrome Check
+--------------------------------------------------
+isPalindrome(s, start, end)
+
+Ye function 2-pointer technique use karta hai:
+- start aur end se compare karo
+- agar characters equal hain to andar move karo
+- agar mismatch mil gaya to false
+- agar poora loop complete ho gaya to true
+
+Matlab:
+sirf palindrome substring ko hi recursion mein allow karte hain.
+
+--------------------------------------------------
+Backtracking Flow
+--------------------------------------------------
+Agar substring palindrome hai:
+
+1. curr.add(s.substring(index, i+1))
+   -> current partition mein ye part add karo
+
+2. helper(s, i+1, result, curr)
+   -> next part ko process karo starting from i+1
+
+3. curr.remove(curr.size()-1)
+   -> wapas current substring hata do
+   -> ye backtracking hai
+
+Pattern:
+choose -> recurse -> undo
+
+--------------------------------------------------
+Why backtracking needed?
+--------------------------------------------------
+Kyuki ek palindrome substring choose karne ke baad
+hume baaki possible cuts bhi explore karne hote hain.
+
+Example:
+s = "aab"
+
+Index 0 se:
+- "a" choose kar sakte hain
+- "aa" bhi choose kar sakte hain
+
+Agar pehle "a" choose kiya,
+to us path ke partitions explore karne ke baad
+hume wapas aake "aa" wala path bhi try karna padega.
+
+Isliye remove() step zaroori hai.
+
+--------------------------------------------------
+Example Dry Run
+--------------------------------------------------
+s = "aab"
+
+Start index = 0
+
+Try substrings from index 0:
+1. "a" -> palindrome
+   curr = ["a"]
+   recurse from index 1
+
+   From index 1:
+   1. "a" -> palindrome
+      curr = ["a", "a"]
+      recurse from index 2
+
+      From index 2:
+      1. "b" -> palindrome
+         curr = ["a", "a", "b"]
+         index reaches end
+         add to result
+
+2. "aa" -> palindrome
+   curr = ["aa"]
+   recurse from index 2
+
+   From index 2:
+   1. "b" -> palindrome
+      curr = ["aa", "b"]
+      add to result
+
+Final answer:
+[["a","a","b"], ["aa","b"]]
+
+--------------------------------------------------
+Why all answers mil jaate hain?
+--------------------------------------------------
+Kyuki har index se saare possible end positions try ho rahe hain.
+Aur sirf palindrome substrings ko choose karke recursion aage badh raha hai.
+Isliye saare valid palindrome partitions cover ho jaate hain.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case mein har position par multiple cuts possible hote hain,
+to total partitions exponential ho sakte hain.
+
+Roughly:
+O(2^n * n)
+
+Aur palindrome checking bhi O(n) ho sakti hai per substring.
+
+So practical worst-case complexity exponential hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+Current partition list = O(n)
+Result storage alag se lagegi for all partitions
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har index se saare possible substrings try karo,
+jo palindrome ho usse choose karo,
+baaki string ko recursively partition karo,
+aur backtracking se saare valid partitions generate karo.
+
+Quick Revision – Palindrome Partitioning
+
+1. Current index se saare possible substrings try karo
+2. Agar substring palindrome hai to curr mein add karo
+3. Next index se recursion call karo
+4. Baad mein substring hata do (backtracking)
+5. index == length -> ek valid partition mil gaya
+
+Concept:
+Backtracking + Palindrome check
+
+Time: Exponential
+Space: O(n) recursion
+
+#Code:
+
+import java.util.*;
+
+public class Solution
+{
+    public List<List<String>> partition(String s)
+    {
+        //You can code here
+        List<List<String>> result = new ArrayList<>();
+        ArrayList<String> curr = new ArrayList<>();
+        helper(s, 0, result, curr);
+        return result;
+    }
+
+    public void helper(String s, int index, List<List<String>> result, ArrayList<String> curr){
+        //Base case
+        if(index == s.length()){
+            result.add(new ArrayList<>(curr));
+            return;
+        }
+
+        for(int i=index; i<=s.length()-1; i++){
+            if(isPalindrome(s, index, i)){
+                curr.add(s.substring(index, i+1));
+                helper(s, i+1, result, curr);
+                curr.remove(curr.size()-1);
+            }
+        }
+    }
+
+    public boolean isPalindrome(String s, int start, int end){
+        while(start <= end){
+            if(s.charAt(start++) != s.charAt(end--)){
+                return false;
+            }
+        }
+        return true;
+    }
+}
