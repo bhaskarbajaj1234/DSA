@@ -1,0 +1,68 @@
+#Approach:
+
+Search Insert Position – Lower Bound Concept
+
+Is problem me hume target ka position find karna hota hai.
+Agar target array me exist karta hai to uska index return karna hai,
+warna jis position par wo insert hoga sorted order maintain rakhne ke liye,
+wo index return karna hai.
+
+Ye exactly Lower Bound hota hai.
+
+Lower Bound ka matlab:
+First index jahan value >= target ho.
+
+Binary search use karte hain:
+Agar nums[mid] >= target:
+    ho sakta hai ye answer ho, isliye ans = mid store karte hain
+    aur left side me search karte hain (high = mid - 1)
+Else:
+    target right side me hoga (low = mid + 1)
+
+Loop ke baad ans hi lower bound hota hai.
+
+Time Complexity: O(log n)
+
+Upper Bound Concept
+
+Upper Bound ka matlab:
+First index jahan value > target ho.
+
+Binary search me:
+Agar nums[mid] > target:
+    ye possible answer hai
+    ans = mid
+    high = mid - 1
+Else:
+    low = mid + 1
+
+Lower Bound → first >= target
+Upper Bound → first > target
+
+Memory Trick:
+LB = >= target
+UB = > target
+
+#Code:
+
+class Solution {
+    public int searchInsert(int[] nums, int target) {
+        //This is Lower Bound only
+        int low = 0;
+        int high = nums.length - 1;
+        int ans = nums.length;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+
+            if(nums[mid] >= target){
+                ans = mid;
+                high = mid-1;
+            }
+            else{
+                low = mid+1;
+            }
+        }
+        return ans;
+    }
+}
