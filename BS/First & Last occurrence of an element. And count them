@@ -1,0 +1,103 @@
+#Approach:
+
+Find First and Last Position in Sorted Array – Binary Search Approach
+
+Is problem me hume sorted array me target ka first index aur last index find karna hota hai.
+Isliye hum simple binary search ka modified version use karte hain.
+
+First Occurrence:
+Binary search lagao.
+Agar nums[mid] == target:
+    ans = mid store karo
+    Left side me search karo (high = mid - 1)
+Kyuki hume aur pehla occurrence mil sakta hai.
+
+Agar nums[mid] < target:
+    Right side me jao (low = mid + 1)
+Agar nums[mid] > target:
+    Left side me jao (high = mid - 1)
+
+Last Occurrence:
+Binary search lagao.
+Agar nums[mid] == target:
+    ans = mid store karo
+    Right side me search karo (low = mid + 1)
+Kyuki hume aur last occurrence mil sakta hai.
+
+Baaki conditions same rahengi.
+
+Agar target nahi milta to ans -1 rahega.
+
+Time Complexity: O(log n)
+
+Count Occurrences in Sorted Array
+
+Count = lastOccurence - firstOccurence + 1
+
+Agar firstOccurence = -1 ho,
+to count = 0 (element exist hi nahi karta).
+
+Memory Trick:
+First Occ → left jao
+Last Occ → right jao
+Count = last - first + 1
+
+
+#Code:
+
+class Solution {
+
+    public int firstOcc(int[] nums, int target){
+        //First Occurence
+        int low = 0;
+        int high = nums.length - 1;
+        int ans = -1;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+
+            if(nums[mid] == target){
+                ans = mid;
+                high = mid-1;
+            }
+            else if(nums[mid] < target){
+                low = mid+1;
+            }
+            else{
+                high = mid-1;
+            }
+        }
+        return ans;
+    }
+
+    public int lastOcc(int[] nums, int target){
+        //Last Occurence
+        int low = 0;
+        int high = nums.length - 1;
+        int ans = -1;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+
+            if(nums[mid] == target){
+                ans = mid;
+                low = mid+1;
+            }
+            else if(nums[mid] > target){
+                high = mid-1;
+            }
+            else{
+                low = mid+1;
+            }
+        }
+        return ans;
+    }
+
+    public int[] searchRange(int[] nums, int target) {
+        int val1 = firstOcc(nums, target);
+        int val2 = lastOcc(nums, target);
+
+        int[] result = {val1, val2};
+        return result;
+    }
+}
