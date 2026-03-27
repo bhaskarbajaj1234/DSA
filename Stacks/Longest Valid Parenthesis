@@ -1,0 +1,59 @@
+#Approach:
+
+Approach:
+Ye code longest valid parentheses substring nikalne ke liye stack of indices use karta hai.
+
+1. Stack me initially -1 push karte hain.
+   Ye base index ki tarah kaam karta hai for length calculation.
+2. String ko left se right traverse karte hain.
+3. Agar '(' mile, to uska index stack me push kar do.
+4. Agar ')' mile, to stack ka top pop kar do
+   kyuki ek opening bracket ko match karne ki koshish ho rahi hai.
+5. Pop ke baad:
+   - agar stack empty ho gaya, to current index push kar do
+     (ye new invalid base ban jaata hai)
+   - warna valid substring ki length = i - stack.peek()
+6. Har baar maxLen update karte rehte hain.
+
+Main idea:
+Stack unmatched brackets ke indices store karta hai.
+Jab valid pair milta hai, to current index aur stack ke top ke beech ka gap
+valid parentheses substring ki length deta hai.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.*;
+public class Solution
+{
+    public int longestValidParentheses(String s)
+    {
+        //You can code here
+
+        int n = s.length();
+        int maxLen = 0;
+        Deque<Integer> stack = new ArrayDeque<>();
+        stack.push(-1);
+
+        for(int i=0; i<n; i++){
+          char ch = s.charAt(i);
+
+          if(ch == '('){
+            stack.push(i);
+          }
+          else{
+            stack.pop();
+            if(stack.isEmpty()){
+              stack.push(i);
+            }
+            else{
+              int len = i - stack.peek();
+              maxLen = Math.max(maxLen, len);
+            }
+          }
+        }
+        return maxLen;      
+    }
+}
