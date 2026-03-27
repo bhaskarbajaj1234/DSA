@@ -1,0 +1,42 @@
+#Approach:
+
+Approach:
+Ye code count karta hai kitne substrings me at least ek 'a', ek 'b' aur ek 'c' present ho.
+
+1. hash array me a, b, c ka latest index store karte hain.
+2. String ko left se right traverse karte hain.
+3. Har character ka latest index update kar dete hain.
+4. Jab teeno characters kam se kam ek baar mil jaate hain,
+   to unke latest indices me se jo minimum hoga,
+   us tak ke sab starting positions valid hongi.
+5. Isliye count me add karte hain:
+   1 + min(lastIndexOfA, lastIndexOfB, lastIndexOfC)
+
+Main idea:
+Agar current index i tak a, b, c teeno mil gaye,
+to earliest valid start 0 se lekar minimum latest index tak ho sakta hai.
+Isliye utne saare substrings current i par end hote hue valid ban jaate hain.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int numberOfSubstrings(String s) {
+        int n = s.length();
+        int[] hash = new int[3];
+        Arrays.fill(hash, -1);
+        int cnt = 0;
+
+        for(int i=0; i<n; i++){
+            hash[s.charAt(i) - 'a'] = i;
+
+            if(hash[0] != -1 && hash[1] != -1 && hash[2] != -1){
+                cnt += 1 + Math.min(hash[0], Math.min(hash[1], hash[2]));
+            }
+        }
+        return cnt;
+        
+    }
+}
