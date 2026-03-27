@@ -1,0 +1,84 @@
+#Approach:
+
+Approach (Hinglish) – Single Element in Sorted Array
+
+Array sorted hai aur har element 2 baar aata hai except ek element jo sirf 1 baar aata hai.
+Hume O(log n) time chahiye, isliye Binary Search use karenge.
+
+Key Observation:
+Normal pairs ka pattern:
+First element even index par hota hai, second element odd index par hota hai.
+Example: [1,1,2,2,3,3,4,4]
+Pairs: (0,1), (2,3), (4,5), (6,7)
+
+Lekin jab single element aata hai, uske baad pattern shift ho jata hai:
+Single element ke left side -> (even, odd)
+Single element ke right side -> (odd, even)
+
+Steps:
+1. Edge cases check karo:
+   - Agar n == 1 -> return nums[0]
+   - Agar first element single hai -> return nums[0]
+   - Agar last element single hai -> return nums[n-1]
+
+2. Binary search lagao:
+   low = 1, high = n-2
+
+3. mid calculate karo:
+   mid = (low + high) / 2
+
+4. Check karo mid single hai kya:
+   Agar nums[mid] != nums[mid-1] AND nums[mid] != nums[mid+1]
+   -> nums[mid] hi answer hai
+
+5. Decide karo left ya right:
+   Agar (mid even AND nums[mid] == nums[mid+1])
+   OR (mid odd AND nums[mid] == nums[mid-1])
+   -> Single element right side mein hai -> low = mid + 1
+   Else
+   -> Single element left side mein hai -> high = mid - 1
+
+Time Complexity: O(log n)
+Space Complexity: O(1)
+
+One line intuition:
+Single element ke baad pair indexing pattern shift ho jata hai,
+us shift ko use karke binary search se answer find karte hain.
+
+#Code:
+
+class Solution {
+    public int singleNonDuplicate(int[] nums) {
+        int n = nums.length;
+        if(n == 1) return nums[0];
+        if(nums[0] != nums[1]){
+            return nums[0];
+        }
+        if(nums[n-1] != nums[n-2]){
+            return nums[n-1];
+        }
+        int low = 1;
+        int high = n-2;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+
+            //CHeck if mid is the single element
+            if(nums[mid] != nums[mid-1] && nums[mid] != nums[mid+1]){
+                return nums[mid];
+            }
+
+            // if the element is in right then: (even,odd) -> element on right half
+            // (odd,even) -> element on left half
+
+            // for the condition if the element is in the right half
+            else if((mid % 2 == 0 && nums[mid+1] == nums[mid]) || (mid % 2 == 1 && nums[mid-1] == nums[mid])){
+                low = mid+1;
+            }
+            else{
+                high = mid-1;
+            }
+        }
+        return 1;
+    }
+}
