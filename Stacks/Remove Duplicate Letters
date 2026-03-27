@@ -1,0 +1,69 @@
+#Approach:
+
+Approach:
+Ye code duplicate letters hata kar lexicographically smallest string banata hai using stack.
+
+1. Pehle har character ka last occurrence index store karte hain.
+   Isse pata chalta hai ki koi character future me dobara aayega ya nahi.
+2. String ko left se right traverse karte hain.
+3. Agar current character already result me aa chuka hai (seen = true),
+   to usse skip kar dete hain.
+4. Warna stack se tab tak pop karte hain jab tak:
+   - stack top current character se bada ho, aur
+   - stack top future me dobara aane wala ho
+   Isse result lexicographically chhota banta hai.
+5. Fir current character ko stack me push karke seen mark kar dete hain.
+6. End me stack se string bana kar reverse kar dete hain.
+
+Main idea:
+Har character sirf ek baar rakhna hai, aur answer dictionary order me sabse chhota chahiye.
+Isliye bigger characters ko hata dete hain agar wo baad me fir mil sakte hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public String removeDuplicateLetters(String s) {
+      //You can code here
+
+      int n = s.length();
+      //prepare a hash array and mark lastIndex of character
+      int[] lastIndex = new int[26];
+      for(int i=0; i<n; i++){
+        lastIndex[s.charAt(i) - 'a'] = i;
+      }
+
+      Deque<Character> stack = new ArrayDeque<>();
+      boolean[] seen = new boolean[26];
+
+      for(int i=0; i<n; i++){
+        char ch = s.charAt(i);
+        //if already exist in stack then skip iteration
+        if(seen[ch - 'a']) continue;
+
+        //pop until stack is empty && current character is smaller than stack.top and also stack.top element
+        // must be available in the string in future
+        while(!stack.isEmpty() && stack.peek() > ch && lastIndex[stack.peek() - 'a'] > i){
+          seen[stack.pop() - 'a'] = false;
+        }
+
+        //otherwise just normally add the character and mark it as seen for to eliminate duplicacy
+        stack.push(ch);
+        seen[ch - 'a'] = true;
+      }
+
+      //Now make a stringBuilder and do the operations 
+      StringBuilder sb = new StringBuilder();
+      while(!stack.isEmpty()){
+        sb.append(stack.pop());
+      }
+
+      sb.reverse();
+      return sb.toString();
+
+  }
+}
