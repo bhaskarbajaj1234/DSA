@@ -1,0 +1,12 @@
+#Code:
+
+class Solution {
+    public int NnumbersSum(int N) {
+        //your code goes here
+        //Base case
+        if(n==0){
+            return;
+        }
+        return n + NnumbersSum(n-1);
+    }
+}
