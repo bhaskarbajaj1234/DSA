@@ -1,0 +1,101 @@
+#Approach:
+
+Approach:
+Ye code infix ko postfix me convert karne ke liye stack use karta hai.
+
+1. Expression ko left se right traverse karte hain.
+2. Agar current character operand ho (letter/number), to directly answer me append kar do.
+3. Agar '(' mile, to stack me push kar do.
+4. Agar ')' mile, to stack se tab tak operators nikaalo jab tak '(' na mil jaaye.
+   Phir '(' ko remove kar do.
+5. Agar operator mile (+, -, *, /, ^), to stack ke top par jo operators higher ya equal priority ke hain,
+   unhe pehle answer me daal do, fir current operator push karo.
+6. End me stack me bache hue sab operators answer me append kar do.
+
+Main idea:
+Operands ka order same rehta hai, bas operators ko precedence aur brackets ke according arrange kiya jata hai.
+Stack isi precedence handling ke liye use hota hai.
+
+Note:
+priority() function operators ki precedence batata hai:
+^ > * / > + -
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque;
+
+public class Solution {
+
+    public static int priority(Character a){
+      if(a == '^'){
+        return 2;
+      }
+      else if(a == '*' || a == '/'){
+        return 1;
+      }
+      else if(a == '+' || a == '-'){
+        return 0;
+      }
+      else{
+        return -1;
+      }
+    }
+
+    public static String infixToPostfix(String infixExpression) {
+      //You can code here
+
+      StringBuilder ans = new StringBuilder();
+      int n = infixExpression.length();
+      int i = 0;
+      Deque<Character> stack = new ArrayDeque<>();
+
+      while(i < n){
+        //For spaces
+        if (infixExpression.charAt(i) == ' ') {
+          i++;
+          continue;
+        }
+        //if it is an operand
+        if((infixExpression.charAt(i) >= 'A' && infixExpression.charAt(i) <= 'Z') ||
+        (infixExpression.charAt(i) >= 'a' && infixExpression.charAt(i) <= 'z') ||
+        infixExpression.charAt(i) >= '0' && infixExpression.charAt(i) <= '9'){
+
+          ans.append(infixExpression.charAt(i));
+        }
+
+        //if it is an opening bracket
+        else if(infixExpression.charAt(i) == '('){
+          stack.push(infixExpression.charAt(i));
+        }
+
+        //if it is a closing bracket
+        else if(infixExpression.charAt(i) == ')'){
+          while(!stack.isEmpty() && stack.peek() != '('){
+            ans.append(stack.pop());
+          }
+          stack.pop(); //to remove opening bracket from the stack
+        }
+
+        //if it is an operator
+        else{
+          while(!stack.isEmpty()  && stack.peek() != '(' && priority(infixExpression.charAt(i)) <= priority(stack.peek())){
+            ans.append(stack.peek());
+            stack.pop();
+          }
+          stack.push(infixExpression.charAt(i));
+        }
+        i++;
+      }
+
+      while(!stack.isEmpty()){
+        ans.append(stack.peek());
+        stack.pop();
+      }
+
+      return ans.toString();
+    }
+}
