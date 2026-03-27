@@ -1,0 +1,75 @@
+#Approach:
+
+Floor and Ceil in Sorted Array – Binary Search Approach
+
+Floor ka matlab:
+Array ka sabse bada element jo <= x ho.
+
+Ceil ka matlab:
+Array ka sabse chhota element jo >= x ho.
+
+Dono ko binary search se efficiently nikal sakte hain.
+
+Floor ke liye:
+Binary search lagao.
+Agar nums[mid] <= x:
+    Ye possible floor ho sakta hai,
+    isliye floor = nums[mid] store karo
+    aur right side me search karo (low = mid + 1)
+Else:
+    Left side me jao (high = mid - 1)
+
+Ceil ke liye:
+Binary search lagao.
+Agar nums[mid] >= x:
+    Ye possible ceil ho sakta hai,
+    isliye ceil = nums[mid] store karo
+    aur left side me search karo (high = mid - 1)
+Else:
+    Right side me jao (low = mid + 1)
+
+Agar floor ya ceil na mile to -1 return karo.
+
+Time Complexity: O(log n)
+Space Complexity: O(1)
+
+
+#Code:
+
+class Solution {
+    public int[] getFloorAndCeil(int[] nums, int x) {
+        int n = nums.length;
+        int floor = -1;
+        int ceil = -1;
+
+        int low = 0, high = n - 1;
+
+        // Find Floor
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+            if(nums[mid] <= x){
+                floor = nums[mid];
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        // Reset for Ceil
+        low = 0;
+        high = n - 1;
+
+        // Find Ceil
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+            if(nums[mid] >= x){
+                ceil = nums[mid];
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+
+        return new int[]{floor, ceil};
+    }
+}
