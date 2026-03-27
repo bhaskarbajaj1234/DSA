@@ -1,0 +1,250 @@
+#Approach:
+
+Approach (Hinglish) – Median of Two Sorted Arrays (Binary Search on Partition)
+
+Is question mein hume 2 sorted arrays ka median find karna hai
+without actually merging them,
+aur time complexity O(log(m+n)) ke around chahiye.
+
+Agar hum dono arrays merge karenge,
+to O(m+n) time lag jaayega,
+jo allowed optimal complexity nahi hai.
+
+Isliye yaha Binary Search on Partition use hota hai.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Median ka concept ye hota hai ki
+final combined sorted array ko 2 halves mein divide karo:
+
+Left half
+Right half
+
+Condition:
+1. Left half ke elements ki count right half ke equal ho
+   ya odd case mein left half mein 1 extra ho sakta hai
+2. Left half ke saare elements <= right half ke saare elements
+
+Agar ye partition mil gaya,
+to median easily nikal jayega.
+
+--------------------------------------------------
+Why binary search on smaller array?
+--------------------------------------------------
+Code mein pehle ye ensure kiya gaya hai:
+
+if(nums1.length > nums2.length){
+    return findMedianSortedArrays(nums2, nums1);
+}
+
+Hum hamesha chhoti array par binary search karte hain
+taaki partition safe rahe aur complexity better ho:
+O(log(min(n1, n2)))
+
+--------------------------------------------------
+Partition Concept
+--------------------------------------------------
+Maan lo:
+nums1 mein partition mid1 hai
+nums2 mein partition mid2 hai
+
+To combined left side mein total elements hone chahiye:
+
+left = (n1 + n2 + 1) / 2
+
+Isliye:
+mid2 = left - mid1
+
+Matlab:
+Agar hum nums1 se mid1 elements left side mein le rahe hain,
+to nums2 se automatically mid2 elements left side mein lene padenge.
+
+--------------------------------------------------
+Boundary Elements
+--------------------------------------------------
+Partition ke around 4 important values hoti hain:
+
+l1 = nums1 ke left partition ka last element
+l2 = nums2 ke left partition ka last element
+r1 = nums1 ke right partition ka first element
+r2 = nums2 ke right partition ka first element
+
+Agar partition edge par ho,
+to boundary handle karne ke liye:
+l1/l2 = -infinity
+r1/r2 = +infinity
+
+Code mein:
+l1 = Integer.MIN_VALUE
+l2 = Integer.MIN_VALUE
+r1 = Integer.MAX_VALUE
+r2 = Integer.MAX_VALUE
+
+Ye isliye taaki comparisons easy ho jaayein.
+
+--------------------------------------------------
+Correct Partition Condition
+--------------------------------------------------
+Partition tab correct hoga jab:
+
+l1 <= r2
+and
+l2 <= r1
+
+Iska matlab:
+Left side ka sabse bada element
+right side ke sabse chhote element se bada nahi hai.
+
+In short:
+Saare left elements <= saare right elements
+
+--------------------------------------------------
+Median kaise niklega?
+--------------------------------------------------
+Case 1: Total length odd hai
+-> Median left half ka maximum element hoga
+-> answer = max(l1, l2)
+
+Case 2: Total length even hai
+-> Median = left max + right min ka average
+-> answer = (max(l1, l2) + min(r1, r2)) / 2.0
+
+--------------------------------------------------
+Binary Search Movement
+--------------------------------------------------
+Case 1:
+Agar l1 > r2
+-> nums1 ki left side mein bada element aa gaya
+-> partition nums1 mein zyada right chala gaya
+-> hume left jaana hai
+-> high = mid1 - 1
+
+Case 2:
+Else
+-> l2 > r1 hoga
+-> nums1 ka partition aur right le jaana padega
+-> low = mid1 + 1
+
+--------------------------------------------------
+Why this works?
+--------------------------------------------------
+Hum combined array ko directly build nahi kar rahe,
+bas dono arrays mein aisa cut dhoond rahe hain
+jahan left half aur right half valid ban jaayein.
+
+Kyuki arrays sorted hain,
+partition move karne par behavior monotonic hota hai,
+isliye binary search possible hai.
+
+--------------------------------------------------
+Dry Run Example 1
+--------------------------------------------------
+nums1 = [1,3]
+nums2 = [2]
+
+n1 = 1, n2 = 2 after swapping if needed
+left = (1+2+1)/2 = 2
+
+Aisa partition milta hai jahan:
+left side = [1,2]
+right side = [3]
+
+Odd length hai,
+median = max(left side) = 2
+
+--------------------------------------------------
+Dry Run Example 2
+--------------------------------------------------
+nums1 = [1,2]
+nums2 = [3,4]
+
+Correct partition par:
+left side = [1,2]
+right side = [3,4]
+
+Even length hai,
+median = (2 + 3) / 2 = 2.5
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Binary search only on smaller array:
+O(log(min(n1, n2)))
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+O(1)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Dono sorted arrays ko aise partition karo
+ki left half ke saare elements right half se chhote ya equal ho jaayein,
+fir median directly boundary elements se nikal jaata hai.
+
+Quick Revision – Median of Two Sorted Arrays
+
+1. Hamesha smaller array par binary search lagao
+2. Partition aise choose karo ki combined left half size fixed ho
+3. Check:
+   l1 <= r2 and l2 <= r1
+4. Agar valid partition mil gaya:
+   - odd length -> max(l1, l2)
+   - even length -> (max(l1, l2) + min(r1, r2)) / 2
+5. Agar l1 > r2 -> left jao
+6. Else -> right jao
+
+Time: O(log(min(n1, n2)))
+Space: O(1)
+
+#Code:
+
+class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+
+        if(nums1.length > nums2.length){
+            return findMedianSortedArrays(nums2, nums1);
+        }
+        int n1 = nums1.length;
+        int n2 = nums2.length;
+        int low = 0;
+        int high = n1;
+        int left = (n1 + n2 + 1)/2;
+        int n = n1 + n2;
+
+        while(low <= high){
+            int mid1 = (low + high)/2;
+            int mid2 = left - mid1;
+
+            int l1 = Integer.MIN_VALUE;
+            int l2 = Integer.MIN_VALUE;
+            int r1 = Integer.MAX_VALUE;
+            int r2 = Integer.MAX_VALUE;
+
+            if(mid1 < n1) r1 = nums1[mid1];
+            if(mid2 < n2) r2 = nums2[mid2];
+            if(mid1 - 1 >= 0) l1 = nums1[mid1 - 1];
+            if(mid2 - 1 >= 0) l2 = nums2[mid2 - 1];
+
+            //Checking for the main logic 
+            if(l1 <= r2 && l2 <= r1){
+                if(n % 2 == 1){
+                    return Math.max(l1, l2);
+                }
+                else{
+                    return (Math.max(l1, l2) + Math.min(r1, r2)) / 2.0;
+                }
+            }
+
+            else if(l1 > r2){
+                high = mid1-1;
+            }
+            else{
+                low = mid1+1;
+            }
+        }
+        return 0.0;      
+    }
+}
