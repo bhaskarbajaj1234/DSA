@@ -1,0 +1,69 @@
+#Approach:
+
+Find How Many Times Array is Rotated – Binary Search Approach
+
+Sorted rotated array me jitni baar array rotate hota hai,
+utni hi position par minimum element aa jata hai.
+Isliye problem ko directly minimum element ka index find karne me convert kar sakte hain.
+
+Agar minimum element index i par hai,
+to array i times rotated hai.
+
+Approach:
+Hum binary search use karte hain.
+
+Har step par check karte hain ki kaunsa half sorted hai.
+
+Agar left half sorted hai:
+to us half ka minimum nums[low] hoga.
+Isliye nums[low] ko possible answer maan kar
+right side me search karte hain, kyunki actual minimum dusre half me ho sakta hai.
+
+Agar left half sorted nahi hai:
+to iska matlab rotation point left half me hai
+aur nums[mid] possible minimum ho sakta hai.
+Isliye nums[mid] ko answer ke liye consider karte hain
+aur left side me search karte hain.
+
+Poore process me hum minimum element aur uska index track karte rehte hain.
+
+End me minimum element ka index hi total rotations hota hai.
+
+Time Complexity: O(log n)
+Space Complexity: O(1)
+
+Number of rotations = index of minimum element
+
+
+#Code:
+
+class Solution {
+    public int findKRotation(int[] nums) {
+        int low = 0;
+        int high = nums.length - 1;
+        int ans = Integer.MAX_VALUE;
+        int index = -1;
+
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+
+            // if left half is sorted
+            if(nums[low] <= nums[mid]){
+                if(nums[low] < ans){
+                    ans = nums[low];
+                    index = low;
+                }
+                low = mid + 1;
+            }
+            // right half is sorted, minimum lies in left half including mid
+            else{
+                if(nums[mid] < ans){
+                    ans = nums[mid];
+                    index = mid;
+                }
+                high = mid - 1;
+            }
+        }
+        return index;
+    }
+}
