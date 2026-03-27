@@ -1,0 +1,66 @@
+#Approach:
+
+Square Root of a Number (Using Binary Search) – Hinglish Approach
+
+Problem:
+Given a positive integer n, find its square root.
+If n perfect square nahi hai, to floor value return karni hai.
+
+Why Binary Search?
+Kyuki sqrt(n) ka answer range 1 se n ke beech hi hoga.
+Aur hume fast solution chahiye -> O(log n)
+
+Key Idea:
+Hum aisa number x find karna chahte hain jiska square <= n ho
+aur (x+1)^2 > n ho.
+Wahi floor sqrt hoga.
+
+Binary Search Logic:
+Search space: 1 to n
+
+mid = (low + high) / 2
+
+Agar mid * mid == n
+-> Perfect square -> return mid
+
+Agar mid * mid < n
+-> Answer right side mein ho sakta hai
+-> Store mid as potential answer
+-> low = mid + 1
+
+Agar mid * mid > n
+-> Square bada ho gaya
+-> high = mid - 1
+
+Loop ke end par jo last stored mid hoga wahi floor sqrt hoga.
+
+Time Complexity: O(log n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int floorSqrt(int n) {
+        if(n == 0 || n == 1) return n;
+
+        int low = 1;
+        int high = n;
+        int ans = 0;
+
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+
+            if((long)mid * mid == n){
+                return mid;
+            }
+            else if((long)mid * mid < n){
+                ans = mid;      // store possible answer
+                low = mid + 1;
+            }
+            else{
+                high = mid - 1;
+            }
+        }
+        return ans;
+    }
+}
