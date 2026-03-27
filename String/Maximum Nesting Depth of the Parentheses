@@ -1,0 +1,41 @@
+#Approach:
+
+Maximum Nesting Depth of Parentheses – Counter Approach
+
+Is problem me hume batana hota hai ki parentheses kitne maximum level tak nested hain.
+
+Hum ek counter variable rakhte hain jo current depth batata hai.
+Jab bhi opening bracket '(' mile, depth 1 se increase kar dete hain
+aur maximum depth ko update karte rehte hain.
+
+Jab bhi closing bracket ')' mile, depth 1 se decrease kar dete hain
+kyunki ek nesting level close ho gaya.
+
+Baaki characters jaise digits ya operators ko ignore kar dete hain
+kyunki unka nesting depth par koi effect nahi hota.
+
+End me jo maximum depth record hui hoti hai,
+wahi answer hoti hai.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int maxDepth(String s) {
+        int val = 0;
+        int maxLen = 0;
+
+        for(int i=0; i<s.length(); i++){
+            if(s.charAt(i) == '('){
+                val++;
+                maxLen = Math.max(maxLen, val);
+            }
+            else if(s.charAt(i) == ')'){
+                val--;
+            }
+        }
+        return maxLen;
+    }
+}
