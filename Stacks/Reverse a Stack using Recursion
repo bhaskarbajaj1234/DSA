@@ -1,0 +1,48 @@
+#Approach:
+
+Approach:
+Ye code stack ko recursion se reverse karta hai without using extra data structure.
+
+1. reverseStack() function stack ka top element nikaalta hai aur baaki stack ko recursively reverse karta hai.
+2. Jab recursion se wapas aate hain, to jo element nikala tha usse stack ke bottom me insert kar dete hain.
+3. insertAtBottom() function recursion se bottom tak jaata hai:
+   - Agar stack empty ho jaaye → element push kar do (ye bottom ban jaayega)
+   - Warna top element nikaal ke recursion call karo
+   - Fir wapas aate time sab elements wapas push kar do
+4. Is process se har element bottom me insert hota jaata hai aur stack reverse ho jaata hai.
+
+Main idea:
+Reverse karne ka logic:
+Top element nikaalo → baaki stack reverse karo → top element ko bottom me daal do.
+
+Time Complexity: O(n^2)
+Space Complexity: O(n) recursion stack
+
+#Code:
+
+import java.util.*;
+public class Solution {
+    public void reverseStack(Stack<Integer> s) {
+        //You can code here
+        //Base case
+        if(s.isEmpty()){
+          return;
+        }
+
+        int topEle = s.pop();
+        reverseStack(s);
+        insertAtBottom(s, topEle);     
+    }
+
+    private void insertAtBottom(Stack<Integer> s, int topEle){
+      //Base case
+      if(s.isEmpty()){
+        s.push(topEle);
+        return;
+      }
+
+      int ele = s.pop();
+      insertAtBottom(s, topEle);
+      s.push(ele);
+    }
+}
