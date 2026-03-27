@@ -1,0 +1,120 @@
+#Approach:
+
+Approach (Hinglish) – Generate Binary Strings Without Consecutive 1s
+
+Question:
+Length n ki binary strings generate karni hain
+lekin string mein kabhi bhi "11" nahi aana chahiye.
+
+Example:
+n = 3
+Valid:
+000, 001, 010, 100, 101
+Invalid:
+011, 110, 111 (kyuki consecutive 1s hain)
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Har position par hum 2 choices le sakte hain:
+1. '0'
+2. '1'
+
+Lekin '1' tabhi add kar sakte hain
+jab previous character '1' na ho.
+
+Isliye hume previous character track karna padega.
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(n, curr, last, result)
+
+n = required length
+curr = current string
+last = last placed character (0 ya 1)
+result = final answer list
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar curr.length() == n
+-> String complete ho gayi
+-> result mein add kar do
+
+--------------------------------------------------
+Choices
+--------------------------------------------------
+1. '0' hamesha add kar sakte hain
+   helper(n, curr + "0", 0, result)
+
+2. '1' sirf tab add kar sakte hain
+   jab last == 0 ho
+   helper(n, curr + "1", 1, result)
+
+Isse kabhi bhi "11" nahi banega.
+
+--------------------------------------------------
+Why lexicographical order automatically?
+--------------------------------------------------
+Kyuki hum pehle '0' add kar rahe hain
+phir '1' add kar rahe hain.
+
+Isliye output automatically sorted order mein aata hai:
+000, 001, 010, 100, 101
+
+--------------------------------------------------
+Recursion Tree (n = 3)
+--------------------------------------------------
+Start ""
+→ 0 → 00 → 000
+           → 001
+     → 01 → 010
+→ 1 → 10 → 100
+           → 101
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Total valid strings Fibonacci pattern follow karte hain
+Approx ≈ O(2^n)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har position par '0' always allowed hai,
+'1' sirf tab allowed hai jab previous character '1' na ho.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+
+    public List<String> generateBinaryStrings(int n) {
+        List<String> result = new ArrayList<>();
+        helper(n, "", 0, result);
+        return result;
+    }
+
+    public void helper(int n, String curr, int last, List<String> result) {
+        // Base case
+        if (curr.length() == n) {
+            result.add(curr);
+            return;
+        }
+
+        // Always allowed to place '0'
+        helper(n, curr + "0", 0, result);
+
+        // Place '1' only if last placed was not '1'
+        if (last == 0) {
+            helper(n, curr + "1", 1, result);
+        }
+    }
+}
