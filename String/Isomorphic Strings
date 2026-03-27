@@ -1,0 +1,64 @@
+#Approach:
+
+Isomorphic Strings – HashMap Mapping Approach
+
+Is problem me hume check karna hota hai ki string s ke har character ko
+string t ke kisi character se consistently replace kiya ja sakta hai ya nahi.
+
+Sabse pehle dono strings ki length compare karte hain.
+Agar length different ho, to wo isomorphic ho hi nahi sakti.
+
+Phir hum ek HashMap use karte hain
+jisme s ka character key hota hai aur t ka corresponding character value hota hai.
+
+String ko character by character traverse karte hain:
+Agar current character of s pehle map me nahi hai,
+to check karte hain ki t ka current character kisi aur key ke saath already mapped to nahi hai.
+Agar mapped hai, to do alag characters same character par map ho rahe hain, jo allowed nahi hai,
+to false return kar dete hain.
+
+Agar current s character already map me present hai,
+to check karte hain ki wo same t character ko hi map kar raha ho.
+Agar nahi, to mapping inconsistent hai, so false return kar dete hain.
+
+Agar poori string traverse ho jaye aur koi issue na aaye,
+to strings isomorphic hain.
+
+Time Complexity: O(n)
+Space Complexity: O(1) / O(n)
+
+#Code:
+
+class Solution {
+    public boolean isIsomorphic(String s, String t) {
+
+        //check if they are equal in length or not 
+        if(s.length() != t.length()){
+            return false;
+        }
+
+        HashMap<Character, Character> map = new HashMap<>();
+
+        for(int i=0; i<s.length(); i++){
+            char orignal = s.charAt(i);
+            char replacement = t.charAt(i);
+
+            if(!map.containsKey(orignal)){
+                if(!map.containsValue(replacement)){
+                    map.put(orignal, replacement);
+                }
+                else{
+                    return false;
+                }
+            }
+            else{
+                char check = map.get(orignal);
+                if(check != replacement){
+                    return false;
+                }
+            }
+        }
+        return true;
+        
+    }
+}
