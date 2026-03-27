@@ -1,0 +1,42 @@
+#Approach:
+
+Rotate String – Concatenation Trick
+
+Is problem me hume check karna hota hai ki goal string,
+original string s ko left shift karke ban sakti hai ya nahi.
+
+Agar s ko baar baar rotate karein,
+to uski saari possible rotations s + s ke andar substring ke form me mil jaati hain.
+
+Example:
+s = "abcde"
+s + s = "abcdeabcde"
+
+Ab isme:
+"bcdea", "cdeab", "deabc", "eabcd", "abcde"
+sab possible rotations mil jaati hain.
+
+Isliye approach:
+Sabse pehle dono strings ki length check karo.
+Agar length same nahi hai, to answer false hoga.
+
+Phir ek nayi string banao:
+check = s + s
+
+Agar check ke andar goal present hai,
+to iska matlab goal, s ki kisi rotation se ban sakti hai.
+Otherwise false.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    public boolean rotateString(String s, String goal) {
+        if(s.length() != goal.length()) return false;
+        String check = s + s;
+        
+        return check.contains(goal);
+    }
+}
