@@ -1,0 +1,15 @@
+#Code:
+
+public class Solution {
+    public static int power(int x, int n)
+    {
+        //You can code here
+
+        //Base case
+        if(n==0){
+          return 1;
+        }
+
+        return x * power(x, n-1);
+    }
+}
