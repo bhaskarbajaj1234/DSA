@@ -1,0 +1,234 @@
+#Approach:
+
+Approach (Hinglish) – Generate Brackets (Backtracking)
+
+Is question mein hume n pairs of parentheses diye gaye hain
+aur hume saare valid / balanced bracket combinations generate karne hain.
+
+Example:
+n = 3
+Valid answers:
+((()))
+(()())
+(())()
+()(())
+()()()
+
+Yaha sirf wahi strings valid hongi
+jahan brackets balanced ho aur well-formed ho.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Har step par hum 2 choices try kar sakte hain:
+1. '(' add karo
+2. ')' add karo
+
+Lekin har jagah blindly add nahi kar sakte,
+warna invalid strings ban jaayengi.
+
+Isliye backtracking use karte hain
+aur sirf valid choices ko hi explore karte hain.
+
+--------------------------------------------------
+Important Conditions
+--------------------------------------------------
+1. Open bracket '(' tabhi add kar sakte hain
+   jab open < n ho
+   kyuki total n open brackets hi allowed hain
+
+2. Close bracket ')' tabhi add kar sakte hain
+   jab close < open ho
+   kyuki close bracket kabhi bhi open bracket se zyada nahi ho sakta
+   warna string invalid ho jaayegi
+
+Yehi 2 conditions poore problem ka core hain.
+
+--------------------------------------------------
+Function Meaning
+--------------------------------------------------
+generateParenthisis(n, curr, i, open, close, result)
+
+Yaha:
+n = total pairs
+curr = current string
+i = current length of string
+open = kitne '(' use ho chuke hain
+close = kitne ')' use ho chuke hain
+result = final answer list
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+Agar current string ki length 2*n ho gayi:
+-> Matlab n open aur n close brackets use ho chuke
+-> Current string valid complete answer hai
+-> result mein add kar do
+
+if(i == 2*n){
+    result.add(curr);
+    return result;
+}
+
+--------------------------------------------------
+Recursive Choices
+--------------------------------------------------
+Choice 1: Add '('
+Agar open < n
+-> ek open bracket aur add kar sakte hain
+
+Code:
+curr = curr + '('
+generateParenthisis(n, curr, i+1, open+1, close, result)
+
+Uske baad backtrack:
+curr ko previous state mein wapas lao
+
+--------------------------------------------------
+Choice 2: Add ')'
+Agar close < open
+-> tabhi close bracket add kar sakte hain
+
+Kyuki valid expression mein kabhi bhi closing brackets,
+opening brackets se zyada nahi ho sakte.
+
+Code:
+curr = curr + ')'
+generateParenthisis(n, curr, i+1, open, close+1, result)
+
+--------------------------------------------------
+Why close < open condition?
+--------------------------------------------------
+Suppose current string = "(()"
+Yaha open = 2, close = 1
+Hum ek ')' aur add kar sakte hain
+
+Lekin agar current string = ")("
+to start mein hi close > open ho jaata
+jo invalid hai
+
+Isliye hum invalid states ko recursion mein jaane hi nahi dete.
+
+--------------------------------------------------
+Why backtracking?
+--------------------------------------------------
+Kyuki ek branch explore karne ke baad
+hume doosri branch bhi try karni hoti hai.
+
+So pattern hota hai:
+choose -> recurse -> undo
+
+Yaha '(' add karke recursion ke baad
+curr ko wapas previous state mein la rahe hain.
+
+--------------------------------------------------
+Why output sorted order mein aata hai?
+--------------------------------------------------
+Question mein bola hai sorted order where '(' comes first then ')'.
+
+Code mein pehle '(' wali branch chal rahi hai,
+phir ')' wali.
+Isliye answers naturally lexicographical order mein aa jaate hain.
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+n = 2
+
+Start: ""
+open = 0, close = 0
+
+Add '(' -> "("
+Add '(' -> "(("
+Now open = 2, aur '(' nahi add kar sakte
+
+Add ')' -> "(()"
+Add ')' -> "(())"
+-> valid answer
+
+Backtrack
+
+From "("
+Add ')' -> "()"
+Then add '(' -> "()("
+Then add ')' -> "()()"
+-> valid answer
+
+Final:
+[(()), ()()]
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Total valid combinations = Catalan number
+Approx:
+O(4^n / sqrt(n))
+
+Har valid string ki length 2n hoti hai,
+to generation cost isi order ki hoti hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack depth = O(2n) = O(n)
+Result space alag se lagegi for storing all valid strings
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har step par '(' ya ')' add karo,
+lekin sirf tab jab string balanced reh sake,
+aur backtracking se saare valid combinations generate karo.
+
+Quick Revision – Generate Brackets
+
+1. open < n -> '(' add kar sakte hain
+2. close < open -> ')' add kar sakte hain
+3. length == 2*n -> valid answer
+4. Pehle '(' branch, phir ')' branch
+5. Backtracking se saare combinations generate hote hain
+
+Concept:
+Backtracking + valid state pruning
+
+Time: Catalan number based
+Space: O(n) recursion
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    
+    public List<String> AllParenthesis(int n) {
+        //You can code here
+        List<String> result = new ArrayList<>();
+
+        generateParenthisis(n, "", 0, 0, 0, result);
+
+        return result;
+    }
+
+    public List<String> generateParenthisis(int n, String curr, int i, int open, int close, List<String> result){
+
+      //Base case
+      if(i == 2*n){
+        result.add(curr);
+        return result;
+      }
+
+      if(open < n){
+        curr = curr + '(';
+        generateParenthisis(n, curr, i+1, open+1, close, result);
+        //Backtrack
+        curr = curr.substring(0, curr.length() - 1);
+      }
+
+      if(close < open){
+        curr = curr + ')';
+        generateParenthisis(n, curr, i+1, open, close+1, result);
+      }
+
+      return result;
+    }
+}
