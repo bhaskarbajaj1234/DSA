@@ -1,0 +1,50 @@
+#Approach:
+
+Find Minimum in Rotated Sorted Array – Binary Search Approach
+
+Is problem me sorted array rotate ho chuki hoti hai,
+aur hume minimum element find karna hota hai.
+
+Observation:
+Har step par array ka ek half definitely sorted hota hai.
+Agar left half sorted hai, to us half ka minimum nums[low] hoga.
+To hum ans ko nums[low] se update kar sakte hain
+aur minimum dusre half me ho sakta hai, isliye right side me search karte hain.
+
+Agar left half sorted nahi hai,
+to iska matlab rotation point left half me hai
+aur minimum nums[mid] ya uske left side me ho sakta hai.
+Isliye ans ko nums[mid] se update karte hain
+aur high = mid - 1 karke left side me search karte hain.
+
+Is tarah har step par search space half hoti rehti hai,
+isliye time complexity O(log n) rehti hai.
+
+Time Complexity: O(log n)
+Space Complexity: O(1)
+
+#Code:
+
+class Solution {
+    public int findMin(int[] nums) {
+        int low = 0;
+        int high = nums.length-1;
+        int ans = Integer.MAX_VALUE;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+
+            //if left half is sorted
+            if(nums[low] <= nums[mid]){
+                ans = Math.min(ans, nums[low]);
+                low = mid+1;
+            }
+            //if right half is sorted
+            else{
+                ans = Math.min(ans, nums[mid]);
+                high = mid-1;
+            }
+        }
+        return ans;
+    }
+}
