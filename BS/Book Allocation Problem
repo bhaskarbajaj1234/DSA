@@ -1,0 +1,229 @@
+#Approach:
+
+Approach (Hinglish) – Book Allocation Problem (Binary Search on Answer)
+
+Is question mein hume books ko m students mein allocate karna hai
+aise ki:
+1. Har student ko kam se kam 1 book mile
+2. Books contiguous honi chahiye
+3. Maximum pages assigned to any student minimum ho
+
+Matlab:
+Hume minimum possible value find karni hai
+for "maximum pages assigned to a student".
+
+Ye exactly Binary Search on Answer wala pattern hai.
+
+--------------------------------------------------
+Key Idea
+--------------------------------------------------
+Answer pages ke range mein hoga:
+
+Minimum possible answer = max(nums)
+Maximum possible answer = sum(nums)
+
+Why low = max(nums)?
+Kyuki kisi bhi student ko agar koi book mil rahi hai,
+to usse kam se kam us book ke pages handle karne padenge.
+Agar max book 90 pages ki hai,
+to answer 90 se chhota kabhi ho hi nahi sakta.
+
+Why high = sum(nums)?
+Agar sirf ek student saari books le le,
+to maximum pages = total sum of all books.
+
+So search space:
+low = maximum pages of a single book
+high = total sum of all books
+
+--------------------------------------------------
+Impossible Case
+--------------------------------------------------
+Agar students m > number of books n,
+to allocation possible nahi hai,
+kyuki har student ko at least 1 book chahiye.
+
+Isliye:
+if(m > n) return -1
+
+--------------------------------------------------
+Check Function
+--------------------------------------------------
+countStudents(nums, pages)
+
+Ye function batata hai ki
+agar hum maximum allowed pages per student = "pages" rakhein,
+to kitne students chahiye honge.
+
+Logic:
+1. Ek student se start karo
+2. Books ko left to right contiguous order mein allocate karo
+3. Jab tak current student ke pages + next book <= pages hai,
+   usi student ko book dete raho
+4. Jaise hi exceed kare,
+   naya student lena padega
+5. End mein total students count return kar do
+
+Example:
+nums = [12, 34, 67, 90], pages = 113
+
+Student 1:
+12 + 34 + 67 = 113
+
+Student 2:
+90
+
+Total students = 2
+
+--------------------------------------------------
+Binary Search Logic
+--------------------------------------------------
+mid = ek possible answer hai
+matlab hum check kar rahe hain:
+"Kya har student ko at most mid pages dekar allocation possible hai?"
+
+Case 1:
+Agar required students <= m
+-> matlab allocation possible hai
+-> ho sakta hai aur chhota maximum pages bhi possible ho
+-> left side search karo
+-> high = mid - 1
+
+Case 2:
+Agar required students > m
+-> matlab mid pages ka limit bahut chhota hai
+-> zyada students lag rahe hain
+-> hume allowed pages badhane padenge
+-> right side search karo
+-> low = mid + 1
+
+--------------------------------------------------
+Why return low?
+--------------------------------------------------
+Binary search ke end par low first aisa minimum value hota hai
+jahan allocation possible ho jata hai.
+
+Isi liye answer = low
+
+--------------------------------------------------
+Dry Run
+--------------------------------------------------
+nums = [12, 34, 67, 90], m = 2
+
+low = 90
+high = 203
+
+Try mid = 146
+Possible in 2 students
+-> answer ho sakta hai smaller ho
+-> left jao
+
+Try mid = 117
+Possible in 2 students
+-> left jao
+
+Try mid = 103
+Need more than 2 students
+-> right jao
+
+Aise-aise final minimum valid answer 113 milta hai
+
+Allocation:
+12, 34, 67 | 90
+
+Maximum pages = 113
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+maxi() = O(n)
+sum() = O(n)
+countStudents() = O(n)
+Binary Search = O(log(sum - max))
+
+Total = O(n * log(sum(nums) - max(nums)))
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+O(1)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Aisa minimum maximum pages value find karna hai
+jisme books contiguous way mein m students ko allocate ho jaayein,
+isliye answer space par binary search lagate hain.
+
+Quick Revision – Book Allocation Problem
+
+1. If m > n -> return -1
+2. low = max(nums), high = sum(nums)
+3. Binary search on max pages per student
+4. Check how many students are needed for a given pages limit
+5. If students <= m -> possible, smaller answer try karo
+6. Else -> pages limit badhao
+7. Final answer = low
+
+Time: O(n * log(sum - max))
+Space: O(1)
+
+#Code:
+
+class Solution {
+
+    public int maxi(int[] nums){
+        int maxVal = Integer.MIN_VALUE;
+        for(int i = 0; i < nums.length; i++){
+            maxVal = Math.max(maxVal, nums[i]);
+        }
+        return maxVal;
+    }
+
+    public int sum(int[] nums){
+        int total = 0;
+        for(int i = 0; i < nums.length; i++){
+            total += nums[i];
+        }
+        return total;
+    }
+
+    public int countStudents(int[] nums, int pages){
+        int students = 1;
+        int pagesStudent = 0;
+
+        for(int i = 0; i < nums.length; i++){
+            if(pagesStudent + nums[i] <= pages){
+                pagesStudent += nums[i];
+            }
+            else{
+                students++;
+                pagesStudent = nums[i];
+            }
+        }
+        return students;
+    }
+
+    public int findPages(int[] nums, int m) {
+        int n = nums.length;
+
+        if(m > n) return -1;
+
+        int low = maxi(nums);
+        int high = sum(nums);
+
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+
+            int students = countStudents(nums, mid);
+
+            if(students <= m){
+                high = mid - 1;
+            }
+            else{
+                low = mid + 1;
+            }
+        }
+        return low;
+    }
+}
