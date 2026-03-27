@@ -1,0 +1,268 @@
+#Approach:
+
+Approach (Hinglish) – Permutations of a String (Backtracking + Swapping + Duplicate Handling)
+
+Is question mein hume string ke saare unique permutations generate karne hain
+aur unhe lexicographical sorted order mein return karna hai.
+
+Permutation ka matlab:
+String ke characters ko har possible order mein arrange karna.
+
+Agar string mein duplicate characters ho,
+to duplicate permutations answer mein nahi aane chahiye.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Hum string ko char array mein convert karte hain
+aur position by position characters fix karte hain.
+
+Har position l par:
+- l se r tak koi bhi character laa sakte hain
+- isliye swap karke us character ko current position par fix karte hain
+- fir next position ke liye recursion chala dete hain
+
+Ye Backtracking + Swapping approach hai.
+
+--------------------------------------------------
+Why char array banaya?
+--------------------------------------------------
+String Java mein immutable hoti hai,
+isliye directly characters swap nahi kar sakte.
+
+Isliye:
+char[] arr = str.toCharArray();
+
+Ab array mein easily swap kar sakte hain.
+
+--------------------------------------------------
+Why starting mein sort kiya?
+--------------------------------------------------
+Arrays.sort(arr);
+
+Sorting ke 2 fayde hain:
+1. Lexicographical order maintain karne mein help milti hai
+2. Duplicate characters ko handle karna easy hota hai
+
+Although end mein Collections.sort(result) bhi kiya gaya hai,
+starting sort se recursion ka flow cleaner ho jata hai.
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(arr, l, r, result)
+
+Yaha:
+arr = current character arrangement
+l = current position jo fix karni hai
+r = last index
+result = final answer list
+
+Matlab:
+0 se l-1 tak positions already fixed hain,
+ab l-th position ke liye choice leni hai.
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+if(l == r)
+
+Matlab:
+Saari positions fix ho chuki hain
+aur current arr ek complete permutation hai.
+
+To:
+result.add(new String(arr));
+
+Current char array ko string bana kar answer mein add kar dete hain.
+
+--------------------------------------------------
+Main Recursive Logic
+--------------------------------------------------
+for(int i = l; i <= r; i++)
+
+Matlab:
+Current position l par hum
+l se r tak kisi bhi character ko laa kar fix kar sakte hain.
+
+Steps:
+1. swap(arr, i, l)
+   -> i-th character ko l-th position par lao
+
+2. helper(arr, l+1, r, result)
+   -> ab next position ke permutations generate karo
+
+3. swap(arr, i, l)
+   -> array ko original state mein wapas lao
+   -> ye backtracking hai
+
+Pattern:
+choose -> recurse -> undo
+
+--------------------------------------------------
+Why HashSet usedAtLevel use kiya?
+--------------------------------------------------
+Agar string mein duplicate characters hain,
+to same level par same character ko multiple baar fix karne se
+duplicate permutations ban jaayenge.
+
+Isliye har recursive level par ek HashSet use kiya gaya hai:
+
+HashSet<Character> usedAtLevel = new HashSet<>();
+
+Agar koi character us level par already use ho chuka hai,
+to usse skip kar dete hain.
+
+Code:
+if(usedAtLevel.contains(arr[i])) continue;
+
+Ye ensure karta hai ki
+same recursion level par same character sirf ek baar use ho.
+
+--------------------------------------------------
+Example with duplicates
+--------------------------------------------------
+String = "AAB"
+
+Without HashSet:
+same 'A' ko same position par alag-alag baar fix karke
+duplicate permutations aa jaate:
+AAB, ABA, AAB, ABA, BAA, BAA
+
+With HashSet:
+same level par duplicate A skip ho jayega
+
+Unique permutations:
+AAB, ABA, BAA
+
+--------------------------------------------------
+Backtracking kyu zaroori hai?
+--------------------------------------------------
+Kyuki ek choice try karne ke baad
+hume next choices bhi explore karni hoti hain.
+
+Example:
+Agar l = 0 par pehle 'A' fix kiya,
+to us branch ke permutations generate karne ke baad
+hume doosra character bhi l = 0 par try karna padega.
+
+Isliye swap undo karna mandatory hai.
+
+--------------------------------------------------
+Why final sort kiya?
+--------------------------------------------------
+Collections.sort(result);
+
+Backtracking se saare unique permutations generate ho jaate hain,
+lekin exact output order guaranteed nahi hota.
+Isliye end mein result ko lexicographically sort kar diya.
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+str = "ABC"
+
+Possible permutations:
+ABC
+ACB
+BAC
+BCA
+CAB
+CBA
+
+str = "AAB"
+
+Unique permutations:
+AAB
+ABA
+BAA
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case agar saare characters distinct ho:
+Total permutations = n!
+
+Har permutation banane/copy karne mein O(n)
+
+So total approx:
+O(n * n!)
+
+Duplicate case mein actual permutations kam ho sakte hain,
+lekin worst case same factorial order hi rehta hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+HashSet at each level = O(n) worst case
+Result storage = O(n * number_of_permutations)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har position par ek unique character fix karo,
+swap karke next positions ke permutations recursively banao,
+aur same level par duplicates skip karne ke liye HashSet use karo.
+
+Quick Revision – Permutations of a String
+
+1. String ko char array mein convert karo
+2. Har position l par l..r tak characters try karo
+3. Swap -> recurse -> swap back
+4. Same level par duplicate character skip karne ke liye HashSet use karo
+5. l == r par current permutation result mein add karo
+6. End mein result sort kar do
+
+Concept:
+Backtracking + Swapping + Duplicate skipping
+
+Time: O(n * n!)
+Space: O(n)
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+  
+    public List<String> permute(String str) {
+
+      //You can code here
+      char[] arr = str.toCharArray();
+      Arrays.sort(arr); 
+      ArrayList<String> result = new ArrayList<>();
+
+      helper(arr, 0, str.length()-1, result);
+      Collections.sort(result); 
+      return result;
+    }
+
+    public void swap(char[] arr, int a, int b){
+      char temp = arr[a];
+      arr[a] = arr[b];
+      arr[b] = temp;
+    }
+
+    public List<String> helper(char[] arr, int l, int r, ArrayList<String> result){
+      //Base case
+      if(l == r){
+        result.add(new String(arr));
+        return result;
+      }
+
+      //We are using HashSet because to keep a track not to have duplicates
+      HashSet<Character> usedAtLevel = new HashSet<>();
+
+      //Main logic
+      for(int i=l; i <= r; i++){
+        if(usedAtLevel.contains(arr[i])) continue;
+        usedAtLevel.add(arr[i]);
+
+        swap(arr, i, l);
+        helper(arr, l+1, r, result);
+        swap(arr, i, l);
+      }
+      return result;
+    }
+}
