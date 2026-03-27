@@ -1,0 +1,285 @@
+#Approach:
+
+Approach (Hinglish) – N Queens Problem (Backtracking + Hashing Arrays)
+
+Is question mein hume n queens ko n x n chessboard par place karna hai
+aise ki koi bhi 2 queens ek dusre ko attack na karein.
+
+Queen attack kar sakti hai:
+1. Same row mein
+2. Same column mein
+3. Same diagonal par
+
+Hume saare possible valid boards return karne hain.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Is code mein hum column by column queen place kar rahe hain.
+
+Matlab:
+Har column mein exactly 1 queen place karne ki koshish karte hain.
+Ab current column ke liye har row check karte hain
+ki kya waha queen safely place ho sakti hai ya nahi.
+
+Agar safe hai:
+-> queen place karo
+-> next column ke liye recursion call karo
+
+Agar aage solution nahi banta:
+-> queen hata do
+-> next row try karo
+
+Yehi backtracking hai.
+
+--------------------------------------------------
+Board Initialization
+--------------------------------------------------
+Board ko char[][] se represent kiya gaya hai.
+
+Har cell initially '.'
+matlab empty cell
+
+Jahan queen place hoti hai waha 'Q' store hota hai.
+
+Code:
+for(char[] x : board) Arrays.fill(x, '.');
+
+--------------------------------------------------
+Why extra arrays use kiye gaye?
+--------------------------------------------------
+Agar har baar row, upper diagonal aur lower diagonal manually check karenge,
+to har placement check O(n) ka ho jayega.
+
+Is code mein optimization ke liye 3 arrays use ki gayi hain:
+
+1. leftRow[row]
+   -> batata hai ki is row mein queen already hai ya nahi
+
+2. lowerDiagonal[row + col]
+   -> batata hai lower diagonal occupied hai ya nahi
+
+3. upperDiagonal[(n-1) + (col-row)]
+   -> batata hai upper diagonal occupied hai ya nahi
+
+In arrays ki wajah se safe check O(1) mein ho jata hai.
+
+--------------------------------------------------
+Why row + col for lower diagonal?
+--------------------------------------------------
+Same lower diagonal ke saare cells ka row + col same hota hai.
+
+Example:
+(0,2), (1,1), (2,0)
+In sabka row + col = 2
+
+Isliye lowerDiagonal[row + col] use karte hain.
+
+--------------------------------------------------
+Why (n-1) + (col-row) for upper diagonal?
+--------------------------------------------------
+Same upper diagonal ke saare cells ka (col - row) same hota hai.
+
+Lekin (col - row) negative bhi ho sakta hai,
+isliye usme (n-1) add karte hain
+taaki index non-negative ho jaaye.
+
+Isliye:
+upperDiagonal[(n-1) + (col-row)]
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(col, board, n, result, leftRow, lowerDiagonal, upperDiagonal)
+
+Yaha:
+col = current column jisme queen place karni hai
+
+Matlab:
+0 se col-1 tak ke columns mein queens already place ho chuki hain
+ab current column ke liye valid row dhoondni hai.
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+if(col == n)
+
+Matlab:
+Agar hum n columns cross kar gaye,
+to n queens successfully place ho chuki hain
+aur ek valid board mil gaya.
+
+Ab current board ko List<String> mein convert karke result mein add kar dete hain.
+
+--------------------------------------------------
+Placement Check
+--------------------------------------------------
+Har row ke liye check karte hain:
+
+if(leftRow[row] == 0 &&
+   lowerDiagonal[row + col] == 0 &&
+   upperDiagonal[(n-1) + (col-row)] == 0)
+
+Agar teeno 0 hain,
+to matlab:
+- row free hai
+- lower diagonal free hai
+- upper diagonal free hai
+
+To queen safely place ho sakti hai.
+
+--------------------------------------------------
+Place + Recurse + Backtrack
+--------------------------------------------------
+Agar safe hai to:
+
+1. board[row][col] = 'Q'
+2. row aur diagonals ko occupied mark karo
+3. next column ke liye recursion call karo
+
+helper(col+1, ...)
+
+Phir recursion ke baad:
+4. queen hata do
+5. row aur diagonals ko wapas free mark karo
+
+Yahi backtracking step hai.
+
+Pattern:
+choose -> recurse -> undo
+
+--------------------------------------------------
+Why column by column?
+--------------------------------------------------
+Kyuki ek queen har column mein exactly ek hi chahiye.
+To column fix karke rows try karna natural aur simple ho jata hai.
+
+Isse same column ka conflict automatically avoid ho jata hai,
+kyuki ek column mein ek hi queen place kar rahe hain.
+
+--------------------------------------------------
+Example (n = 4)
+--------------------------------------------------
+Column 0:
+Row 0 par queen place ki
+
+Column 1:
+Ab row/diagonals check karke valid row dhoondenge
+
+Agar future columns mein queen place nahi ho paayi,
+to previous queen hata kar doosri row try karenge
+
+Isi process se saare valid boards milte hain.
+
+For n = 4, total 2 solutions milte hain.
+
+--------------------------------------------------
+Why board ko string list mein convert kiya?
+--------------------------------------------------
+Question ka output format List<List<String>> hai.
+Isliye jab valid solution milta hai,
+har row ko String bana kar ek temp list mein add karte hain,
+fir temp ko result mein add kar dete hain.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case backtracking exponential hota hai.
+
+Roughly:
+O(N!) ke around maana jata hai,
+kyuki har column ke liye rows try ho rahi hain
+aur pruning bhi ho rahi hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Board = O(n^2)
+3 helper arrays = O(n) + O(2n-1) + O(2n-1)
+Recursion stack = O(n)
+
+Overall auxiliary space dominated by board:
+O(n^2)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har column mein ek safe row par queen place karo,
+row aur diagonals ko arrays se track karo,
+aur backtracking se saare valid board configurations generate karo.
+
+Quick Revision – N Queens
+
+1. Column by column queen place karo
+2. Har row par check karo:
+   - row free?
+   - lower diagonal free?
+   - upper diagonal free?
+3. Safe hai to queen place karo
+4. Next column solve karo
+5. Fail ho to queen hata do (backtrack)
+6. col == n -> valid board mil gaya
+
+Optimization:
+leftRow, lowerDiagonal, upperDiagonal arrays
+
+Time: Exponential / around O(N!)
+Space: O(n^2)
+
+#Code:
+
+import java.util.*;
+
+public class Solution
+{
+    public List<List<String>> solveNQueens(int n)
+    {
+        //You can code here
+
+        char[][] board = new char[n][n];
+
+        //filling the board with '.';
+        for(char[] x : board) Arrays.fill(x, '.');
+        List<List<String>> result = new ArrayList<>();
+
+        int[] leftRow = new int[n];
+        int[] lowerDiagonal = new int[(2*n)-1];
+        int[] upperDiagonal = new int[(2*n)-1];
+
+        helper(0, board, n, result, leftRow, lowerDiagonal, upperDiagonal);
+        return result;
+      
+    }
+
+    public void helper(int col, char[][] board, int n, List<List<String>> result, int[] leftRow, int[] lowerDiagonal, int[] upperDiagonal){
+
+        //Base case: Basically yha hum iterate row wise kr rhe h then poori row ko as string input krke temp mei fir result mei add kr rhe h poore ans ko
+        if(col == n){
+            ArrayList<String> temp = new ArrayList<>();
+            for(int i=0; i<n; i++){
+                temp.add(new String(board[i]));
+            }
+            result.add(temp);
+            return;
+        }
+
+        //Now we will traverse row wise and see in that current column can we place our queen ?
+        for(int row=0; row<n; row++){
+            if(leftRow[row] == 0 && lowerDiagonal[row + col] == 0 && upperDiagonal[(n-1) + (col-row)] == 0){
+                board[row][col] = 'Q';
+                leftRow[row] = 1;
+                lowerDiagonal[row + col] = 1;
+                upperDiagonal[(n-1) + (col-row)] = 1;
+
+                //Now check and then return back and find another solution as well via backtracking
+                helper(col+1, board, n, result, leftRow, lowerDiagonal, upperDiagonal);
+
+                //Backtrack
+                board[row][col] = '.';
+                leftRow[row] = 0;
+                lowerDiagonal[row + col] = 0;
+                upperDiagonal[(n-1) + (col-row)] = 0;
+            }
+        }
+    }
+}
