@@ -1,0 +1,264 @@
+#Approach:
+
+Approach (Hinglish) – Matrix Median (Binary Search on Values)
+
+Is question mein matrix row-wise sorted hai,
+aur hume poori matrix ka median find karna hai
+without actually saare elements ko ek array mein daal kar sort kiye.
+
+Agar hum matrix ko flatten karke sort karenge,
+to time zyada lagega.
+Isliye yaha Binary Search on Answer / Values use karte hain.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Median ka matlab hota hai:
+sorted order mein middle element.
+
+Agar total elements = n * m hain,
+to median ki required position hogi:
+
+req = (n * m) / 2
+
+Ab hum directly median value guess karenge
+aur check karenge ki us value se chhote ya equal kitne elements hain.
+
+--------------------------------------------------
+Search Space
+--------------------------------------------------
+Answer matrix ke minimum aur maximum element ke beech hi hoga.
+
+Lowest possible value:
+Sab rows ke first elements mein jo minimum hai
+
+Highest possible value:
+Sab rows ke last elements mein jo maximum hai
+
+Isliye:
+low = smallest first element among all rows
+high = largest last element among all rows
+
+--------------------------------------------------
+How to count elements <= mid ?
+--------------------------------------------------
+Har row sorted hai,
+to kisi bhi row mein elements <= mid count karna
+binary search se ho sakta hai.
+
+Code mein ub(arr, x) function use hua hai.
+
+ub(arr, x):
+Ye first index return karta hai jahan value > x hoti hai.
+
+Aur sorted array mein first index of > x
+ka matlab hota hai:
+utne elements x se chhote ya equal hain.
+
+Example:
+arr = [1, 3, 3, 5, 8], x = 3
+
+First element > 3 is 5 at index 3
+To index 3 ka matlab:
+3 elements <= 3 hain
+
+So ub(arr, x) directly count of elements <= x de deta hai.
+
+--------------------------------------------------
+blackBox Function
+--------------------------------------------------
+blackBox(matrix, mid)
+
+Ye function poori matrix mein total count nikalta hai
+ki kitne elements <= mid hain.
+
+Logic:
+1. Har row par ub(row, mid) call karo
+2. Sab counts add kar do
+3. Total count return karo
+
+--------------------------------------------------
+Binary Search Logic
+--------------------------------------------------
+Ab hum ek value mid try karte hain
+aur dekhte hain ki matrix mein kitne elements <= mid hain.
+
+Case 1:
+Agar smallerEl <= req
+-> Matlab mid abhi median se chhota ya equal ho sakta hai
+-> Hume aur bada value try karna hoga
+-> low = mid + 1
+
+Case 2:
+Agar smallerEl > req
+-> Matlab enough elements already mid tak aa gaye hain
+-> Ho sakta hai median isse chhota ho
+-> high = mid - 1
+
+Binary search ke end par low median value hota hai.
+
+--------------------------------------------------
+Why does this work?
+--------------------------------------------------
+Hum median ki actual position target kar rahe hain.
+
+Median wo smallest value hoti hai
+jiske liye usse chhote ya equal elements ka count
+required middle position se zyada ho jaye.
+
+Isi liye jab count <= req hota hai,
+to hume right move karna padta hai.
+
+Aur jab count > req hota hai,
+to possible answer mil gaya,
+lekin aur chhota valid value dhoondne ke liye left move karte hain.
+
+--------------------------------------------------
+Dry Run
+--------------------------------------------------
+matrix =
+[
+ [1, 4, 9],
+ [2, 5, 6],
+ [3, 7, 8]
+]
+
+Flatten sorted form hoti:
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+Total elements = 9
+req = 9 / 2 = 4
+Median = 5th element = 5
+
+Binary search values par chalegi:
+low = 1
+high = 9
+
+Try mid = 5
+Count of elements <= 5 = 5
+5 > 4
+-> answer left side bhi ho sakta hai
+
+Try mid = 3
+Count = 3
+3 <= 4
+-> answer right side mein hoga
+
+Aise final low = 5 milta hai
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+lowestEl() = O(n)
+highestEl() = O(n)
+
+blackBox(mid):
+Har row par binary search = O(log m)
+Total rows = n
+So O(n log m)
+
+Binary search on value range:
+O(log(maxValue - minValue))
+
+Total:
+O(n log m * log(maxValue - minValue))
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+O(1)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Median ko directly value space mein binary search se dhoondo,
+aur har mid par count karo ki matrix mein kitne elements usse chhote ya equal hain.
+
+Quick Revision – Matrix Median
+
+1. low = minimum first element of rows
+2. high = maximum last element of rows
+3. mid par count karo kitne elements <= mid hain
+4. Har row mein ye count binary search se niklega
+5. Agar count <= req -> right jao
+6. Else -> left jao
+7. Final low = median
+
+Time: O(n log m * log(value range))
+Space: O(1)
+
+#Code:
+
+class Solution {
+
+    public int lowestEl(int[][] matrix, int n, int m){
+        int lowEl = Integer.MAX_VALUE;
+        for(int i=0; i<n; i++){
+            if(matrix[i][0] < lowEl){
+                lowEl = matrix[i][0];
+            }
+        }
+        return lowEl;
+    }
+
+    public int highestEl(int[][] matrix, int n, int m){
+        int highEl = Integer.MIN_VALUE;
+        for(int i=0; i<n; i++){
+            if(matrix[i][m-1] > highEl){
+                highEl = matrix[i][m-1];
+            }
+        }
+        return highEl;
+    }
+
+    public int ub(int[] arr, int x){
+        int n = arr.length;
+        int low = 0;
+        int high = n - 1;
+        int ans = n;
+
+        while(low <= high){
+            int mid = (low + high)/2;
+            
+            if(arr[mid] > x){
+                ans = mid;
+                high = mid-1;
+            }
+            else{
+                low = mid+1;
+            }
+        }
+        return ans;
+
+    }
+    
+    public int blackBox(int[][] matrix, int mid){
+        int cnt = 0;
+        int n = matrix.length;
+        for(int i=0; i<n; i++){
+            cnt += ub(matrix[i], mid);
+        }
+        return cnt;
+    }
+
+    public int findMedian(int[][] matrix) {
+        int n = matrix.length;
+        int m = matrix[0].length;
+
+        int low = lowestEl(matrix, n, m);
+        int high = highestEl(matrix, n, m);
+        int req = (n*m)/2;
+        while(low <= high){
+            int mid = (low + high)/2;
+            int smallerEl = blackBox(matrix, mid);
+
+            if(smallerEl <= req){
+                low = mid+1;
+            }
+            else{
+                high = mid-1;
+            }
+        }
+        return low;
+    }
+}
