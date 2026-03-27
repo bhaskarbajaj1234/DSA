@@ -1,0 +1,280 @@
+#Approach:
+
+Approach (Hinglish) – Sudoku Solver (Backtracking)
+
+Is question mein hume Sudoku board ke empty cells fill karne hain.
+Empty cells '.' se represent kiye gaye hain.
+
+Sudoku ke rules:
+1. Har row mein 1 to 9 exactly ek baar aana chahiye
+2. Har column mein 1 to 9 exactly ek baar aana chahiye
+3. Har 3x3 sub-grid mein 1 to 9 exactly ek baar aana chahiye
+
+Ye classic Backtracking problem hai.
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Hum board ko cell by cell traverse karte hain.
+Jab bhi koi empty cell milta hai,
+to usme 1 se 9 tak har number try karte hain.
+
+Agar koi number safe hai,
+to us cell mein rakh dete hain
+aur recursively aage solve karte hain.
+
+Agar baad mein pata chalta hai ki aage solution possible nahi hai,
+to us number ko hata dete hain
+aur next number try karte hain.
+
+Yehi backtracking hai:
+choose -> recurse -> undo
+
+--------------------------------------------------
+Why char[][] ko int[][] mein convert kiya?
+--------------------------------------------------
+Code mein board originally char[][] hai,
+jahan empty cell '.' hota hai.
+
+Execution easy karne ke liye code pehle char board ko int array mein convert karta hai:
+'.' -> 0
+'1' to '9' -> 1 to 9
+
+Isse comparisons aur placements easy ho jaate hain.
+
+End mein solution milne ke baad
+int[][] ko wapas char[][] mein convert kar diya jata hai.
+
+--------------------------------------------------
+solveSudoku Function Flow
+--------------------------------------------------
+1. char board ko int array arr mein convert karo
+2. solveSudokuHelper(arr, 0, 0) call karo
+3. Solved int array ko wapas char board mein convert kar do
+
+--------------------------------------------------
+isSafe Function
+--------------------------------------------------
+Ye function check karta hai ki
+kya kisi cell (row, col) mein num place karna valid hai ya nahi.
+
+3 checks hote hain:
+
+1. Row check:
+   Kya same row mein num already present hai?
+
+2. Column check:
+   Kya same column mein num already present hai?
+
+3. 3x3 Grid check:
+   Kya same sub-grid mein num already present hai?
+
+Agar teeno jagah num nahi mila,
+to placement safe hai.
+
+--------------------------------------------------
+How 3x3 grid find ho raha hai?
+--------------------------------------------------
+int gridRow = row / 3;
+int gridCol = col / 3;
+
+Ye batata hai ki current cell kis 3x3 box mein hai.
+
+Fir us box ke saare cells loop se check karte hain:
+cellRow = 3 * gridRow + i
+cellCol = 3 * gridCol + j
+
+Matlab current sub-grid ke 9 cells check ho jaate hain.
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+solveSudokuHelper(arr, row, col)
+
+Ye recursion se board solve karta hai.
+
+row, col current cell ko represent karte hain.
+
+--------------------------------------------------
+Base Cases
+--------------------------------------------------
+1. if(row == 9) return true;
+   -> Matlab hum last row ke baad pahunch gaye
+   -> poora board solve ho gaya
+
+2. if(col == 9)
+   -> Current row khatam ho gayi
+   -> next row ke first column par jao
+   -> solveSudokuHelper(arr, row+1, 0)
+
+3. if(arr[row][col] != 0)
+   -> Cell already filled hai
+   -> next column par move karo
+
+--------------------------------------------------
+Backtracking Logic
+--------------------------------------------------
+Agar current cell empty hai (0),
+to 1 se 9 tak sab numbers try karte hain.
+
+for(int i = 1; i <= 9; i++)
+
+Har number ke liye:
+1. Check if safe
+2. Safe hai to arr[row][col] = i
+3. Recursive call for next cell
+4. Agar recursion true return kare -> solution mil gaya
+5. Agar recursion fail kare -> cell ko wapas 0 kar do
+
+Ye undo step hi backtracking hai.
+
+--------------------------------------------------
+Why backtracking needed?
+--------------------------------------------------
+Kyuki koi number current cell par abhi valid lag sakta hai,
+lekin future cells ke liye problem create kar sakta hai.
+
+To agar aage jaake dead end milta hai,
+to hume wapas aakar current choice change karni padti hai.
+
+Isliye:
+place -> recurse -> remove
+
+--------------------------------------------------
+Example Intuition
+--------------------------------------------------
+Suppose kisi empty cell par possible numbers 2, 5, 7 hain.
+
+Hum pehle 2 try karenge.
+Agar poora Sudoku solve ho gaya -> done.
+
+Agar aage dead end aaya,
+to 2 hata denge aur 5 try karenge.
+
+Agar 5 se bhi fail hua,
+to 7 try karenge.
+
+Isi tarah recursion saari possibilities explore karti hai
+jab tak unique solution na mil jaaye.
+
+--------------------------------------------------
+Why unique solution help karta hai?
+--------------------------------------------------
+Question mein guaranteed hai ki input board ka only one solution hai.
+
+Isliye jaise hi recursion ko ek valid complete solution milta hai,
+wo true return karke ruk jaata hai.
+
+Hume multiple solutions store nahi karne padte.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case mein har empty cell par 9 choices try ho sakti hain,
+to theoretical worst case bahut large hota hai:
+O(9^(number of empty cells))
+
+Lekin practical Sudoku constraints aur pruning ki wajah se
+ye kaafi efficient chal jaata hai.
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack depth = O(number of empty cells)
+Auxiliary array arr = 9 x 9
+
+Overall auxiliary space manageable hai.
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Har empty cell mein 1 se 9 tak safe number try karo,
+aage recursion se solve karo,
+aur galat choice hone par backtrack karke number hata do.
+
+Quick Revision – Sudoku Solver
+
+1. Board ko int array mein convert karo
+2. Empty cell (0) par 1 to 9 try karo
+3. Row, column, 3x3 grid mein safe check karo
+4. Safe hai to place karo aur next cell solve karo
+5. Fail ho to 0 karke backtrack karo
+6. row == 9 -> Sudoku solved
+
+Concept:
+Backtracking
+
+Time: Exponential in worst case
+Space: Recursion stack + board
+
+#Code:
+
+public class Solution {
+
+    public void solveSudoku(char[][] board) {
+        //You can code here
+        
+        int[][] arr = new int[9][9];
+        //converting character array to integer array so that all execution could be done easily.
+        for(int i=0; i<9; i++){
+          for(int j=0; j<9; j++){
+            if(board[i][j] == '.'){
+              arr[i][j] = 0;
+            }
+            else{
+              arr[i][j] = board[i][j] - '0';
+            }
+          }
+        }
+
+        solveSudokuHelper(arr, 0, 0);       
+        //Now we will convert it to character array shanti se
+        for(int i=0; i<9; i++){
+          for(int j=0; j<9; j++){
+            if(arr[i][j] == 0){
+              board[i][j] = '.';
+            }
+            else{
+              board[i][j] = (char)(arr[i][j] + '0');
+            }  
+          }
+        }
+    }
+
+    public boolean isSafe(int[][] arr, int row, int col, int num){
+      //checking in the complete row and the complete column
+      for(int i=0; i<9; i++){
+        if(arr[row][i] == num) return false;
+        if(arr[i][col] == num) return false;
+      }
+
+      //now checking for the whole grid
+      int gridRow = row/3;
+      int gridCol = col/3;
+      for(int i=0; i<3; i++){
+        for(int j=0; j<3; j++){
+          int cellRow = 3*gridRow + i;
+          int cellCol = 3*gridCol + j;
+          if(arr[cellRow][cellCol] == num) return false;
+        }
+      }
+
+      return true;
+    }
+
+    public boolean solveSudokuHelper(int[][] arr, int row, int col){
+      //Base cases
+      if(row == 9) return true;
+      if(col == 9) return solveSudokuHelper(arr, row+1, 0);
+      if(arr[row][col] != 0) return solveSudokuHelper(arr, row, col+1);
+
+      for(int i=1; i<=9; i++){
+        if(isSafe(arr, row, col, i)){
+          arr[row][col] = i;
+          if(solveSudokuHelper(arr, row, col+1)) return true;
+          arr[row][col] = 0; //Backtracking if we are not getting answer
+        }
+      }
+      return false;
+    }
+}
