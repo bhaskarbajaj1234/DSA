@@ -1,0 +1,20 @@
+#Code:
+
+public class Solution{
+    public static boolean arraySortedOrNot(int []arr, int n){
+      //You can code here
+      return isSortedorNot(arr, n, 0);       
+    }
+
+    public static boolean isSortedorNot(int[] arr, int n, int i){
+
+      //base case
+      if(i == n-1){
+        return true;
+      }
+      if(arr[i] > arr[i+1]){
+        return false;
+      }
+      return isSortedorNot(arr, n, i+1);
+    }
+}
