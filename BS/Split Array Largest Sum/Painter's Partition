@@ -1,0 +1,208 @@
+#Approach:
+
+Approach (Hinglish) – Split Array Largest Sum (Binary Search on Answer)
+
+Is question mein hume array ko k non-empty contiguous subarrays mein split karna hai
+aise ki un subarrays mein jo largest sum ho,
+wo minimum possible ho.
+
+Matlab:
+Hume "largest subarray sum" ko minimize karna hai.
+
+Ye exactly Book Allocation / Painter’s Partition jaisa pattern hai,
+isliye yaha bhi Binary Search on Answer use hota hai.
+
+--------------------------------------------------
+Key Idea
+--------------------------------------------------
+Answer kis range mein hoga?
+
+Minimum possible answer = max(nums)
+Maximum possible answer = sum(nums)
+
+Why low = max(nums)?
+Kyuki kisi bhi split mein har element kisi na kisi subarray mein to jayega hi.
+To largest sum kam se kam largest element jitna to hoga hi.
+Usse chhota answer possible hi nahi hai.
+
+Why high = sum(nums)?
+Agar poora array ek hi subarray le liya,
+to largest sum total sum ke equal ho jayega.
+
+So search space:
+low = maximum element
+high = total sum of array
+
+--------------------------------------------------
+Helper Function
+--------------------------------------------------
+helper(nums, mid)
+
+Ye function batata hai ki
+agar hum maximum allowed subarray sum = mid maan lein,
+to array ko split karne ke liye minimum kitne subarrays chahiye honge.
+
+Logic:
+1. Start with 1 subarray
+2. Current running sum maintain karo
+3. Agar current sum + nums[i] <= mid hai,
+   to current subarray mein add kar do
+4. Agar exceed ho jaye,
+   to new subarray start karo
+   aur count increase kar do
+5. End mein total number of subarrays return kar do
+
+Example:
+nums = [7,2,5,10,8], mid = 18
+
+Subarray 1: 7 + 2 + 5 = 14
+Next 10 add karenge to 24 ho jayega, exceed karega
+To new subarray start
+
+Subarray 2: 10 + 8 = 18
+
+Total subarrays = 2
+
+--------------------------------------------------
+Binary Search Logic
+--------------------------------------------------
+mid ek possible answer hai,
+matlab hum check kar rahe hain:
+"Kya array ko aise split kiya ja sakta hai
+ki har subarray ka sum at most mid ho?"
+
+Case 1:
+Agar helper(mid) > k
+-> Matlab itna chhota limit rakhne par
+   k se zyada subarrays ban rahe hain
+-> mid small hai
+-> hume allowed largest sum badhana padega
+-> right side search karo
+-> low = mid + 1
+
+Case 2:
+Agar helper(mid) <= k
+-> Matlab split possible hai
+-> ho sakta hai aur chhota largest sum bhi possible ho
+-> left side search karo
+-> high = mid - 1
+
+--------------------------------------------------
+Why helper gives "minimum subarrays needed"?
+--------------------------------------------------
+Kyuki hum greedily current subarray ko jitna ho sake fill kar rahe hain
+without exceeding mid.
+Isse unnecessary extra splits nahi bante.
+To jo count milega, wo minimum subarrays count hoga for that mid.
+
+--------------------------------------------------
+Why return low?
+--------------------------------------------------
+Binary search ke end par low first aisa minimum value hota hai
+jahan array ko k ya usse kam subarrays mein split karna possible ho.
+Isi liye final answer = low
+
+--------------------------------------------------
+Dry Run
+--------------------------------------------------
+nums = [7,2,5,10,8], k = 2
+
+low = 10
+high = 32
+
+Try mid = 21
+Possible in 2 subarrays
+-> smaller answer try karo
+
+Try mid = 15
+Need 3 subarrays
+-> answer bada chahiye
+
+Try mid = 18
+Possible in 2 subarrays
+-> valid
+
+Final answer = 18
+
+Split:
+[7,2,5] and [10,8]
+Largest sum = 18
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+maxi() = O(n)
+sumation() = O(n)
+helper() = O(n)
+Binary Search = O(log(sum - max))
+
+Total = O(n * log(sum(nums) - max(nums)))
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+O(1)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Aisa minimum largest subarray sum find karna hai
+jisme array ko k contiguous parts mein split kiya ja sake,
+isliye answer space par binary search lagate hain.
+
+#Code:
+
+class Solution {
+
+    public int maxi(int[] nums){
+        int n = nums.length;
+        int maxVal = Integer.MIN_VALUE;
+        for(int i=0; i<n; i++){
+            maxVal = Math.max(maxVal, nums[i]);
+        }
+        return maxVal;
+    }
+
+    public int sumation(int[] nums){
+        int n = nums.length;
+        int sum = 0;
+        for(int i=0; i<n; i++){
+            sum += nums[i];
+        }
+        return sum;
+    }
+
+    public int helper(int[] nums, int mid){
+        int painter = 1;
+        int blocks = 0;
+        int n = nums.length;
+        for(int i=0; i<n; i++){
+            if(blocks + nums[i] > mid){
+                painter++;
+                blocks = nums[i];
+            }
+            else{
+                blocks += nums[i];
+            }
+        }
+        return painter;
+    }
+
+    public int splitArray(int[] nums, int k) {
+        int low = maxi(nums);
+        int high = sumation(nums);
+
+        while(low <= high){
+            int mid = (low + high)/2;
+            int val = helper(nums, mid);
+
+            if(val > k){
+                low = mid+1;
+            }
+            else{
+                high = mid-1;
+            }
+        }
+        return low;
+    }
+}
