@@ -1,0 +1,53 @@
+#Approach:
+
+Approach:
+Ye code nearest smaller element on left nikalne ke liye monotonic increasing stack use karta hai.
+
+1. Stack me indices store hote hain.
+2. Pehle element ke left me kuch nahi hota, isliye uska answer -1 hota hai.
+3. Har index i ke liye stack se tab tak pop karte hain jab tak top wala element
+   current element se greater ya equal ho.
+4. Iske baad:
+   - agar stack empty ho gaya, to left me koi smaller element nahi hai → answer -1
+   - warna stack ke top par nearest smaller element ka index hai → uski value answer me add kar do
+5. Fir current index ko stack me push kar dete hain.
+
+Main idea:
+Stack me sirf useful elements rakhe jaate hain.
+Jo elements current se bade ya equal hain, wo nearest smaller kabhi nahi banenge,
+isliye unhe hata dete hain.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.*;
+public class Solution
+{
+    public static ArrayList<Integer> prevSmaller(ArrayList<Integer> A)
+    {
+        //You can code here
+        int n = A.size();
+        ArrayList<Integer> result = new ArrayList<>();
+        result.add(-1);
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        stack.push(0);
+
+        for(int i=1; i<n; i++){
+          while(!stack.isEmpty() && A.get(stack.peek()) >= A.get(i)){
+            stack.pop();
+          }
+
+          //Now if stack is empty
+          if(stack.isEmpty()){
+            result.add(-1);
+          }
+          else{
+            result.add(A.get(stack.peek()));
+          }
+          stack.push(i);
+        }
+        return result;
+    }
+}
