@@ -1,0 +1,107 @@
+#Approach:
+
+Approach:
+Ye code Maximal Rectangle problem ko histogram problem me convert karke solve karta hai.
+
+1. Har row ko histogram ki tarah treat karte hain.
+   - Agar matrix[i][j] = '1' ho, to his[j] ko +1 kar dete hain
+   - Agar '0' ho, to his[j] = 0 kar dete hain
+2. Is tarah har row ke liye continuous 1's ki height ban jaati hai.
+3. Ab har updated histogram par largestRectangleArea() call karte hain.
+4. largestRectangleArea me har bar ke liye:
+   - previous smaller index
+   - next smaller index
+   nikaal kar width find karte hain.
+5. Area = height * width
+6. Har row ke histogram se max area nikaal ke overall maxArea update kar dete hain.
+
+Main idea:
+2D matrix ko directly solve nahi kar rahe,
+balki har row tak ke 1's ko histogram bana ke
+“Largest Rectangle in Histogram” wala logic apply kar rahe hain.
+
+Time Complexity: O(rows * cols)
+Space Complexity: O(cols)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque;
+
+public class Solution{
+  public int maximalRectangle(char[][] matrix)
+  {
+      //You can code here
+      int row = matrix.length;
+      if(row == 0) return 0; //for to prevent arrayBound error
+      int col = matrix[0].length;
+      int maxArea = 0;
+      int[] his = new int[col];
+      for(int i=0; i<row; i++){
+        for(int j=0; j<col; j++){
+          if(matrix[i][j] == '0'){
+            his[j] = 0;
+          }else{
+            his[j]++;
+          }
+        }
+        int currArea = largestRectangleArea(his);
+        maxArea = Math.max(maxArea, currArea);
+      }
+      return maxArea;    
+  }
+  public int[] previousSmaller(int[] heights){
+        int n = heights.length;
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        int[] ans = new int[n];
+
+        for(int i=0; i<n; i++){
+            while(!stack.isEmpty() && heights[stack.peek()] >= heights[i]){
+                stack.pop();
+            }
+
+            if(stack.isEmpty()){
+                ans[i] = -1;
+            }
+            else{
+                ans[i] = stack.peek();
+            }
+            stack.push(i);
+        }
+        return ans;
+    }
+    public int[] nextSmaller(int[] heights){
+        int n = heights.length;
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        int[] ans = new int[n];
+
+        for(int i=n-1; i>=0; i--){
+            while(!stack.isEmpty() && heights[stack.peek()] >= heights[i]){
+                stack.pop();
+            }
+
+            if(stack.isEmpty()){
+                ans[i] = n;
+            }
+            else{
+                ans[i] = stack.peek();
+            }
+            stack.push(i);
+        }
+        return ans;
+    }
+
+    public int largestRectangleArea(int[] heights) {
+        int n = heights.length;
+        int[] ps = previousSmaller(heights);
+        int[] ns = nextSmaller(heights);
+        int maxVal = 0;
+
+        for(int i=0; i<n; i++){
+            int curr = (ns[i] - ps[i] - 1) * heights[i];
+            maxVal = Math.max(maxVal, curr);
+        }
+        return maxVal;
+
+    }
+}
