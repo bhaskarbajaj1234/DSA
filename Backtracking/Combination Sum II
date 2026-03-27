@@ -1,0 +1,386 @@
+#Approach:
+
+Approach (Hinglish) – Combination Sum II (Each Element Used Only Once)
+
+Is question mein hume aise unique combinations find karne hain
+jinka sum = target ho.
+
+Difference from Combination Sum 1:
+1. Har element sirf ek baar use ho sakta hai
+2. Input array mein duplicates ho sakte hain
+3. Answer mein duplicate combinations nahi aani chahiye
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Hum backtracking use karte hain
+aur current index se aage ke elements try karte hain.
+
+Har step par:
+- ek element choose karte hain
+- target se minus karte hain
+- next recursive call mein i+1 bhejte hain
+  kyuki same element dobara use nahi kar sakte
+
+--------------------------------------------------
+Why sorting zaroori hai?
+--------------------------------------------------
+Arrays.sort(candidates);
+
+Sorting ke 2 main fayde hain:
+
+1. Duplicate elements ko easily skip kar sakte hain
+2. Agar current element target se bada ho gaya,
+   to aage ke elements bhi bade honge
+   -> so break kar sakte hain
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(candidates, target, ans, curr, idx)
+
+candidates = sorted input array
+target = remaining target
+ans = final answer list
+curr = current combination
+idx = current starting index
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+if(target == 0)
+
+Matlab current combination ka sum target ke equal ho gaya
+-> valid answer mil gaya
+-> curr ki copy ans mein add kar do
+-> return
+
+--------------------------------------------------
+Main Loop Logic
+--------------------------------------------------
+for(int i = idx; i < candidates.length; i++)
+
+Matlab:
+Current recursion level par
+idx se end tak koi bhi element choose kar sakte hain.
+
+Har i ke liye:
+1. Duplicate skip check
+2. Target se bada hai to break
+3. Element add karo
+4. Recursively next index par jao
+5. Backtrack karo
+
+--------------------------------------------------
+Duplicate Skip Logic
+--------------------------------------------------
+if(i > idx && candidates[i] == candidates[i-1]) continue;
+
+Ye line bahut important hai.
+
+Iska matlab:
+Agar same recursion level par same value dobara aa rahi hai,
+to usse skip kar do.
+
+Example:
+candidates = [1,1,2]
+
+Agar same level par dono 1 ko separately start karne doge,
+to duplicate combinations banengi.
+
+Isliye:
+same level par duplicate values skip karte hain.
+
+Dhyaan rahe:
+Ye sirf same level par skip karta hai,
+isliye [1,1,6] jaise valid answers phir bhi ban sakte hain.
+
+--------------------------------------------------
+Why break when candidates[i] > target?
+--------------------------------------------------
+if(candidates[i] > target) break;
+
+Array sorted hai.
+To agar current element target se bada hai,
+to uske baad ke saare elements bhi bade honge.
+Isliye unhe try karne ka koi fayda nahi.
+
+Ye pruning hai, jo recursion ko fast banati hai.
+
+--------------------------------------------------
+Why recursive call mein i+1 bheja?
+--------------------------------------------------
+helper(candidates, target - candidates[i], ans, curr, i+1);
+
+Kyuki har element sirf ek baar use ho sakta hai.
+To current element use karne ke baad
+next call mein uske baad wale indices se hi choose karenge.
+
+Combination Sum 1 mein idx same jaata tha,
+yaha i+1 ja raha hai.
+
+--------------------------------------------------
+Backtracking Step
+--------------------------------------------------
+curr.add(candidates[i]);
+helper(...);
+curr.remove(curr.size() - 1);
+
+Pattern:
+choose -> recurse -> undo
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+candidates = [10,1,2,7,6,1,5], target = 8
+
+Sort karne ke baad:
+[1,1,2,5,6,7,10]
+
+Possible valid combinations:
+[1,1,6]
+[1,2,5]
+[1,7]
+[2,6]
+
+Duplicate combinations nahi aati
+kyuki same level duplicates skip ho rahe hain.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case exponential hai,
+kyuki multiple subsets try ho rahe hain.
+
+Approx:
+O(2^n)
+
+Sorting:
+O(n log n)
+
+Overall:
+O(n log n + 2^n)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+Current combination = O(n)
+
+Ignoring answer storage:
+O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Sorted array par backtracking lagao,
+har element ko sirf ek baar use karo,
+same level ke duplicates skip karo,
+aur target 0 hone par combination store kar lo.
+
+Approach (Hinglish) – Combination Sum II (Each Element Used Only Once)
+
+Is question mein hume aise unique combinations find karne hain
+jinka sum = target ho.
+
+Difference from Combination Sum 1:
+1. Har element sirf ek baar use ho sakta hai
+2. Input array mein duplicates ho sakte hain
+3. Answer mein duplicate combinations nahi aani chahiye
+
+--------------------------------------------------
+Main Idea
+--------------------------------------------------
+Hum backtracking use karte hain
+aur current index se aage ke elements try karte hain.
+
+Har step par:
+- ek element choose karte hain
+- target se minus karte hain
+- next recursive call mein i+1 bhejte hain
+  kyuki same element dobara use nahi kar sakte
+
+--------------------------------------------------
+Why sorting zaroori hai?
+--------------------------------------------------
+Arrays.sort(candidates);
+
+Sorting ke 2 main fayde hain:
+
+1. Duplicate elements ko easily skip kar sakte hain
+2. Agar current element target se bada ho gaya,
+   to aage ke elements bhi bade honge
+   -> so break kar sakte hain
+
+--------------------------------------------------
+Helper Function Meaning
+--------------------------------------------------
+helper(candidates, target, ans, curr, idx)
+
+candidates = sorted input array
+target = remaining target
+ans = final answer list
+curr = current combination
+idx = current starting index
+
+--------------------------------------------------
+Base Case
+--------------------------------------------------
+if(target == 0)
+
+Matlab current combination ka sum target ke equal ho gaya
+-> valid answer mil gaya
+-> curr ki copy ans mein add kar do
+-> return
+
+--------------------------------------------------
+Main Loop Logic
+--------------------------------------------------
+for(int i = idx; i < candidates.length; i++)
+
+Matlab:
+Current recursion level par
+idx se end tak koi bhi element choose kar sakte hain.
+
+Har i ke liye:
+1. Duplicate skip check
+2. Target se bada hai to break
+3. Element add karo
+4. Recursively next index par jao
+5. Backtrack karo
+
+--------------------------------------------------
+Duplicate Skip Logic
+--------------------------------------------------
+if(i > idx && candidates[i] == candidates[i-1]) continue;
+
+Ye line bahut important hai.
+
+Iska matlab:
+Agar same recursion level par same value dobara aa rahi hai,
+to usse skip kar do.
+
+Example:
+candidates = [1,1,2]
+
+Agar same level par dono 1 ko separately start karne doge,
+to duplicate combinations banengi.
+
+Isliye:
+same level par duplicate values skip karte hain.
+
+Dhyaan rahe:
+Ye sirf same level par skip karta hai,
+isliye [1,1,6] jaise valid answers phir bhi ban sakte hain.
+
+--------------------------------------------------
+Why break when candidates[i] > target?
+--------------------------------------------------
+if(candidates[i] > target) break;
+
+Array sorted hai.
+To agar current element target se bada hai,
+to uske baad ke saare elements bhi bade honge.
+Isliye unhe try karne ka koi fayda nahi.
+
+Ye pruning hai, jo recursion ko fast banati hai.
+
+--------------------------------------------------
+Why recursive call mein i+1 bheja?
+--------------------------------------------------
+helper(candidates, target - candidates[i], ans, curr, i+1);
+
+Kyuki har element sirf ek baar use ho sakta hai.
+To current element use karne ke baad
+next call mein uske baad wale indices se hi choose karenge.
+
+Combination Sum 1 mein idx same jaata tha,
+yaha i+1 ja raha hai.
+
+--------------------------------------------------
+Backtracking Step
+--------------------------------------------------
+curr.add(candidates[i]);
+helper(...);
+curr.remove(curr.size() - 1);
+
+Pattern:
+choose -> recurse -> undo
+
+--------------------------------------------------
+Example
+--------------------------------------------------
+candidates = [10,1,2,7,6,1,5], target = 8
+
+Sort karne ke baad:
+[1,1,2,5,6,7,10]
+
+Possible valid combinations:
+[1,1,6]
+[1,2,5]
+[1,7]
+[2,6]
+
+Duplicate combinations nahi aati
+kyuki same level duplicates skip ho rahe hain.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Worst case exponential hai,
+kyuki multiple subsets try ho rahe hain.
+
+Approx:
+O(2^n)
+
+Sorting:
+O(n log n)
+
+Overall:
+O(n log n + 2^n)
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+Recursion stack = O(n)
+Current combination = O(n)
+
+Ignoring answer storage:
+O(n)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Sorted array par backtracking lagao,
+har element ko sirf ek baar use karo,
+same level ke duplicates skip karo,
+aur target 0 hone par combination store kar lo.
+
+#Code:
+
+class Solution {
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        List<List<Integer>> ans = new ArrayList<>();
+        Arrays.sort(candidates);
+        helper(candidates, target, ans, new ArrayList<>(), 0);
+        return ans;
+    }
+
+    public void helper(int[] candidates, int target, List<List<Integer>> ans, ArrayList<Integer> curr, int idx){
+        //Base case
+        if(target == 0){
+            ans.add(new ArrayList<>(curr));
+            return;
+        }
+
+        //Main Logic
+        for(int i=idx; i<candidates.length; i++){
+            if(i > idx && candidates[i] == candidates[i-1]) continue;
+            if(candidates[i] > target) break;
+
+            curr.add(candidates[i]);
+            helper(candidates, target - candidates[i], ans, curr, i+1);
+            curr.remove(curr.size() - 1);
+        }
+    }
+}
