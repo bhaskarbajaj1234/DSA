@@ -1,0 +1,184 @@
+#Approach:
+
+Approach (Hinglish) – Minimize Max Distance to Gas Station (Binary Search on Answer)
+
+Is question mein hume k naye gas stations place karne hain
+aise ki adjacent gas stations ke beech ka maximum distance minimum ho jaaye.
+
+Yaha answer koi integer nahi hoga,
+balki decimal value bhi ho sakti hai,
+isliye is question mein Binary Search on Real Numbers lagti hai.
+
+--------------------------------------------------
+Key Idea
+--------------------------------------------------
+Hum directly gas stations place nahi karte.
+Hum ek value "mid" assume karte hain,
+jo represent karti hai:
+
+"Maximum allowed distance between adjacent gas stations"
+
+Ab hume check karna hota hai:
+Kya hum k ya usse kam naye stations add karke
+har adjacent gap ko mid ya usse kam bana sakte hain?
+
+Agar haan:
+-> mid valid hai
+-> ho sakta hai aur chhota answer bhi possible ho
+-> left side search karenge
+
+Agar nahi:
+-> mid bahut chhota hai
+-> itne kam distance ko maintain karne ke liye k se zyada stations chahiye
+-> right side search karenge
+
+--------------------------------------------------
+Search Space
+--------------------------------------------------
+low = 0
+high = arr[n-1] - arr[0]
+
+Why?
+Minimum possible maximum distance theoretically 0 ke close ho sakta hai
+aur maximum initial largest spread ke andar hi hoga.
+
+--------------------------------------------------
+Check Function Logic
+--------------------------------------------------
+Har do consecutive stations ke beech gap nikalte hain:
+
+gap = arr[i] - arr[i-1]
+
+Agar gap <= mid:
+-> koi new station ki zaroorat nahi
+
+Agar gap > mid:
+-> is gap ko chhote parts mein todna padega
+
+Question:
+Kitne stations chahiye honge taaki har part <= mid ho jaaye?
+
+Formula idea:
+Agar gap ko sections mein divide karna hai,
+to required stations approximately:
+
+required = ceil(gap / mid) - 1
+
+Example:
+gap = 9, mid = 3
+Stations needed = ceil(9/3) - 1 = 3 - 1 = 2
+
+Kyuki 2 stations add karke gap 3,3,3 ho jayega.
+
+Fir saare gaps ke required stations ka total nikalte hain.
+
+Agar total required stations <= k
+-> mid possible hai
+Else
+-> mid possible nahi hai
+
+--------------------------------------------------
+Binary Search Logic
+--------------------------------------------------
+mid = (low + high) / 2
+
+Case 1:
+Agar check(mid) == true
+-> itna maximum distance maintain karna possible hai
+-> aur minimum answer chahiye
+-> ans = mid
+-> high = mid - 1e-6
+
+Case 2:
+Agar check(mid) == false
+-> mid bahut chhota hai
+-> zyada distance allow karna padega
+-> low = mid + 1e-6
+
+Kyuki decimal answer chahiye,
+isliye hum 1e-6 precision ke around search karte hain.
+
+--------------------------------------------------
+Important Intuition
+--------------------------------------------------
+Jaise-jaise allowed maximum distance "mid" badhta hai,
+utne kam extra stations chahiye hote hain.
+
+Matlab:
+mid bada -> requirement easy
+mid chhota -> requirement hard
+
+Ye monotonic behavior hai,
+isliye binary search valid hai.
+
+--------------------------------------------------
+Why answer decimal mein aata hai?
+--------------------------------------------------
+Kyuki nayi gas stations non-integer positions par bhi place ki ja sakti hain.
+Isliye exact answer 0.5, 2.333333, etc. ho sakta hai.
+
+--------------------------------------------------
+Time Complexity
+--------------------------------------------------
+Har check = O(n)
+Binary search on precision = O(n * log(range / 1e-6))
+
+Practically isse likh sakte ho:
+O(n * log(high/precision))
+
+--------------------------------------------------
+Space Complexity
+--------------------------------------------------
+O(1)
+
+--------------------------------------------------
+One line intuition
+--------------------------------------------------
+Aisa minimum possible maximum adjacent distance find karna hai
+jo k new gas stations add karke achieve ho sake,
+isliye answer space par binary search lagate hain.
+
+#Code:
+
+class Solution {
+
+    public boolean check(int[] arr, int k, double mid){
+        int count = 0;
+
+        for(int i=1; i<arr.length; i++){
+            int diff = arr[i] - arr[i-1];
+            if(diff > mid){
+                count += diff/mid;
+            }
+        }
+        if(count > k){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    public double minimiseMaxDistance(int[] arr, int k) {
+        int n = arr.length;
+        double low = 0;
+        double high = arr[n-1] - arr[0];
+        double ans=0;
+
+        while(low <= high){
+            double mid = (low + high)/2;
+
+            if(check(arr, k, mid) == true){
+                ans = mid;
+                high = mid - 0.000001;
+            }
+            else{
+                low = mid + 0.000001;
+            }
+        }
+        return ans;
+        
+    }
+}
+
+The gist is that if difference is more than Mid, then at most we can place k stations. If the required stations between 2 stations is more than k, then we should return false.
