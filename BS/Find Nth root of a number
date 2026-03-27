@@ -1,0 +1,73 @@
+#Approach:
+
+Nth Root of a Number – Hinglish Approach (Binary Search on Answer)
+
+Problem:
+Given N aur M, aisa number X find karna hai jiska X^N = M ho.
+Agar exact integer root exist karta hai to return X, warna -1 return karo.
+
+Why Binary Search?
+Kyuki answer range 1 se M ke beech hi hoga.
+Aur hume fast solution chahiye -> O(log M)
+
+Key Idea:
+Hum aisa number X find karna chahte hain jiska:
+X^N == M -> return X
+X^N < M  -> right side jao
+X^N > M  -> left side jao
+
+Steps:
+1. Search space lo = 1 to M
+2. mid nikalo
+3. mid^N calculate karo
+4. Agar mid^N == M -> mid answer
+5. Agar mid^N < M -> low = mid + 1
+6. Agar mid^N > M -> high = mid - 1
+7. Agar loop khatam ho gaya aur exact match nahi mila -> return -1
+
+Important:
+mid^N calculate karte time overflow ho sakta hai,
+isliye multiplication step by step karo aur beech mein check karo.
+
+Time Complexity: O(log M * N)
+Space Complexity: O(1)
+
+One line intuition:
+Binary search se aisa number find karo jiska power N exactly M ke equal ho.
+
+#Code:
+
+class Solution {
+
+    public int NthRoot(int N, int M) {
+        int low = 1;
+        int high = M;
+
+        while(low <= high){
+            int mid = low + (high - low) / 2;
+            long val = power(mid, N, M);
+
+            if(val == M){
+                return mid;
+            }
+            else if(val < M){
+                low = mid + 1;
+            }
+            else{
+                high = mid - 1;
+            }
+        }
+        return -1;
+    }
+
+    private long power(int base, int exp, int limit){
+        long result = 1;
+        for(int i = 0; i < exp; i++){
+            result = result * base;
+            if(result > limit){
+                return result;
+            }
+        }
+        return result;
+    }
+}
