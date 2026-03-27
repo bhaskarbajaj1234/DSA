@@ -1,0 +1,149 @@
+#Approach:
+
+Approach:
+Ye code har subarray ka range directly nikalne ke bajay,
+total contribution of maximums - total contribution of minimums karta hai.
+
+1. Pehle sumSubarrayMins() se total sum of all subarray minimums nikala gaya hai.
+2. Phir sumSubarrayMaxs() se total sum of all subarray maximums nikala gaya hai.
+3. Final answer:
+   total maximum contribution - total minimum contribution
+
+Kaise contribution nikal rahe hain:
+1. Har element ke liye find karte hain:
+   - minimum case me: PSE aur NSE
+   - maximum case me: PGE aur NGE
+2. Inse pata chalta hai ki current element kitne subarrays me min/max banega.
+3. Formula:
+   contribution = arr[i] * leftChoices * rightChoices
+
+Main idea:
+Har subarray generate nahi kar rahe.
+Bas count kar rahe hain ki koi element minimum kitni baar ban raha hai
+aur maximum kitni baar ban raha hai.
+
+Important edge point:
+Duplicates handle karne ke liye min aur max dono cases me
+strict aur non-strict comparisons carefully use kiye gaye hain,
+taaki double counting na ho.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+class Solution {
+    private long sumSubarrayMins(int[] arr) {
+
+        int[] pse = findPse(arr);
+        int[] nse = findNse(arr);
+        long total = 0;
+        int mod = (int)(1e9 + 7);
+
+        for(int i=0; i<arr.length; i++){
+            int left = i - pse[i];
+            int right = nse[i] - i;
+            total += 1L * left * right * arr[i];
+        }
+
+        return total;
+    }
+
+    private int[] findNse(int[] arr){
+        Deque<Integer> stack = new ArrayDeque<>();
+        int n = arr.length;
+        int[] nse = new int[n];
+
+        for(int i=n-1; i>=0; i--){
+            while(!stack.isEmpty() && arr[stack.peek()] >= arr[i]){
+                stack.pop();
+            }
+
+            nse[i] = stack.isEmpty() ? n : stack.peek();
+            stack.push(i);
+        }
+        return nse;
+    }
+
+    private int[] findPse(int[] arr){
+        Deque<Integer> stack = new ArrayDeque<>();
+        int n = arr.length;
+        int[] pse = new int[n];
+
+        for(int i=0; i<n; i++){
+            //Why there is no = sign in while condition ?
+            // Because of an edge case where elements are same say 1,1. In this case
+            // the 1st index element 1 will duplicate a subarray that has already been calculated as a result 
+            // to eliminate this edge case, we didn't use = sign
+            while(!stack.isEmpty() && arr[stack.peek()] > arr[i]){
+                stack.pop();
+            }
+
+            pse[i] = stack.isEmpty() ? -1 : stack.peek();
+            stack.push(i);
+        }
+        return pse;
+    }
+
+    private long sumSubarrayMaxs(int[] arr) {
+
+        int[] pge = findPge(arr);
+        int[] nge = findNge(arr);
+        long total = 0;
+        int mod = (int)(1e9 + 7);
+
+        for(int i=0; i<arr.length; i++){
+            int left = i - pge[i];
+            int right = nge[i] - i;
+            total += 1L * left * right * arr[i];
+        }
+
+        return total;
+    }
+
+    private int[] findNge(int[] arr){
+        Deque<Integer> stack = new ArrayDeque<>();
+        int n = arr.length;
+        int[] nge = new int[n];
+
+        for(int i=n-1; i>=0; i--){
+            //Why there is no = sign in while condition ?
+            // Because of an edge case where elements are same say 1,1. In this case
+            // the 1st index element 1 will duplicate a subarray that has already been calculated as a result 
+            // to eliminate this edge case, we didn't use = sign
+            while(!stack.isEmpty() && arr[stack.peek()] < arr[i]){
+                stack.pop();
+            }
+
+            nge[i] = stack.isEmpty() ? n : stack.peek();
+            stack.push(i);
+        }
+        return nge;
+    }
+
+    private int[] findPge(int[] arr){
+        Deque<Integer> stack = new ArrayDeque<>();
+        int n = arr.length;
+        int[] pge = new int[n];
+
+        for(int i=0; i<n; i++){
+            
+            while(!stack.isEmpty() && arr[stack.peek()] <= arr[i]){
+                stack.pop();
+            }
+
+            pge[i] = stack.isEmpty() ? -1 : stack.peek();
+            stack.push(i);
+        }
+        return pge;
+    }
+
+
+    public long subArrayRanges(int[] nums) {
+
+        long result = sumSubarrayMaxs(nums) - sumSubarrayMins(nums);
+
+        return result;
+        
+    }
+}
