@@ -1,0 +1,62 @@
+#Approach:
+
+Approach:
+Ye code stack use karke check karta hai ki kisi bracket pair ke andar actual operation hai ya nahi.
+
+1. Expression ko left se right traverse karte hain.
+2. Har character ko stack me push karte jaate hain, jab tak ')' na mil jaaye.
+3. Jaise hi ')' milta hai, stack se pop karna start karte hain until '(' mile.
+4. Is popped part ke andar agar koi operator (+, -, *, /) mil gaya,
+   to brackets useful hain, yani redundant nahi hain.
+5. Agar '(' tak pahunchne se pehle koi operator nahi mila,
+   to iska matlab brackets ke andar sirf single element ya unnecessary expression tha,
+   isliye brackets redundant hain → return true.
+6. Agar poori string traverse ho gayi aur aisa koi case nahi mila, to return false.
+
+Main idea:
+Kisi bhi valid bracket pair ke andar agar operator hi nahi hai,
+to wo bracket extra hai aur uski zarurat nahi hai.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque; 
+
+public class Solution {
+    public boolean hasRedundantBraces(String s) {
+      // You can code here
+
+      int n = s.length();
+      Deque<Character> stack = new ArrayDeque<>();
+
+      for(int i=0; i<n; i++){
+        char ch = s.charAt(i);
+
+        if(ch == ')'){
+          char top = stack.pop();
+          boolean flag = true;
+
+          while(!stack.isEmpty() && top != '('){
+            
+            if(top == '+' || top == '-' || top == '*' || top == '/'){
+              flag = false; //meaning bracket is not redundant
+            }
+
+            top = stack.pop();
+          }
+          if(flag == true){
+            //meaning brackets are redundant
+            return true;
+          }
+        }
+        else{
+          stack.push(ch);
+        }
+      }
+      return false;
+
+    }
+}
