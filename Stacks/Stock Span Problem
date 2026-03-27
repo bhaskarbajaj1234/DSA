@@ -1,0 +1,64 @@
+#Approach:
+
+Approach:
+Ye code monotonic decreasing stack use karta hai, jisme indices store hote hain.
+Har day ke liye hum left side me nearest greater price wala index dhundte hain.
+
+1. Day 0 ka span hamesha 1 hoga, isliye s[0] = 1.
+2. Stack me indices store kiye jaate hain.
+3. Current price se chhote ya equal price wale sab indices stack se pop kar dete hain,
+   kyuki wo current day ka answer nahi ban sakte.
+4. Agar stack empty ho gaya, iska matlab left me koi greater element nahi hai,
+   to span = i + 1.
+5. Agar stack empty nahi hai, to top par nearest greater element ka index hai,
+   to span = i - stack.peek().
+6. Fir current index ko stack me push kar dete hain future days ke liye.
+
+Main idea:
+Stack hamesha aise indices rakhta hai jinke prices decreasing order me hote hain.
+Isse har element mostly ek hi baar push-pop hota hai, isliye solution efficient hai.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+#Code:
+
+import java.util.Deque;
+import java.util.ArrayDeque;
+
+public class Solution
+{
+    public static int[] calculateSpan(int price[], int n)
+    {
+        //You can code here
+
+        Deque<Integer> stack = new ArrayDeque<>();
+
+        int[] s = new int[n];
+        s[0] = 1;
+        stack.push(0);
+
+        for(int i=1; i<n; i++){
+          while(!stack.isEmpty()){
+            int top = stack.peek();
+            if(price[top] > price[i]){
+              break;
+            }
+            else{
+              stack.pop();
+            }
+          }
+          if(stack.isEmpty()){
+            s[i] = i+1;
+          }
+          else{
+            s[i] = i - stack.peek();
+          }
+          stack.push(i);
+        }
+        return s;
+      
+
+      
+    }
+}
