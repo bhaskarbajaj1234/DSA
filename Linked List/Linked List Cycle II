@@ -1,0 +1,69 @@
+#Approach:
+
+Approach (Hinglish):
+
+1. Pehle Floyd Cycle Detection use karte hain:
+   - slow 1 step chalega
+   - fast 2 step chalega
+
+2. Agar cycle hai, to slow aur fast kisi point par mil jayenge.
+
+3. Jaise hi dono mil jayein:
+   - slow ko dobara head par le aao
+   - ab slow aur fast dono 1-1 step move karo
+
+4. Jis node par dono dobara milenge,
+   wahi cycle ka starting node hoga.
+
+5. Agar fast ya fast.next null ho jaye,
+   to cycle exist nahi karti, return null.
+
+Main Idea:
+- First meeting point cycle confirm karta hai
+- Second meeting point cycle ka start deta hai
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+
+#code:
+
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+
+        if(head == null || head.next == null){
+            return null;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head;
+
+        //Detection of a cycle
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+
+            //if detected then chase down to starting point
+            if(slow == fast){
+                slow = head;
+                while(fast != slow){
+                    slow = slow.next;
+                    fast = fast.next;
+                }
+                return slow;
+            }
+        }
+        return null;        
+    }
+}
