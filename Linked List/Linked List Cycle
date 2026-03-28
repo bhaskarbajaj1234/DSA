@@ -1,0 +1,54 @@
+#Approach:
+
+Approach (Detect Cycle in Linked List - Floyd Algorithm):
+
+1. Do pointer use karte hain: slow aur fast.
+2. Slow 1 step move karega, fast 2 step move karega.
+3. Agar linked list me cycle hoga, to fast pointer slow ko pakad lega
+   (matlab dono kisi point par mil jayenge).
+4. Agar cycle nahi hoga, to fast pointer null ho jayega.
+5. Loop condition: fast != null && fast.next != null
+6. Agar slow == fast ho jaye, return true.
+7. Loop khatam ho jaye to return false.
+
+Main Idea:
+- Fast pointer slow se tez hai, isliye cycle me pakad lega.
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+
+        if(head == null || head.next == null){
+            return false;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head;
+
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+
+            if(slow == fast){
+                return true;
+            }
+        }
+        return false;
+        
+    }
+}
