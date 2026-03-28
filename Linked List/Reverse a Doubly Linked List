@@ -1,0 +1,67 @@
+#Approach:
+
+Approach (Hinglish):
+
+1. Agar list empty hai ya sirf 1 node hai, to reverse karne ki zarurat nahi hai.
+   Direct head return kar do.
+
+2. DLL ko reverse karne ke liye har node ke `prev` aur `next` pointers ko swap karte hain.
+
+3. Ek `current` pointer head se start karega.
+   Ek `last` pointer rakhenge jo last processed node ko track karega.
+
+4. Har iteration me:
+   - `last = current.prev`
+   - `current.prev = current.next`
+   - `current.next = last`
+
+5. Swap ke baad normal DLL ki tarah `next` me move nahi karenge,
+   kyuki pointers swap ho chuke hote hain.
+   Isliye `current = current.prev` karte hain.
+
+6. Jab loop khatam hota hai, `last.prev` new head hota hai,
+   usi ko return kar dete hain.
+
+Main Idea:
+- Har node ke prev aur next ko ulta kar do
+- Aur swapped pointer ki direction me move karo
+- End me new head return karo
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+#Code:
+
+/*
+class ListNode {
+    int data;
+    ListNode prev, next;
+    ListNode(int val) {
+        this.data = val;
+        this.prev = null;
+        this.next = null;
+    }
+}
+*/
+
+class Solution {
+    public ListNode reverseDLL(ListNode head) {
+        // Your code goes here
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        //swapping
+        ListNode current = head;
+        ListNode last = null;
+        while(current != null){
+            last = current.prev;
+            current.prev = current.next;
+            current.next = last;
+
+            current = current.prev;
+        }
+        
+        return last.prev;
+    }
+}
