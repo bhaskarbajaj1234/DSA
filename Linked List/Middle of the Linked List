@@ -1,0 +1,42 @@
+#Approach:
+
+Approach (Middle of Linked List - Slow Fast Pointer):
+
+1. Do pointer lo: slow aur fast.
+2. Slow 1 step move karega, fast 2 step move karega.
+3. Jab fast list ke end par pahunch jayega, slow middle par hoga.
+4. Loop condition: fast != null && fast.next != null
+5. Agar even nodes hue, to slow automatically second middle par rukega.
+6. Slow ko return kar do.
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode middleNode(ListNode head) {
+        if(head == null || head.next == null){
+            return head;
+        }
+        ListNode slow = head;
+        ListNode fast = head;
+
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        return slow;
+    }
+}
