@@ -1,0 +1,61 @@
+#Approach:
+
+Approach (Reverse Linked List - Recursion):
+
+1. Recursion me hum list ko last node tak le jaate hain.
+2. Base case: agar head null hai ya sirf 1 node hai, to wahi new head hoga.
+3. Recursive call: reverseList(head.next) se baaki list reverse ho jaati hai.
+4. Ab current node ko reverse me jodte hain:
+   - head.next ka next = head kar dete hain (front.next = head)
+5. Fir head.next = null kar dete hain taki cycle na bane.
+6. Har recursive call new head return karta hai jo last node hota hai.
+
+Flow:
+1 -> 2 -> 3 -> 4 -> 5
+Recursion stack me jaake banega:
+5 -> 4 -> 3 -> 2 -> 1
+
+Time Complexity: O(N)
+Space Complexity: O(N)  // recursion stack
+
+#Code:
+
+/*Definition of singly linked list:
+class ListNode {
+    int val;
+    ListNode next;
+
+    ListNode() {
+        val = 0;
+        next = null;
+    }
+
+    ListNode(int data1) {
+        val = data1;
+        next = null;
+    }
+
+    ListNode(int data1, ListNode next1) {
+        val = data1;
+        next = next1;
+    }
+}
+ */
+
+class Solution {
+    public ListNode reverseList(ListNode head) {
+
+        //Base case
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode newNode = reverseList(head.next);
+        ListNode front = head.next; 
+        front.next = head;
+        head.next = null;
+
+        return newNode;
+        
+    }
+}
