@@ -1,0 +1,83 @@
+#Approach:
+
+Approach (Length of Loop in Linked List):
+
+1. Floyd Cycle Detection use karte hain (slow & fast pointer).
+2. Slow 1 step move karega, fast 2 step move karega.
+3. Agar slow aur fast mil gaye → cycle exist karta hai.
+4. Ab loop ki length nikalne ke liye:
+   - Fast ko ek step aage badhao
+   - Ek counter len = 1 rakho
+   - Jab tak fast wapas slow par na aa jaye, fast ko move karte raho
+   - Har step par len++ karo
+5. Jab fast == slow ho jaye, len hi loop ki length hai.
+6. Agar cycle detect hi nahi hua → return 0.
+
+Main Idea:
+- Pehle cycle detect karo
+- Fir cycle me ek round lagao aur nodes count karo
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+#Code:
+
+/*Definition of singly linked list:
+class ListNode {
+    int val;
+    ListNode next;
+
+    ListNode() {
+        val = 0;
+        next = null;
+    }
+
+    ListNode(int data1) {
+        val = data1;
+        next = null;
+    }
+
+    ListNode(int data1, ListNode next1) {
+        val = data1;
+        next = next1;
+    }
+}
+ */
+
+ class Solution {
+     public int findLengthOfLoop(ListNode head) {
+        if(head == null || head.next == null){
+            return 0;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        //detection of a cycle
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+
+            if(slow == fast){
+                int len = 1;
+                fast = fast.next;
+                while(slow != fast){
+                    fast = fast.next;
+                    len += 1;
+                }
+                return len;
+            }
+        }
+        return 0;
+     }
+ }
+
+
+
+
+
+
+
+
+
+
