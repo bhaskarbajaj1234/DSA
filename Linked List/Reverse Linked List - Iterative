@@ -1,0 +1,59 @@
+#Approach:
+
+Approach (Reverse Linked List - Iterative):
+
+1. Hume linked list ke arrows ulte karne hote hain.
+2. 3 pointers use karte hain:
+   - prev = previous node
+   - temp = current node
+   - front = next node store karne ke liye
+3. Sabse pehle front = temp.next store karo.
+4. Fir temp.next = prev karke link reverse karo.
+5. Prev ko aage badhao: prev = temp
+6. Temp ko aage badhao: temp = front
+7. Jab temp null ho jaye, prev new head hoga.
+
+Example:
+1 -> 2 -> 3 -> 4
+
+Iteration:
+1 -> null
+2 -> 1 -> null
+3 -> 2 -> 1 -> null
+4 -> 3 -> 2 -> 1 -> null
+
+Return prev (new head)
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        //swapping
+        ListNode temp = head;
+        ListNode prev = null;
+        while(temp != null){
+            ListNode front = temp.next;
+            temp.next = prev;
+            prev = temp;
+            temp = front;
+        }
+        return prev;
+    }
+}
