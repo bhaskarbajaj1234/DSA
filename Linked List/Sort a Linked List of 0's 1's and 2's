@@ -1,0 +1,84 @@
+#Approach:
+
+Approach:
+
+Is question me linked list me sirf 0, 1, 2 diye hue hain.
+Hume in-place sort karna hai (nodes change karne hain, values nahi).
+
+Hum 3 dummy linked list banaenge:
+Zero list
+One list
+Two list
+
+Step 1:
+Traverse original linked list.
+
+Step 2:
+Agar node.data == 0 → zero list me daal do
+Agar node.data == 1 → one list me daal do
+Agar node.data == 2 → two list me daal do
+
+Step 3:
+Ab tino lists ko connect karo:
+Zero → One → Two
+
+Step 4:
+Return zeroHead.next
+
+Time Complexity: O(n)
+Space Complexity: O(1) (only pointers used)
+
+Ye Dutch National Flag problem ka linked list version hai.
+
+#Code:
+
+/*
+Definition of singly linked list:
+class ListNode{
+    public int data;
+    public ListNode next;
+    ListNode() { data = 0; next = null; }
+    ListNode(int x) { data = x; next = null; }
+    ListNode(int x, ListNode next) { data = x; this.next = next; }
+}
+*/
+
+class Solution {
+    public ListNode sortList(ListNode head) {
+
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode zeroHead = new ListNode(-1);
+        ListNode oneHead = new ListNode(-1);
+        ListNode twoHead = new ListNode(-1);
+        ListNode zero = zeroHead;
+        ListNode one = oneHead;
+        ListNode two = twoHead;
+
+        ListNode temp = head;
+
+        while(temp != null){
+            if(temp.data == 0){
+                zero.next = temp;
+                zero = zero.next;
+            }
+            else if(temp.data == 1){
+                one.next = temp;
+                one = one.next;
+            }
+            else{
+                two.next = temp;
+                two = two.next;
+            }
+            temp = temp.next;
+        }
+        zero.next = oneHead.next;
+        one.next = twoHead.next;
+        two.next = null;
+
+        return zeroHead.next;
+
+    }
+}
