@@ -1,0 +1,88 @@
+#Approach:
+
+Hinglish Approach:
+
+Is question me DLL me jitne bhi nodes ka value target ke equal hai,
+un sabko delete karna hai.
+
+Step 1:
+Temp pointer se poori DLL traverse karo.
+
+Step 2:
+Agar temp.val == target ho:
+- prev node ko next node se connect karo
+- next node ko prev node se connect karo
+
+Step 3:
+Agar delete hone wala node head hai,
+to head ko head.next pe move karo
+
+Step 4:
+Traversal continue karo until temp becomes null
+
+Important:
+DLL me deletion ke time dono links handle karne hote hain:
+prev.next
+and
+next.prev
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+/*Definition of doubly linked list:
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode prev;
+
+    ListNode() {
+        val = 0;
+        next = null;
+        prev = null;
+    }
+
+    ListNode(int data1) {
+        val = data1;
+        next = null;
+        prev = null;
+    }
+
+    ListNode(int data1, ListNode next1, ListNode prev1) {
+        val = data1;
+        next = next1;
+        prev = prev1;
+    }
+}
+ */
+
+class Solution {
+    public ListNode deleteAllOccurrences(ListNode head, int target) {
+
+        ListNode temp = head;
+
+        while(temp != null){
+            if(temp.val == target){
+                if(temp == head){
+                    head = head.next;
+                }
+                ListNode prevNode = temp.prev;
+                ListNode nextNode = temp.next;
+
+                if(prevNode != null){
+                    prevNode.next = nextNode;
+                }
+                if(nextNode != null){
+                    nextNode.prev = prevNode;
+                }
+                temp = nextNode;
+            }
+            else{
+                temp = temp.next;
+            }
+        }
+        return head;
+
+    }
+}
