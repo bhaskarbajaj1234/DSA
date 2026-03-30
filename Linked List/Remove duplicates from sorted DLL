@@ -1,0 +1,77 @@
+#Approach:
+
+Approach (Hinglish):
+
+Ye DLL sorted hai, isliye duplicate values hamesha ek saath milengi.
+
+Step 1:
+Temp pointer ko head pe rakho.
+
+Step 2:
+Har node ke liye ek nextNode lo jo temp.next se start kare.
+
+Step 3:
+Jab tak nextNode ka value temp ke equal hai,
+tab tak nextNode ko aage badhate raho.
+Isse saare duplicate nodes skip ho jayenge.
+
+Step 4:
+Ab temp.next ko nextNode se connect kar do.
+Agar nextNode null nahi hai, to uska prev bhi temp pe set kar do.
+
+Step 5:
+Temp ko aage badhao aur same process repeat karo.
+
+Is tarah har value ka sirf ek hi node bachega.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+/*Definition of doubly linked list:
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode prev;
+
+    ListNode() {
+        val = 0;
+        next = null;
+        prev = null;
+    }
+
+    ListNode(int data1) {
+        val = data1;
+        next = null;
+        prev = null;
+    }
+
+    ListNode(int data1, ListNode next1, ListNode prev1) {
+        val = data1;
+        next = next1;
+        prev = prev1;
+    }
+}
+ */
+
+class Solution {
+    public ListNode removeDuplicates(ListNode head) {
+
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode temp = head;
+        while(temp != null && temp.next != null){
+            ListNode nextNode = temp.next;
+            while(nextNode != null && nextNode.val == temp.val){
+                nextNode = nextNode.next;
+            }
+            temp.next = nextNode;
+            if(nextNode != null) nextNode.prev = temp;
+            temp = temp.next;
+        }
+        return head;
+    }
+}
