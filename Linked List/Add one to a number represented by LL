@@ -1,0 +1,92 @@
+#Approach:
+
+Approach (Recursive – Backtracking):
+
+Is question me number linked list me diya hai.
+Hume usme +1 add karna hai.
+
+Important observation:
+Addition hamesha last digit se start hoti hai.
+But singly linked list me last pe direct ja nahi sakte.
+Isliye recursion use karte hain.
+
+Step 1:
+Recursion ko last node tak bhejo.
+
+Step 2:
+Last node pe +1 add karo.
+
+Step 3:
+Agar value 10 ho jaye → node = 0, carry = 1
+Else carry = 0
+
+Step 4:
+Carry ko previous nodes me propagate karo.
+
+Step 5:
+Agar sab nodes 9 the (like 9→9→9),
+to new head bana do with value 1.
+
+Example:
+1 → 2 → 9
+Recursion:
+9 + 1 = 10 → 0 carry 1
+2 + 1 = 3
+1 → 3 → 0
+
+Time Complexity: O(n)
+Space Complexity: O(n) recursion stack
+
+#Code:
+
+/*Definition of singly linked list:
+class ListNode {
+    int val;
+    ListNode next;
+
+    ListNode() {
+        val = 0;
+        next = null;
+    }
+
+    ListNode(int data1) {
+        val = data1;
+        next = null;
+    }
+
+    ListNode(int data1, ListNode next1) {
+        val = data1;
+        next = next1;
+    }
+}
+ */
+
+class Solution {
+
+    private int helper(ListNode head){
+        ListNode temp = head;
+        //base case
+        if(temp == null){
+            return 1;
+        }
+
+        int carry = helper(temp.next);
+        temp.val = temp.val + carry;
+        if(temp.val < 10){
+            return 0;
+        }
+        temp.val = 0;
+        return 1;
+    }
+
+    public ListNode addOne(ListNode head) {
+
+        int carry = helper(head);
+        if(carry == 1){
+            ListNode newNode = new ListNode(1);
+            newNode.next = head;
+            return newNode;
+        }
+        return head;
+    }
+}
