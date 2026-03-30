@@ -1,0 +1,149 @@
+#Approach:
+
+Approach (Hinglish – Easy to Revise):
+
+Is question me dono numbers linked list me reverse order me diye gaye hain.
+Matlab:
+l1 = [2,4,3] => 342
+l2 = [5,6,4] => 465
+
+Hume in dono ko add karke answer bhi linked list me return karna hai.
+
+----------------------------------------------------
+
+Main Idea:
+Jaise normal addition karte hain waise hi karenge:
+- ek digit l1 se
+- ek digit l2 se
+- carry add karenge
+- new digit answer list me daal denge
+
+Kyuki digits reverse order me hain,
+isliye hume reverse karne ki need nahi hai.
+Head se hi addition start ho jayega.
+
+----------------------------------------------------
+
+Step by Step:
+
+1. Ek dummy node banao
+   Ye result linked list banane me help karega.
+
+2. Ek temp pointer rakho
+   Ye result list ke last pe naye nodes attach karega.
+
+3. Carry variable initially 0 rakho.
+
+4. Loop tab tak chalega jab tak:
+   - l1 bacha hai
+   - ya l2 bacha hai
+   - ya carry bacha hai
+
+5. Har iteration me:
+   - sum = 0
+   - agar l1 null nahi hai to uska val add karo
+   - agar l2 null nahi hai to uska val add karo
+   - carry bhi add karo
+
+6. New digit:
+   sum % 10
+   Iska node bana ke result me jod do
+
+7. New carry:
+   sum / 10
+
+8. End me dummy.next return kar do
+
+----------------------------------------------------
+
+Example:
+l1 = [2,4,3]
+l2 = [5,6,4]
+
+Step 1:
+2 + 5 = 7
+digit = 7, carry = 0
+
+Step 2:
+4 + 6 = 10
+digit = 0, carry = 1
+
+Step 3:
+3 + 4 + 1 = 8
+digit = 8, carry = 0
+
+Answer:
+[7,0,8]
+
+----------------------------------------------------
+
+Why dummy node?
+Dummy node se special case handle nahi karna padta
+for first node insertion.
+Result banana easy ho jata hai.
+
+----------------------------------------------------
+
+Time Complexity: O(max(n, m))
+Kyuki hum dono linked lists ko ek baar traverse kar rahe hain.
+
+Space Complexity: O(max(n, m))
+Result linked list ban rahi hai.
+
+----------------------------------------------------
+
+Important Edge Cases:
+1. Different length lists
+   Example: [9,9,9] and [1]
+
+2. Final carry bache
+   Example: [9,9] + [1]
+   Answer: [0,0,1]
+
+3. Zero values
+   Example: [0] + [0] => [0]
+
+----------------------------------------------------
+
+Interview Line:
+“Since digits are already stored in reverse order, we can simulate elementary school addition directly from head to tail using carry.”
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode dummyNode = new ListNode(-1);
+        ListNode temp = dummyNode;
+        int carry = 0;
+
+        while(l1 != null || l2 != null || carry == 1){
+            int sum = 0;
+            if(l1 != null){
+                sum += l1.val;
+                l1 = l1.next;
+            }
+
+            if(l2 != null){
+                sum += l2.val;
+                l2 = l2.next;
+            }
+
+            sum += carry;
+            carry = sum / 10;
+            ListNode newNode = new ListNode(sum % 10);
+            temp.next = newNode;
+            temp = temp.next;
+        }
+        return dummyNode.next;
+    }
+}
