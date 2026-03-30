@@ -1,0 +1,70 @@
+#Approach:
+
+Approach (Hinglish):
+
+Is question me hume end se nth node delete karna hai.
+Iske liye best approach hai two pointer (fast & slow).
+
+Step 1:
+Fast pointer ko n steps aage move karo.
+
+Step 2:
+Agar fast null ho gaya → iska matlab head delete karna hai.
+Return head.next.
+
+Step 3:
+Ab slow aur fast dono ko ek saath move karo
+jab tak fast last node tak nahi pahunch jata.
+
+Step 4:
+Ab slow nth node ke just pehle khada hoga.
+To delete:
+slow.next = slow.next.next
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+Important Interview Line:
+"Maintain a gap of n nodes between fast and slow pointer."
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+
+        if(head == null){
+            return null;
+        }
+
+        ListNode fast = head;
+        for(int i=0; i<n; i++){
+            fast = fast.next;
+        }
+
+        if(fast == null){
+            return head.next;
+        }
+
+        ListNode slow = head;
+
+        while(fast.next != null){
+            slow = slow.next;
+            fast = fast.next;
+        }
+
+        slow.next = slow.next.next;
+
+        return head;
+        
+    }
+}
