@@ -1,0 +1,75 @@
+#Approach:
+
+Approach (easy Hinglish):
+1. Slow-fast se middle nikaalo.
+2. Middle ke baad wali linked list reverse karo.
+3. First half aur reversed second half ko compare karo.
+4. Agar kahin mismatch mil gaya to false.
+5. End me second half ko wapas reverse karke original list restore kar do.
+
+Bug tumhare code me ye tha ki reverse karne ke baad bhi comparison old slow.next se start ho raha tha.
+Comparison hamesha reversed list ke head yani newHead se start hona chahiye.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+
+    private ListNode reverse(ListNode x){
+        if(x == null || x.next == null) return x;
+        //I will follow iterative method
+        ListNode prev = null;
+        ListNode temp = x;
+
+        while(temp != null){
+            ListNode front = temp.next;
+            temp.next = prev;
+            prev = temp;
+            temp = front;
+        }
+        return prev;
+
+    }
+
+    public boolean isPalindrome(ListNode head) {
+        
+        if(head == null || head.next == null) return true;
+        //Step -1: We will find the middle point
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        while(fast.next != null && fast.next.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        //Step-2: Reverse the LL
+        ListNode newHead = reverse(slow.next);
+
+        ListNode first = head;
+        ListNode second = newHead;
+
+        while(second != null){
+            if(first.val != second.val){
+                reverse(newHead);
+                return false;
+            }
+            first = first.next;
+            second = second.next;
+        }
+        reverse(newHead);
+        return true;
+    }
+}
