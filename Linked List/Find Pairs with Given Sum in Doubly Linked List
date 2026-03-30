@@ -1,0 +1,79 @@
+#Approach:
+
+Approach (Hinglish):
+
+DLL sorted hai, isliye two-pointer approach use kar sakte hain.
+
+Step 1:
+Left pointer ko head pe rakho.
+
+Step 2:
+Right pointer ko last node tak le jao.
+
+Step 3:
+Ab left aur right ka sum nikaalo:
+- agar sum target se chhota hai, left ko aage badhao
+- agar sum target se bada hai, right ko peeche lao
+- agar sum target ke equal hai, pair store karo
+  aur dono pointers move karo
+
+Step 4:
+Loop tab tak chalega jab tak left aur right cross na kar jayein.
+
+Kyuki list sorted hai, isliye har step pe decide kar sakte hain
+ki left badhana hai ya right ghataana hai.
+
+Time Complexity: O(n)
+Space Complexity: O(1) extra space
+(output list ko छोड़कर)
+
+#Code:
+
+/*
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode prev;
+    
+    ListNode(int val) {
+        this.val = val;
+        this.next = null;
+        this.prev = null;
+    }
+}
+*/
+
+class Solution {
+    public List<List<Integer>> findPairsWithGivenSum(ListNode head, int target) {
+        // Your code goes here
+        List<List<Integer>> ans = new ArrayList<>();
+        if(head == null){
+            return ans;
+        }
+        ListNode left = head;
+        ListNode right = head;
+
+        while(right.next != null){
+            right = right.next;
+        }
+
+        while(left.val < right.val){
+            int sum = left.val + right.val;
+            if(sum < target){
+                left = left.next;
+            }
+            else if(sum > target){
+                right = right.prev;
+            }
+            else{
+                List<Integer> temp = new ArrayList<>();
+                temp.add(left.val);
+                temp.add(right.val);
+                ans.add(temp);
+                left = left.next;
+                right = right.prev;
+            }
+        }
+        return ans;
+    }
+}
