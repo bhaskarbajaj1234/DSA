@@ -1,0 +1,57 @@
+#Approach:
+
+Approach:
+
+Hume middle node delete karna hai.
+Middle = floor(n/2) index → Right middle.
+
+Step 1:
+Slow aur Fast pointer use karo.
+Fast 2 step chalega
+Slow 1 step chalega
+
+Step 2:
+Jab fast null ya fast.next null ho jaye,
+tab slow middle pe hoga.
+
+Step 3:
+Middle delete karne ke liye:
+slowPrev.next = slow.next
+
+Step 4:
+Head return kar do.
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode deleteMiddle(ListNode head) {
+        if(head == null || head.next == null){
+            return null;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head;
+        ListNode slowPrev = null;
+
+        while(fast != null && fast.next != null){
+            slowPrev = slow;
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        slowPrev.next = slow.next;
+        return head;
+    }
+}
