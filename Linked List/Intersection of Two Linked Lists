@@ -1,0 +1,150 @@
+#Approach:
+
+Approach (Hinglish – Easy to Revise):
+
+Is question me hume do linked lists ka intersection node find karna hai.
+Important baat:
+Intersection value same hone se nahi hota,
+intersection tab hota hai jab dono pointers same node reference pe aa jayein.
+
+Matlab:
+Agar dono lists me value 8 hai,
+to zaroori nahi wo intersection ho.
+Intersection tab hoga jab dono same memory node ko point karein.
+
+----------------------------------------------------
+
+Main Idea:
+Do pointers use karenge:
+t1 = headA
+t2 = headB
+
+Dono ko ek-ek step move karte rahenge.
+
+Agar koi pointer apni list ke end pe pahunch jaye,
+to usko doosri list ke head pe bhej denge.
+
+----------------------------------------------------
+
+Why this works?
+
+Maan lo:
+List A length = m
+List B length = n
+
+Agar t1 pehle A traverse kare aur phir B,
+aur t2 pehle B traverse kare aur phir A,
+to dono total m + n distance travel karenge.
+
+Isse jo length difference hai wo automatically balance ho jata hai.
+
+Agar intersection hoga:
+dono pointers same node pe mil jayenge.
+
+Agar intersection nahi hoga:
+dono end me null pe mil jayenge.
+
+----------------------------------------------------
+
+Step by Step:
+
+1. t1 ko headA pe rakho
+2. t2 ko headB pe rakho
+
+3. Jab tak t1 != t2:
+   - t1 ko aage badhao
+   - t2 ko aage badhao
+
+4. Agar t1 null ho jaye:
+   usko headB pe bhej do
+
+5. Agar t2 null ho jaye:
+   usko headA pe bhej do
+
+6. Jab dono equal ho jayenge:
+   wahi answer hai
+   - same node mila to intersection
+   - null mila to no intersection
+
+----------------------------------------------------
+
+Example:
+
+List A: 4 -> 1 -> 8 -> 4 -> 5
+List B: 5 -> 6 -> 1 -> 8 -> 4 -> 5
+
+t1 path:
+A complete, then B
+
+t2 path:
+B complete, then A
+
+Dono eventually node 8 pe mil jayenge.
+
+----------------------------------------------------
+
+Why better than brute force?
+
+Brute force:
+Har node of A ke liye B traverse karna
+Time = O(m*n)
+
+Optimal:
+Two pointers switch trick
+Time = O(m+n)
+Space = O(1)
+
+----------------------------------------------------
+
+Time Complexity: O(m + n)
+Space Complexity: O(1)
+
+----------------------------------------------------
+
+Important Interview Line:
+“Each pointer traverses both lists exactly once, so the path lengths become equalized, which makes them meet at the intersection node or at null.”
+
+----------------------------------------------------
+
+Note:
+Is problem me comparison node reference se hota hai,
+value se nahi.
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if(headA == null || headB == null) return null;
+
+        ListNode t1 = headA;
+        ListNode t2 = headB;
+        
+        while(t1 != t2){
+            t1 = t1.next;
+            t2 = t2.next;
+
+            if(t1 == t2){
+                return t1;
+            }
+
+            if(t1 == null){
+                t1 = headB;
+            }
+            if(t2 == null){
+                t2 = headA;
+            }
+        }
+        return t1;
+    }
+}
