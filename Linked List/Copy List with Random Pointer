@@ -1,0 +1,142 @@
+#Approach:
+
+**Copy List with Random Pointer – Hinglish Approach**
+
+Is question me hume linked list ka **deep copy** banana hai.
+Matlab naye nodes banenge, aur unka `next` aur `random` structure original list jaisa hi hoga, but koi pointer original nodes ko point nahi karega.
+
+### Approach used in this code:
+
+Ye **optimal O(1) extra space** wala approach hai.
+
+---
+
+### Step 1: Har original node ke baad uska copy node insert karo
+
+Agar original list hai:
+
+`A -> B -> C`
+
+to usko convert kar dete hain:
+
+`A -> A' -> B -> B' -> C -> C'`
+
+Yaha `A'`, `B'`, `C'` copied nodes hain.
+
+Isse fayda ye hota hai ki kisi bhi original node ka copy node uske just next me mil jata hai.
+
+---
+
+### Step 2: Random pointers connect karo
+
+Agar kisi original node ka random kisi node `X` ko point kar raha hai,
+to uske copy node ka random `X` ke copy ko point karega.
+
+Kyuki `X` ka copy `X.next` par hi pada hai, isliye:
+
+* original: `temp.random`
+* copied target: `temp.random.next`
+
+So:
+
+```java
+copyNode.random = temp.random.next;
+```
+
+Agar original ka random `null` hai, to copied ka bhi `null` rahega.
+
+---
+
+### Step 3: Original aur copied list ko alag karo
+
+Ab mixed list me original aur copied nodes alternate form me pade hain.
+Is step me:
+
+* copied nodes ko ek alag list me collect karte hain
+* original list ko bhi wapas restore kar dete hain
+
+Matlab:
+
+* `res.next = temp.next` → copied node extract kiya
+* `temp.next = temp.next.next` → original list restore ki
+
+---
+
+### Why this works?
+
+Kyuki har original node ke just next me uska copy node pada hai,
+isliye `random` mapping easily mil jaati hai bina HashMap use kiye.
+
+---
+
+### Complexity:
+
+* **Time Complexity:** `O(n)`
+* **Space Complexity:** `O(1)` extra space
+  (output list ko extra space me count nahi karte)
+
+---
+
+### One-line logic:
+
+> Original ke beech copy insert karo → random set karo → copied list alag nikaal lo.
+
+
+#Code:
+/*
+// Definition for a Node.
+class Node {
+    int val;
+    Node next;
+    Node random;
+
+    public Node(int val) {
+        this.val = val;
+        this.next = null;
+        this.random = null;
+    }
+}
+*/
+
+class Solution {
+    public Node copyRandomList(Node head) {
+
+        //Step-1: Create copyNodes
+        Node temp = head;
+        while(temp != null){
+            Node copyNode = new Node(temp.val);
+            copyNode.next = temp.next;
+            temp.next = copyNode;
+
+            temp = temp.next.next;
+        }
+
+        //Step-2: Connect random
+        temp = head;
+        while(temp != null){
+            Node copyNode = temp.next;
+            if(temp.random != null){
+                copyNode.random = temp.random.next;
+            }
+            else{
+                copyNode.random = null;
+            }
+            temp = temp.next.next;
+        }
+
+        //Step-3: extracting copy list
+        temp = head;
+        Node dummyNode = new Node(-1);
+        Node res = dummyNode;
+
+        while(temp != null){
+            res.next = temp.next;
+            temp.next = temp.next.next;
+
+            res = res.next;
+            temp = temp.next;
+        }
+
+        return dummyNode.next;        
+    }
+}
