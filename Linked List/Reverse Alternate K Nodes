@@ -1,0 +1,180 @@
+#Approach:
+
+**Reverse Alternate K Nodes – Hinglish Approach**
+
+Is question me linked list ko **groups of size B** me dekhna hai, aur **har alternate group ko reverse** karna hai.
+
+Matlab:
+
+* 1st group reverse
+* 2nd group same rehne do
+* 3rd group reverse
+* 4th group same rehne do
+* and so on...
+
+---
+
+### Approach used in this code
+
+Code me list ko group by group process kiya gaya hai using `gNum`:
+
+* `gNum = 1` → odd group number → reverse karna hai
+* `gNum = 2` → even group number → skip karna hai
+* `gNum = 3` → reverse
+* `gNum = 4` → skip
+
+---
+
+### Step 1: Kth node find karo
+
+Har group ke start pe `getKthNode(temp, B)` use kiya gaya hai taaki current group ka last node mil sake.
+
+Ye isliye useful hai kyunki:
+
+* hume exact `B` nodes ka group isolate karna hota hai
+* uske baad hi reverse safely kar sakte hain
+
+---
+
+### Step 2: Odd-numbered group ko reverse karo
+
+Agar current group number odd hai:
+
+1. `kthNode` find karo
+2. `nextNode = kthNode.next` store karo
+3. `kthNode.next = null` karke current group ko alag kar do
+4. `reverse(temp)` se poora group reverse karo
+5. Previous part ko reversed group se connect karo
+6. Reversed group ke end ko `nextNode` se jod do
+
+Important:
+
+* Reverse ke baad original `temp` hi us group ka tail ban jata hai
+* isliye `prevNode = temp` set kiya gaya hai
+
+---
+
+### Step 3: Even-numbered group ko skip karo
+
+Agar group reverse nahi karna:
+
+* simply `B` nodes tak aage move karo
+* `prevNode` ko last node pe le jao
+* `temp` ko next group ke start pe le jao
+
+Is group me pointers change nahi hote, bas traversal hoti hai.
+
+---
+
+### Example
+
+Input:
+`1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9`
+`B = 3`
+
+Groups:
+
+* Group 1: `1 2 3` → reverse → `3 2 1`
+* Group 2: `4 5 6` → same
+* Group 3: `7 8 9` → reverse → `9 8 7`
+
+Final output:
+`3 -> 2 -> 1 -> 4 -> 5 -> 6 -> 9 -> 8 -> 7`
+
+---
+
+### Why this works
+
+* Har group ko isolate karke process kiya ja raha hai
+* Odd groups reverse ho rahe hain
+* Even groups untouched reh rahe hain
+* `prevNode` aur `nextNode` ki help se links properly maintain ho rahe hain
+
+---
+
+### Complexity
+
+* **Time Complexity:** `O(n)`
+* **Space Complexity:** `O(1)`
+
+---
+
+### One-line logic
+
+> Linked list ko B-size groups me todho, odd groups reverse karo, even groups skip karo, aur sabko sahi se reconnect kar do.
+
+
+#Code:
+
+class ListNode {
+	int val;
+	ListNode next;
+	ListNode() { val = 0; next = null; }
+	ListNode(int val) { this.val = val; next = null; }
+	ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+}
+
+public class Solution {
+
+		public ListNode getKthNode(ListNode temp, int k){
+			k -= 1;
+			while(temp != null && k > 0){
+				k--;
+				temp = temp.next;
+			}
+			return temp;
+		}
+
+    public ListNode reverse(ListNode head){
+      if(head == null || head.next == null) return head;
+
+      ListNode temp = head;
+      ListNode prev = null;
+      while(temp != null){
+        ListNode front = temp.next;
+        temp.next = prev;
+        prev = temp;
+        temp = front;
+      }
+      return prev;
+    }
+
+    public ListNode solve(ListNode A, int B) {
+      //You can code here
+			
+			ListNode temp = A;
+			ListNode prevNode = null;
+      int gNum = 1;
+			while(temp != null){
+				if(gNum % 2 == 1){
+          ListNode kthNode = getKthNode(temp, B);
+          if(kthNode == null){
+            if(prevNode != null) prevNode.next = temp;
+            break;
+          }
+          ListNode nextNode = kthNode.next;
+          kthNode.next = null;
+          ListNode newHead = reverse(temp);
+          if(temp == A){
+            A = newHead;
+          }else{
+            prevNode.next = newHead;
+          }
+          prevNode = temp;
+          prevNode.next = nextNode;
+          temp = nextNode;
+          
+        }
+        else{
+          for(int i=1; i<=B && temp != null; i++){
+            prevNode = temp;
+            temp = temp.next;
+          }
+        }
+        gNum++;
+			}
+
+      return A;     
+        
+    }
+}
