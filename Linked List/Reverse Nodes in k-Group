@@ -1,0 +1,86 @@
+#Approach:
+
+**Hinglish quick revision:**
+
+Tumhara code almost sahi hai, but `kthnodeFinder()` mein issue hai.
+Agar remaining nodes `k` se kam hue, to `temp = temp.next` karte karte `temp` null ho jayega aur NPE aa sakta hai.
+Bas wahi fix karna tha by checking:
+
+`if(temp == null) return null;`
+
+Baaki logic sahi hai:
+
+* pehle `kthNode` find kiya
+* group ko tod diya using `kthNode.next = null`
+* group reverse kiya
+* previous part se connect kiya
+* next group pe move kar gaye
+
+Time Complexity: **O(n)**
+Space Complexity: **O(k)** recursion stack for each group
+
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+
+    private ListNode reverse(ListNode head){
+        if(head == null || head.next == null){
+            return head;
+        }
+        ListNode newHead = reverse(head.next);
+        ListNode front = head.next;
+        front.next = head;
+        head.next = null;
+        return newHead;
+    }
+
+    private ListNode kthnodeFinder(ListNode x, int k){
+        ListNode temp = x;
+        for(int i=1; i<k; i++){
+            if(temp == null) return null;
+            temp = temp.next;
+        }
+        return temp;
+    }
+
+    public ListNode reverseKGroup(ListNode head, int k) {
+
+        ListNode temp = head;
+        ListNode prevNode = null;
+        while(temp != null){
+            ListNode kthNode = kthnodeFinder(temp, k);
+            if(kthNode == null){
+                if(prevNode != null){
+                    prevNode.next = temp;
+                }
+                break;
+            }
+            ListNode nextNode = kthNode.next;
+            kthNode.next = null;
+
+            reverse(temp);
+            if(temp == head){
+                //first group
+                head = kthNode;
+            }
+            else{
+                //other group
+                prevNode.next = kthNode;
+            }
+            prevNode = temp;
+            temp = nextNode;
+        }
+        return head;
+    }
+}
