@@ -1,0 +1,147 @@
+#Approach:
+
+**Kth Node From Middle – Hinglish Approach**
+
+Is question me hume linked list ke **middle node se beginning ki taraf Bth node** ka value nikalna hai.
+
+Question me middle position diya hai:
+**(N / 2) + 1**
+Matlab odd aur even dono cases me jo standard slow-fast se middle milta hai, usi ko use kiya gaya hai.
+
+---
+
+### Step 1: Middle node find karo
+
+Code me `findMiddle()` function use hua hai:
+
+* `slow` ek step chalega
+* `fast` do step chalega
+
+Jab `fast` end tak pahunch jayega, `slow` middle pe hoga.
+
+So:
+
+```java
+ListNode middle = findMiddle(head);
+```
+
+---
+
+### Step 2: Head se middle tak distance ka use karo
+
+Ab hume middle se **B nodes piche** jaana hai.
+Linked list me backward move nahi kar sakte, isliye trick use ki gayi hai:
+
+* `slow` ko head pe rakha
+* `fast` ko bhi head pe rakha
+* `fast` ko pehle **B steps aage** le gaye
+
+Ye basically ek **gap of B nodes** create karta hai.
+
+---
+
+### Step 3: Dono pointers ko saath move karo
+
+Ab `slow` aur `fast` dono ko ek-ek step aage move karte hain
+jab tak `fast` middle tak na pahunch jaaye.
+
+Jab `fast` middle pe hoga, tab `slow` exactly **middle se B nodes piche** hoga.
+
+Isi `slow.val` ko return kar dete hain.
+
+---
+
+### Step 4: Invalid case handle karo
+
+Agar `B` itna bada hai ki middle se B steps piche koi node exist hi nahi karta,
+to answer `-1` hoga.
+
+Code me isi liye:
+
+```java
+if(B > 0) return -1;
+```
+
+---
+
+### Example:
+
+List: `1 -> 2 -> 3 -> 4 -> 5`
+Middle = `3`
+B = `2`
+
+Middle se 2 nodes piche = `1`
+
+Output = **1**
+
+---
+
+### Special Case:
+
+Agar `B = 0` ho, to answer khud **middle node** hoga.
+
+Example:
+`1 -> 2 -> 3 -> 4 -> 5`, `B = 0`
+Output = **3**
+
+---
+
+### Complexity:
+
+* **Time Complexity:** `O(n)`
+* **Space Complexity:** `O(1)`
+
+---
+
+### One-line yaad rakhne wali logic:
+
+> Middle find karo, head se do pointers lo, ek me B ka gap banao, phir dono ko saath chalao jab tak fast middle tak na pahunch jaaye.
+
+
+#Code:
+
+/* class ListNode {
+	int val;
+	ListNode next;
+	ListNode() { val = 0; next = null; }
+	ListNode(int val) { this.val = val; next = null; }
+	ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+} */
+
+public class Solution {
+
+		public ListNode findMiddle(ListNode head){
+			ListNode fast = head;
+			ListNode slow = head;
+			while(fast != null && fast.next != null){
+				slow = slow.next;
+				fast = fast.next.next;
+			}
+			return slow;
+		}
+	
+    public int kthNode(ListNode head, int B) {
+        //You can code here
+				if (head == null) return -1;
+
+			// step 1: Finding middle node
+			ListNode middle = findMiddle(head);
+
+			ListNode slow = head;
+			ListNode fast = head;
+			while(B > 0 && fast.next != middle.next){
+				fast = fast.next;
+				B--;
+			}
+
+			if(B > 0) return -1;
+
+			while(fast.next != middle.next){
+				slow = slow.next;
+				fast = fast.next;
+			}
+
+			return slow.val;
+			
+    }
+}
