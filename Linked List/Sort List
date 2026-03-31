@@ -1,0 +1,141 @@
+#Approach:
+
+**Sort List – Hinglish Approach (Merge Sort on Linked List)**
+
+Is question me hume linked list ko **ascending order** me sort karna hai.
+Array ki tarah direct indexing possible nahi hoti, isliye linked list ke liye **Merge Sort** best approach hota hai.
+
+### Approach:
+
+**1. Base case**
+Agar list empty hai ya sirf 1 node hai, to vo already sorted hai.
+
+**2. Middle find karo**
+`slow` aur `fast` pointer use karke middle nikaalte hain.
+Yaha `fast = head.next` se start kiya gaya hai taaki hume **left half ka last node** mile aur list properly 2 parts me split ho sake.
+
+**3. List ko 2 halves me tod do**
+
+* `leftHead = head`
+* `rightHead = middle.next`
+* `middle.next = null`
+
+Ab original list do alag linked lists me split ho gayi.
+
+**4. Recursively dono halves sort karo**
+
+* left part ko sort karo
+* right part ko sort karo
+
+**5. Dono sorted halves merge karo**
+`merge2()` function exactly merge two sorted lists ki tarah kaam karta hai:
+
+* `t1` aur `t2` compare hote hain
+* jo smaller node hota hai, usko result me attach kar dete hain
+* end me bachi hui list directly attach kar dete hain
+
+### Why Merge Sort?
+
+Linked list me merge operation bahut efficiently ho jata hai using pointers, isliye merge sort most suitable hota hai.
+
+### Complexity:
+
+* **Time Complexity:** `O(n log n)`
+* **Space Complexity:** `O(log n)` recursion stack
+
+### One-line yaad rakhne wali logic:
+
+> Middle find karo → list split karo → dono parts sort karo → merge karke final sorted list banao.
+
+
+#Code:
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+
+    private ListNode merge2(ListNode lHead, ListNode rHead){
+
+        ListNode t1 = lHead;
+        ListNode t2 = rHead;
+        ListNode dummyNode = new ListNode(-1);
+        ListNode temp = dummyNode;
+
+        while(t1 != null && t2 != null){
+            if(t1.val < t2.val){
+                temp.next = t1;
+                temp = temp.next;
+                t1 = t1.next;
+            }
+            else if(t1.val > t2.val){
+                temp.next = t2;
+                temp = temp.next;
+                t2 = t2.next;
+            }
+            else{
+                //if both are equal
+                temp.next = t1;
+                temp = temp.next;
+                t1 = t1.next;
+            }
+        }
+
+        //if t2 is exhausted
+        while(t1 != null){
+            temp.next = t1;
+            temp = temp.next;
+            t1 = t1.next;
+        }
+        //if t1 is exhausted
+        while(t2 != null){
+            temp.next = t2;
+            temp = temp.next;
+            t2 = t2.next;
+        }
+        return dummyNode.next;
+    }
+
+    private ListNode findMiddle(ListNode head){
+        ListNode slow = head;
+        ListNode fast = head.next;
+
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    private ListNode mergeSort(ListNode head){
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        ListNode middle = findMiddle(head);
+        ListNode leftHead = head;
+        ListNode rightHead = middle.next;
+        middle.next = null;
+        leftHead = mergeSort(leftHead);
+        rightHead = mergeSort(rightHead);
+
+        return merge2(leftHead, rightHead);
+    }
+
+    public ListNode sortList(ListNode head) {
+        
+        if(head == null || head.next == null){
+            return head;
+        }
+
+        head = mergeSort(head);
+        return head;
+    }
+}
