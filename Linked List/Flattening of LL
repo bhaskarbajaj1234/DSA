@@ -1,0 +1,113 @@
+#Approach:
+
+**Hinglish quick revision:**
+
+Tumhara approach sahi hai:
+
+* recursively right side ko flatten karo
+* current list ko flattened right list ke saath merge karo
+* final answer `child` pointer se return karo
+
+Bas ek important issue hai:
+**old `next` pointers null nahi kar rahe ho**
+
+Flattened list sirf `child` pointer se honi chahiye, isliye merge ke time:
+`temp.next = null`
+karna better hai.
+
+**Approach yaad rakhne ke liye:**
+
+* `head.next` ko pehle flatten karo
+* current vertical list + flattened right list ko merge karo
+* merge exactly sorted linked list merge jaisa hai, bas `next` ki jagah `child` use hoga
+
+**Time Complexity:** O(N * k) worst case
+**Space Complexity:** O(k) recursion stack
+where `k` = number of top-level lists
+
+
+#Code:
+
+/*Definition for singly Linked List
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode child;
+
+    ListNode() {
+        val = 0;
+        next = null;
+        child = null;
+    }
+
+    ListNode(int data1) {
+        val = data1;
+        next = null;
+        child = null;
+    }
+
+    ListNode(int data1, ListNode next1, ListNode next2) {
+        val = data1;
+        next = next1;
+        child = next2;
+    }
+}
+*/
+class Solution {
+
+    private ListNode merge(ListNode headA, ListNode headB){
+        ListNode t1 = headA;
+        ListNode t2 = headB;
+        ListNode dummyNode = new ListNode(-1);
+        ListNode temp = dummyNode;
+        while(t1 != null && t2 != null){
+            if(t1.val < t2.val){
+                temp.child = t1;
+                temp = temp.child;
+                t1 = t1.child;
+            }
+            else if(t1.val > t2.val){
+                temp.child = t2;
+                temp = temp.child;
+                t2 = t2.child;
+            }
+            else{
+                //if both are equal values
+                temp.child = t1;
+                temp = temp.child;
+                t1 = t1.child;
+            }
+            temp.next = null;
+        }
+        //if t2 is exhausted
+        while(t1 != null){
+            temp.child = t1;
+            temp = temp.child;
+            t1 = t1.child;
+            temp.next = null;
+        }
+        //if t1 is exhausted
+        while(t2 != null){
+            temp.child = t2;
+            temp = temp.child;
+            t2 = t2.child;
+            temp.next = null;
+        }
+
+        return dummyNode.child;
+    }
+
+    private ListNode function(ListNode head){
+        if(head == null || head.next == null){
+            return head;
+        }
+        ListNode mergedHead = function(head.next);
+        return merge(head, mergedHead);
+    }
+
+    public ListNode flattenLinkedList(ListNode head) {
+
+        ListNode newHead = function(head);
+        return newHead;
+    }
+}
