@@ -1,0 +1,192 @@
+#Approach:
+
+**Reorder List – Hinglish Approach**
+
+Is question me linked list ko is pattern me reorder karna hai:
+
+`L0 -> Ln -> L1 -> Ln-1 -> L2 -> Ln-2 ...`
+
+Matlab first node, phir last node, phir second node, phir second-last node, aur aise hi.
+
+---
+
+### Approach used in this code
+
+Is problem ko efficiently solve karne ke liye 3 main steps use kiye gaye hain:
+
+### 1. Middle node find karo
+
+Sabse pehle linked list ka middle nikaalte hain using **slow and fast pointer**.
+
+* `slow` ek step chalta hai
+* `fast` do step chalta hai
+
+Jab `fast` end tak pahunch jata hai, `slow` middle ke aas-paas hota hai.
+
+Yaha `fast = head.next` se start kiya gaya hai, taaki left half thoda controlled split ho.
+
+---
+
+### 2. List ko 2 parts me tod do
+
+Middle milne ke baad list ko do halves me split kar dete hain:
+
+* `leftHead = head`
+* `rightHead = middleNode.next`
+* `middleNode.next = null`
+
+Ab:
+
+* left half original first part hai
+* right half second part hai
+
+---
+
+### 3. Second half ko reverse karo
+
+Ab second half ko reverse kar dete hain.
+
+Example:
+Agar second half `4 -> 5 -> 6` hai, to reverse ke baad `6 -> 5 -> 4` ho jayega.
+
+Ye isliye zaroori hai kyunki hume reorder me last elements pehle chahiye hote hain.
+
+---
+
+### 4. Dono halves ko alternate merge karo
+
+Ab ek pointer left half pe aur ek right half pe rakho:
+
+* pehle left ka node attach karo
+* phir right ka node
+* phir left ka next
+* phir right ka next
+
+Isi tarah alternate connect karte jao.
+
+Code me:
+
+* `lPtr` left half traverse karta hai
+* `rPtr` right half traverse karta hai
+
+Har step me next nodes store karke pointers safely connect kiye gaye hain.
+
+---
+
+### Example
+
+List:
+`1 -> 2 -> 3 -> 4 -> 5`
+
+**Middle:** `3`
+Split:
+
+* Left = `1 -> 2 -> 3`
+* Right = `4 -> 5`
+
+Reverse right:
+
+* `5 -> 4`
+
+Alternate merge:
+
+* `1 -> 5 -> 2 -> 4 -> 3`
+
+Final answer:
+`1 -> 5 -> 2 -> 4 -> 3`
+
+---
+
+### Why this works
+
+* Middle split se list do manageable parts me toot jaati hai
+* Right half reverse karne se last nodes correct order me mil jaate hain
+* Alternate merge exactly required reorder pattern bana deta hai
+
+---
+
+### Complexity
+
+* **Time Complexity:** `O(n)`
+* **Space Complexity:** `O(1)`
+
+---
+
+### One-line logic
+
+> Middle find karo → second half reverse karo → dono halves ko alternate merge kar do.
+
+
+#Code:
+
+/* class ListNode {
+	int val;
+	ListNode next;
+	ListNode() { val = 0; next = null; }
+	ListNode(int val) { this.val = val; next = null; }
+	ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+} */
+
+public class Solution {
+
+  private ListNode findMiddle(ListNode head){
+    if(head == null || head.next == null){
+      return head;
+    }
+
+    ListNode slow = head;
+    ListNode fast = head.next;
+
+    while(fast != null && fast.next != null){
+      slow = slow.next;
+      fast = fast.next.next;
+    }
+
+    return slow;
+  }
+
+  private ListNode reverse(ListNode head){
+    ListNode prev = null;
+    ListNode temp = head;
+
+    while(temp != null){
+        ListNode front = temp.next;
+        temp.next = prev;
+        prev = temp;
+        temp = front;
+    }
+
+    return prev;
+  }
+
+	public void reorderList(ListNode head) {
+		//You can code here
+    if(head == null || head.next == null){
+      return;
+    }
+
+    //Step-1: Find middle node and break it
+    ListNode middleNode = findMiddle(head);
+    ListNode leftHead = head;
+    
+    ListNode rightHead = middleNode.next;
+    middleNode.next = null;
+
+    //Step-2: reverse the second half
+    rightHead = reverse(rightHead);
+
+    //Step-3: Alternate align the list elements
+    ListNode lPtr = leftHead;
+    ListNode rPtr = rightHead;
+    while(lPtr != null && rPtr != null){
+      ListNode lNext = lPtr.next;
+      ListNode rNext = rPtr.next;
+
+      lPtr.next = rPtr;
+      rPtr.next = lNext;
+
+      lPtr = lNext;
+      rPtr = rNext;
+    }
+	}
+}
