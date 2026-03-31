@@ -1,0 +1,152 @@
+#Approach:
+
+**Partition List – Hinglish Approach**
+
+Is question me hume linked list ko aise rearrange karna hai ki:
+
+* jo nodes **B se chhote** hain, vo pehle aayein
+* jo nodes **B ke barabar ya bade** hain, vo baad me aayein
+
+Aur sabse important baat:
+**relative order same rehna chahiye** dono groups ke andar.
+
+---
+
+### Approach used in this code
+
+Is problem ko solve karne ke liye humne list ko **2 alag linked lists** me divide kiya:
+
+1. **Left list** → jisme values `< B`
+2. **Right list** → jisme values `>= B`
+
+Iske liye 2 dummy nodes use kiye:
+
+* `dummyNodeLeft`
+* `dummyNodeRight`
+
+Ye dummy nodes head handling easy bana dete hain.
+
+---
+
+### Step 1: Traverse the original list
+
+Original list ko ek baar traverse karte hain using `temp`.
+
+Har node ke liye:
+
+* agar `temp.val < B` hai, to us node ko **left list** me attach kar do
+* warna us node ko **right list** me attach kar do
+
+Isse original relative order maintain rehta hai, kyunki hum nodes ko jis order me mil rahe hain, usi order me append kar rahe hain.
+
+---
+
+### Step 2: Right list ko properly end karo
+
+Traversal ke baad:
+
+```java
+right.next = null;
+```
+
+Ye isliye important hai taaki right partition ka tail kisi old unwanted node ko point na kare.
+
+---
+
+### Step 3: Dono lists ko join karo
+
+Ab left list ke end ko right list ke start se connect kar dete hain:
+
+```java
+left.next = dummyNodeRight.next;
+```
+
+Final answer hoga:
+
+```java
+dummyNodeLeft.next
+```
+
+---
+
+### Example
+
+Input:
+`1 -> 4 -> 3 -> 2 -> 5 -> 2`, `B = 3`
+
+Split:
+
+* Left: `1 -> 2 -> 2`
+* Right: `4 -> 3 -> 5`
+
+Join:
+
+* `1 -> 2 -> 2 -> 4 -> 3 -> 5`
+
+Output:
+`[1, 2, 2, 4, 3, 5]`
+
+---
+
+### Why this works
+
+Kyuki:
+
+* hum values `< B` aur `>= B` ko separate kar rahe hain
+* append order same hai, isliye stability maintain hoti hai
+* end me dono lists jod dete hain
+
+---
+
+### Complexity
+
+* **Time Complexity:** `O(n)`
+* **Space Complexity:** `O(1)` extra
+  (sirf dummy nodes aur pointers use hue hain)
+
+---
+
+### One-line logic
+
+> Ek list me `< B` wale nodes daalo, doosri me `>= B` wale, phir dono ko join kar do.
+
+
+#Code:
+
+class ListNode {
+	int val;
+	ListNode next;
+	ListNode() { val = 0; next = null; }
+	ListNode(int val) { this.val = val; next = null; }
+	ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+} 
+
+public class Solution {
+	public ListNode partition(ListNode A, int B) {
+	   //You can code here
+    
+    if(A == null || A.next == null) return A;
+
+    ListNode dummyNodeLeft = new ListNode(-1);
+    ListNode dummyNodeRight = new ListNode(-1);
+    ListNode left = dummyNodeLeft;
+    ListNode right = dummyNodeRight;
+
+    ListNode temp = A;
+    while(temp != null){
+      if(temp.val < B){
+        left.next = temp;
+        left = left.next;
+      }
+      else{
+        right.next = temp;
+        right = right.next;
+      }
+      temp = temp.next;
+    }
+    right.next = null;
+    left.next = dummyNodeRight.next;
+    return dummyNodeLeft.next;
+      
+	}
+}
