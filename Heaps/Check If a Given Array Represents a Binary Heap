@@ -1,0 +1,115 @@
+#Approach:
+
+CHECK IF ARRAY REPRESENTS A MAX HEAP
+
+Idea:
+Array representation of a Max Heap mein har parent apne children se greater ya equal hona chahiye.
+
+For every node:
+Parent >= Left Child
+Parent >= Right Child
+
+--------------------------------------------------
+
+APPROACH
+
+1. Root se traversal start karo.
+
+2. Agar current node leaf hai,
+   to true return karo.
+
+   Condition:
+   i >= n/2
+
+3. Left aur Right child nikalo.
+
+   Left  = 2*i + 1
+   Right = 2*i + 2
+
+4. Check karo:
+   • Parent >= Left Child
+   • Parent >= Right Child (if exists)
+
+5. Recursively left aur right subtree ko verify karo.
+
+6. Agar sab nodes heap property follow karte hain,
+   true return karo.
+   Warna false.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Array:
+
+[90, 15, 10, 7, 12, 2]
+
+Tree:
+
+       90
+      /  \
+    15    10
+   / \    /
+  7  12  2
+
+Checks:
+
+90 >= 15 ✓
+90 >= 10 ✓
+
+15 >= 7 ✓
+15 >= 12 ✓
+
+10 >= 2 ✓
+
+All conditions satisfied.
+
+Output: True
+
+--------------------------------------------------
+
+KEY OBSERVATION
+
+• Leaf nodes automatically valid heaps hote hain.
+• Sirf non-leaf nodes par heap property check karni hoti hai.
+• If any parent < child → Not a Max Heap.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+Time Complexity: O(N)
+(Each node visited once)
+
+Space Complexity: O(H)
+(Recursion stack, H = height of heap)
+
+For complete binary heap:
+O(log N)
+
+#Code:
+
+public class Solution {
+    
+    public boolean countSub(long arr[], long n) {
+    
+        //You can code here
+
+        return helper(arr, n, 0);
+    }
+
+    public boolean helper(long arr[], long n, int i){
+      if(i >= n/2) return true; //leaf node
+      int left = (2*i) + 1; 
+      int right = (2*i) + 2;
+
+      if(arr[i] >= arr[left] && helper(arr, n, left)){
+        if(right < n){ //checks if right node exists or not
+          return arr[i] >= arr[right] && helper(arr, n, right);
+        }
+        else return true;
+      }
+
+      return false;
+    }
+}
