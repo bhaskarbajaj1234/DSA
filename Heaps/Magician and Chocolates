@@ -1,0 +1,236 @@
+#Approach:
+
+MAGICIAN AND CHOCOLATES
+
+Idea:
+Har unit time mein kid kisi bhi bag ko choose kar sakta hai.
+
+Maximum chocolates khane ke liye hamesha us bag ko choose
+karna chahiye jisme sabse zyada chocolates hain.
+
+Isliye har step par largest bag efficiently nikalne ke liye
+Max Heap use karte hain.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Saare bags ko Max Heap mein daal do.
+
+PriorityQueue<Integer>
+with reverseOrder()
+
+Heap ka root hamesha maximum chocolates wala bag hoga.
+
+--------------------------------------------------
+
+2. A times repeat karo.
+
+Har iteration mein:
+
+• Maximum chocolates wala bag nikalo.
+• Kid saari chocolates kha lega.
+• Answer mein add karo.
+• Magician us bag mein floor(Bi/2) chocolates bhar dega.
+• Updated bag ko wapas heap mein daal do.
+
+Code Logic:
+
+temp = pq.poll()
+
+maxChocolates += temp
+
+temp = floor(temp/2)
+
+pq.add(temp)
+
+--------------------------------------------------
+
+EXAMPLE
+
+A = 3
+
+B = [6, 5]
+
+Initial Heap:
+
+[6, 5]
+
+--------------------------------------------------
+
+Time = 1
+
+Take:
+
+6
+
+Chocolates eaten:
+
+6
+
+Total = 6
+
+Magician fills:
+
+floor(6/2) = 3
+
+Heap:
+
+[5, 3]
+
+--------------------------------------------------
+
+Time = 2
+
+Take:
+
+5
+
+Total:
+
+6 + 5 = 11
+
+Magician fills:
+
+floor(5/2) = 2
+
+Heap:
+
+[3, 2]
+
+--------------------------------------------------
+
+Time = 3
+
+Take:
+
+3
+
+Total:
+
+11 + 3 = 14
+
+Magician fills:
+
+floor(3/2) = 1
+
+Heap:
+
+[2, 1]
+
+Answer = 14
+
+--------------------------------------------------
+
+WHY MAX HEAP?
+
+Greedy Choice:
+
+"Hamesha sabse zyada chocolates wala bag choose karo."
+
+Reason:
+• Current step mein maximum chocolates milengi.
+• Future bags magician waise bhi reduce kar dega.
+• Largest bag ko pehle consume karna optimal hai.
+
+--------------------------------------------------
+
+IMPORTANT JAVA POINT
+
+Instead of:
+
+(int)Math.floor(temp/2)
+
+You can simply write:
+
+temp / 2
+
+Because integer division automatically performs floor.
+
+Example:
+
+5 / 2 = 2
+7 / 2 = 3
+
+So:
+
+temp = temp / 2;
+
+--------------------------------------------------
+
+MODULO
+
+Problem asks:
+
+Answer % (10^9 + 7)
+
+Usually safer to apply modulo during addition:
+
+sum = (sum + temp) % MOD
+
+This avoids overflow for large inputs.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+Let:
+
+N = Number of Bags
+A = Number of Time Units
+
+Build Heap:
+
+O(N)
+
+Each iteration:
+
+Poll + Add
+
+O(log N)
+
+Repeated A times:
+
+Time Complexity:
+O(A log N)
+
+Space Complexity:
+O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINTS
+
+• Always choose the bag with maximum chocolates.
+• Max Heap efficiently provides the largest bag.
+• After eating, insert floor(Bi/2) back into the heap.
+• Greedy + Max Heap solution.
+• Time Complexity = O(A log N).
+• Space Complexity = O(N).
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int magicianAndChocolates(int A, ArrayList<Integer> B) {
+        //You can code here
+
+        int maxChocolates = 0;
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());
+        
+        for(int i=0; i<B.size(); i++){
+          pq.add(B.get(i));
+        }
+
+        while(A > 0){
+          int temp = pq.poll();
+          maxChocolates += temp;
+          temp = (int)Math.floor(temp/2);
+          pq.add(temp);
+          A--;
+        }
+        return (maxChocolates % (1000000007));
+    }
+}
