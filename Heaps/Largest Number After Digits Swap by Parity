@@ -1,0 +1,267 @@
+#Approach:
+
+LARGEST NUMBER AFTER DIGITS SWAP BY PARITY
+
+Idea:
+Hum sirf same parity wale digits swap kar sakte hain.
+
+Odd digit ↔ Odd digit
+Even digit ↔ Even digit
+
+Odd position par even digit nahi aa sakta aur
+even position par odd digit nahi aa sakta.
+
+Isliye har position ke parity pattern ko maintain rakhte hue
+sabse bada digit place karna hai.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Number ke saare digits extract karo.
+
+Example:
+
+1234
+
+Digits:
+
+[1, 2, 3, 4]
+
+--------------------------------------------------
+
+2. Odd aur Even digits ko alag Max Heaps mein store karo.
+
+Odd Heap:
+
+[3, 1]
+
+Even Heap:
+
+[4, 2]
+
+Max Heap use karte hain kyuki hume largest digit
+jaldi chahiye.
+
+--------------------------------------------------
+
+3. Original digit array ko left-to-right traverse karo.
+
+Agar current position par odd digit tha:
+
+• Odd Heap ka largest digit use karo.
+
+Agar current position par even digit tha:
+
+• Even Heap ka largest digit use karo.
+
+--------------------------------------------------
+
+4. Naya number build karte jao.
+
+result = result * 10 + selectedDigit
+
+--------------------------------------------------
+
+EXAMPLE
+
+num = 1234
+
+Digits:
+
+[1, 2, 3, 4]
+
+Odd Heap:
+
+[3, 1]
+
+Even Heap:
+
+[4, 2]
+
+--------------------------------------------------
+
+Position 0
+
+Original digit = 1 (Odd)
+
+Take largest odd = 3
+
+Result = 3
+
+--------------------------------------------------
+
+Position 1
+
+Original digit = 2 (Even)
+
+Take largest even = 4
+
+Result = 34
+
+--------------------------------------------------
+
+Position 2
+
+Original digit = 3 (Odd)
+
+Take next odd = 1
+
+Result = 341
+
+--------------------------------------------------
+
+Position 3
+
+Original digit = 4 (Even)
+
+Take next even = 2
+
+Result = 3412
+
+Answer = 3412
+
+--------------------------------------------------
+
+EXAMPLE 2
+
+num = 65875
+
+Odd Digits:
+
+[5, 7, 5]
+→ Max Heap → [7, 5, 5]
+
+Even Digits:
+
+[6, 8]
+→ Max Heap → [8, 6]
+
+Rebuild:
+
+6(E) → 8
+
+5(O) → 7
+
+8(E) → 6
+
+7(O) → 5
+
+5(O) → 5
+
+Result:
+
+87655
+
+--------------------------------------------------
+
+KEY OBSERVATION
+
+Parity positions never change.
+
+Example:
+
+1 2 3 4
+
+Odd Even Odd Even
+
+After swaps:
+
+3 4 1 2
+
+Odd Even Odd Even
+
+Pattern remains same.
+
+So for every odd position choose the largest available odd digit,
+and for every even position choose the largest available even digit.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+Let D = Number of digits
+
+Insert into heaps:
+O(D log D)
+
+Build answer:
+O(D log D)
+
+Time Complexity:
+O(D log D)
+
+Space Complexity:
+O(D)
+
+--------------------------------------------------
+
+INTERVIEW POINTS
+
+• Digits can only swap with digits of the same parity.
+• Store odd and even digits separately in Max Heaps.
+• While rebuilding the number, preserve the original parity pattern.
+• Always place the largest available digit of the required parity.
+• Greedy choice gives the maximum possible number.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int largestInteger(int num) {
+        //You can code here
+
+        //count number of digits in num
+        int temp = num;
+        int count = 0;
+        if(temp == 0){
+          count = 1;
+        }
+        else{
+          while(temp > 0){
+            temp = temp / 10;
+            count++;
+          }
+        }
+
+        int[] arr = new int[count];
+        int x = count-1;
+        if(num == 0){
+          arr[0] = 0;
+        }else{
+          while(num > 0){
+            int digit = num % 10;
+            arr[x] = digit;
+            x--;
+            num /= 10;
+          }
+        }
+
+        PriorityQueue<Integer> pqOdd = new PriorityQueue<>(Comparator.reverseOrder());
+        PriorityQueue<Integer> pqEven = new PriorityQueue<>(Comparator.reverseOrder());
+
+        for(int e : arr){
+          if(e % 2 == 0){
+            //put in even pq
+            pqEven.add(e);
+          }
+          else{
+            pqOdd.add(e);
+          }
+        }
+
+        int result = 0;
+
+        for(int i=0; i<count; i++){
+          if(arr[i] % 2 == 0){
+            result = (result * 10) + pqEven.poll();
+          }
+          else{
+            result = (result * 10) + pqOdd.poll();
+          }
+        }
+
+        return result;        
+    }
+}
