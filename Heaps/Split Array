@@ -1,0 +1,176 @@
+#Approach:
+
+SPLIT ARRAY INTO K SUBSETS SUCH THAT
+MAXIMUM SUBSET SUM IS MINIMUM
+
+Idea:
+Array ko K non-overlapping subsets mein divide karna hai
+aur aise divide karna hai ki kisi bhi subset ka maximum sum
+possible minimum ho.
+
+Greedy approach use karte hain.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Array ko descending order mein sort karo.
+
+Why?
+• Bade elements pehle place karenge.
+• Better balancing milegi.
+
+Example:
+
+[12, 9, 7, 3, 3, 2, 1]
+
+--------------------------------------------------
+
+2. Min Heap banao of size K.
+
+Har heap element ek subset ka current sum represent karega.
+
+Initially:
+
+[0, 0, 0]
+
+(K empty subsets)
+
+--------------------------------------------------
+
+3. Har element ke liye:
+
+• Minimum sum wale subset ko nikalo.
+• Current element us subset mein add karo.
+• Updated sum wapas heap mein daal do.
+
+Code Logic:
+
+smallest = pq.poll();
+pq.add(smallest + element);
+
+--------------------------------------------------
+
+EXAMPLE
+
+Array:
+
+[12, 9, 7, 3, 3, 2, 1]
+K = 3
+
+Initial Heap:
+
+[0, 0, 0]
+
+--------------------------------------------------
+
+Add 12
+
+[0, 0, 12]
+
+Add 9
+
+[0, 9, 12]
+
+Add 7
+
+[7, 9, 12]
+
+Add 3
+
+[9, 10, 12]
+
+Add 3
+
+[10, 12, 12]
+
+Add 2
+
+[12, 12, 14]
+
+Add 1
+
+[12, 13, 14]
+
+Final subset sums:
+
+12, 13, 14
+
+Maximum Sum = 14
+
+--------------------------------------------------
+
+WHY MIN HEAP?
+
+• Heap ka root hamesha minimum subset sum deta hai.
+• Naya element hamesha sabse halka (least loaded)
+  subset mein add hota hai.
+• Isse subsets balanced rehte hain.
+
+--------------------------------------------------
+
+FINAL STEP
+
+Heap mein final subset sums stored hain.
+
+Sabse bada subset sum answer hai.
+
+Code mein:
+• Chhote sums remove kar diye jaate hain.
+• Last remaining (largest sum) return kar diya jata hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+Sorting          : O(N log N)
+
+For each element:
+Poll + Add       : O(log K)
+
+Total            : O(N log K)
+
+Overall:
+
+Time Complexity  : O(N log N)
+Space Complexity : O(K)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+"Sort elements in descending order and always place the
+current largest element into the subset having the minimum
+current sum (using a Min Heap). This balances the subsets
+and minimizes the maximum subset sum."
+
+#Code:
+
+package priorityQueue3;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.PriorityQueue;
+
+public class MainClass {
+    public static void main(String[] args) {
+        Integer a[] = {1, 7, 9, 2, 12, 3, 3};
+        System.out.println(divideSubsets(a, 3));
+    }
+
+    static int divideSubsets(Integer a[], int m) {
+        Arrays.sort(a, Collections.reverseOrder());
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        for (int i = 0; i < m; i++) pq.add(0);
+
+        for (int e : a) {
+            int smallest = pq.poll();
+            pq.add(smallest + e);
+        }
+
+        for (int i = 0; i < m - 1; i++) {
+            pq.poll();
+        }
+        return pq.poll();
+    }
+}
