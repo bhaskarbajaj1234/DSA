@@ -1,0 +1,252 @@
+#Approch:
+
+MAX HEAP - HINGLISH APPROACH
+
+1. INSERTION (insert)
+
+Goal:
+Naya element insert karna aur Max Heap property maintain rakhna.
+
+Approach:
+• Element ko sabse last position par add karo.
+• Ab check karo ki kya ye apne parent se bada hai.
+• Agar bada hai to parent ke saath swap karo.
+• Swap karte hue upar move karte jao (bubble up / percolate up).
+• Jab parent bada mil jaye ya root tak pahunch jao, stop.
+
+Example:
+Heap = [50, 30, 40]
+
+Insert 60
+
+Step 1: [50, 30, 40, 60]
+Step 2: 60 > 30 → swap
+         [50, 60, 40, 30]
+Step 3: 60 > 50 → swap
+         [60, 50, 40, 30]
+
+Time Complexity: O(log n)
+
+
+--------------------------------------------------
+
+2. DELETION (pop)
+
+Goal:
+Maximum element (root) remove karna.
+
+Approach:
+• Root element hi maximum hota hai.
+• Root ko save kar lo.
+• Last element ko root par le aao.
+• Heap size 1 kam kar do.
+• Heap property break ho sakti hai, isliye heapify(0) call karo.
+• Saved root return kar do.
+
+Example:
+
+Heap = [60, 50, 40, 30]
+
+Delete Root
+
+Step 1:
+Remove 60
+
+Step 2:
+Last element 30 ko root par lao
+
+[30, 50, 40]
+
+Step 3:
+Heapify
+
+50 largest hai → swap
+
+[50, 30, 40]
+
+Final Heap:
+[50, 30, 40]
+
+Time Complexity: O(log n)
+
+
+--------------------------------------------------
+
+3. HEAPIFY (Down Heapify)
+
+Goal:
+Kisi node se niche ki taraf Max Heap property restore karna.
+
+Approach:
+• Current node, left child aur right child compare karo.
+• Sabse bada element find karo.
+• Agar child bada hai to swap karo.
+• Swap ke baad us child par recursively heapify call karo.
+• Jab tak heap property satisfy na ho jaye continue karo.
+
+Example:
+
+        20
+       /  \
+     50    40
+
+20 root par hai, jo galat hai.
+
+Step 1:
+Largest = 50
+
+Step 2:
+Swap 20 and 50
+
+        50
+       /  \
+     20    40
+
+Heap property restore ho gayi.
+
+Time Complexity: O(log n)
+
+
+--------------------------------------------------
+
+4. BUILD HEAP
+
+Goal:
+Normal array ko Max Heap mein convert karna.
+
+Approach:
+• Array ke last non-leaf node se start karo.
+• Har node par heapify lagao.
+• Bottom se top tak heapify karte jao.
+• End mein pura array Max Heap ban jayega.
+
+Time Complexity: O(n)
+
+
+--------------------------------------------------
+
+5. HEAP SORT
+
+Goal:
+Array ko sorting order mein arrange karna.
+
+Approach:
+• Pehle buildHeap() se Max Heap banao.
+• Bar-bar maximum element (root) delete karo.
+• Deleted elements ko array ke end mein store karo.
+• Sab elements nikalne ke baad array ascending order mein mil jata hai.
+
+Steps:
+Build Heap → Repeated Pop → Sorted Array
+
+Time Complexity: O(n log n)
+
+
+IMPORTANT INTERVIEW POINTS
+
+• Max Heap mein root hamesha largest element hota hai.
+• Insertion ke time "Bubble Up" hota hai.
+• Deletion ke time "Heapify Down" hota hai.
+• Heap generally array se implement kiya jata hai.
+• Parent Index = (i-1)/2
+• Left Child = 2*i + 1
+• Right Child = 2*i + 2
+• Build Heap = O(n)
+• Insert = O(log n)
+• Delete = O(log n)
+• Peek = O(1)
+
+#Code:
+
+package priorityQueue1;
+
+public class MaxHeap {
+    int a[];
+    int capacity;
+    int size;
+
+    public MaxHeap(int capacity) {
+        this.capacity = capacity;
+        a = new int[capacity];
+        size = 0;
+    }
+
+    // O(logn)
+    public boolean insert(int e) {
+        if (size == capacity) return false;
+        a[size] = e;
+        int i = size;
+        while (i > 0) {
+            int parent = (i-1)/2;
+            if(a[parent] < a[i]) {
+                swap(i, parent);
+                i = parent;
+            } else break;
+        }
+        size++;
+        return true;
+    }
+
+    public int pop() throws Exception {
+        if(size == 0) throw new Exception("Empty PQ");
+        size--;
+        int temp = a[0];
+        a[0] = a[size];
+        heapify(0);
+        return temp;
+    }
+
+    public void heapify(int i) {
+        if(i >= size) return;
+        int left = 2*i+1;
+        int right = 2*i+2;
+        int larger = i;
+        if(left < size && a[left] > a[i]) {
+            larger = left;
+        }
+        if(right < size && a[right] > a[larger]) {
+            larger = right;
+        }
+        if (larger != i) {
+            swap(larger, i);
+            heapify(larger);
+        }
+    }
+
+    public void swap(int i, int j) {
+        int temp = a[i];
+        a[i] = a[j];
+        a[j] = temp;
+    }
+
+    public void print() {
+        for(int i = 0; i<size; i++) {
+            System.out.print(a[i]+" ");
+        }
+        System.out.println();
+    }
+
+
+    ///////////////////////// PriorityQueue 2 ////////////////////////////
+
+    public void buildHeap(int b[]) {
+        if (b.length > capacity) return;
+        for(int i = 0; i<b.length; i++) {
+            a[i] = b[i];
+        }
+        size = b.length;
+        for(int i = size/2; i>=0; i--) {
+            heapify(i);
+        }
+        for(int i = 0; i<b.length; i++) {
+            b[i] = a[i];
+        }
+    }
+
+    public void heapSort(int b[]) throws Exception {
+        buildHeap(b);
+        for(int i = b.length-1; i>=0; i--) {
+            b[i] = pop();
+        }
+    }
+}
