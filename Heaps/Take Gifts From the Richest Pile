@@ -1,0 +1,120 @@
+#Approach:
+
+TAKE GIFTS FROM THE RICHEST PILE
+
+Idea:
+Har second hume sabse badi (richest) pile choose karni hai.
+
+Us pile se gifts lene ke baad sirf:
+
+floor(√pile)
+
+gifts wapas reh jaate hain.
+
+Largest pile ko repeatedly access karne ke liye Max Heap use karte hain.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Saari piles ko Max Heap mein daal do.
+
+2. K times:
+
+   • Largest pile nikalo.
+   • floor(√pile) calculate karo.
+   • Updated value wapas heap mein daal do.
+
+   Code Logic:
+
+   temp = pq.poll();
+
+   temp = (long)Math.sqrt(temp);
+
+   pq.add(temp);
+
+3. K operations ke baad heap ke saare elements ka sum nikal lo.
+
+--------------------------------------------------
+
+EXAMPLE
+
+gifts = [25,64,9,4,100]
+k = 4
+
+100 → 10
+
+64 → 8
+
+25 → 5
+
+10 → 3
+
+Remaining piles:
+
+[9,8,5,4,3]
+
+Sum = 29
+
+--------------------------------------------------
+
+WHY MAX HEAP?
+
+• Hamesha largest pile choose karni hai.
+• Max Heap largest element efficiently provide karta hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+Build Heap: O(N)
+
+K Operations:
+O(K log N)
+
+Final Sum:
+O(N log N)
+
+Time Complexity:
+O((N + K) log N)
+
+Space Complexity:
+O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+"Use a Max Heap to repeatedly pick the richest pile,
+replace it with floor(√pile), and after K operations
+return the sum of all remaining gifts."
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public long pickGifts(int[] gifts, int k) {
+        //You can code here
+
+        PriorityQueue<Long> pq = new PriorityQueue(Comparator.reverseOrder());
+
+        for(long e : gifts){
+          pq.add(e);
+        }
+
+        while(k > 0){
+          long temp = pq.poll();
+          temp = (long)Math.sqrt(temp);
+          pq.add(temp);
+          k--;
+        }
+
+        long sum = 0;
+        while(!pq.isEmpty()){
+          sum += pq.poll();
+        }
+
+        return sum;
+    }
+}
