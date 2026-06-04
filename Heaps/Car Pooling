@@ -1,0 +1,126 @@
+#Approach:
+
+CAR POOLING
+
+Idea:
+Har pickup par passengers increase honge.
+Har drop par passengers decrease honge.
+
+Agar kisi bhi point par onboard passengers > capacity,
+answer false hoga.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Har trip ke liye 2 events banao:
+
+   Pickup:
+   [from, +passengers]
+
+   Drop:
+   [to, -passengers]
+
+2. Saare events ko Min Heap mein location ke basis par store karo.
+
+3. Left-to-right locations process karo.
+
+   onBoard += eventPassengers
+
+4. Agar:
+
+   onBoard > capacity
+
+   return false
+
+5. Saare events process ho gaye to return true.
+
+--------------------------------------------------
+
+EXAMPLE
+
+trips = [[2,1,5],[3,3,7]]
+
+capacity = 4
+
+Events:
+
+[1,+2]
+[5,-2]
+[3,+3]
+[7,-3]
+
+Sorted Order:
+
+[1,+2]
+[3,+3]
+[5,-2]
+[7,-3]
+
+Process:
+
+onBoard = 2
+
+onBoard = 5
+
+5 > 4
+
+Answer = false
+
+--------------------------------------------------
+
+WHY HEAP?
+
+• Events ko location order mein process karna hai.
+• Min Heap hamesha next nearest location deta hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = trips.length
+
+Events = 2N
+
+Time:
+O(N log N)
+
+Space:
+O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+Convert each trip into pickup (+p) and drop (-p) events,
+process them in location order, and track current passengers.
+If onboard passengers ever exceed capacity, return false.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+
+    public boolean carPooling(int[][] trips, int capacity) {
+        //You can code here
+
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>((a,b) -> a[0] - b[0]);
+
+        for(int i=0; i<trips.length; i++){
+          minHeap.add(new int[]{trips[i][1], trips[i][0]}); //pickup
+          minHeap.add(new int[]{trips[i][2], -trips[i][0]}); //drop
+        }
+
+        int onBoard = 0;
+
+        while(!minHeap.isEmpty()){
+          onBoard += minHeap.poll()[1];
+
+          if(onBoard > capacity){
+            return false;
+          }
+        }
+        return true;
+    }
+}
