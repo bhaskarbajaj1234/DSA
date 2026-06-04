@@ -1,0 +1,208 @@
+#Approach:
+
+1. BUILD HEAP FROM ARRAY
+
+Goal:
+Ek normal unsorted array ko Max Heap mein convert karna.
+
+Approach:
+• Sabse pehle array ke saare elements heap ke internal array mein copy kar do.
+• Heap size ko array length ke equal set karo.
+• Last non-leaf node se start karo.
+• Har node par heapify() call karo.
+• Heapify bottom se top ki direction mein chalega.
+• End mein pura array Max Heap ban jayega.
+
+Why Last Non-Leaf Node?
+Leaf nodes already heap hote hain (unke children nahi hote).
+
+Formula:
+Last Non-Leaf Node = size/2 - 1
+
+Example:
+
+Array:
+[10, 50, 20, 5, 30]
+
+Tree Form:
+
+        10
+       /  \
+     50    20
+    / \
+   5  30
+
+Heapify bottom-up:
+
+Step 1:
+Heapify(1)
+
+        10
+       /  \
+     50    20
+    / \
+   5  30
+
+Already correct.
+
+Step 2:
+Heapify(0)
+
+50 > 10
+
+Swap
+
+        50
+       /  \
+     10    20
+    / \
+   5  30
+
+Again heapify at node 1
+
+30 > 10
+
+Swap
+
+        50
+       /  \
+     30    20
+    / \
+   5  10
+
+Final Max Heap:
+
+[50, 30, 20, 5, 10]
+
+Time Complexity: O(n)
+
+Important Point:
+Build Heap O(n) hota hai, O(n log n) nahi.
+
+
+--------------------------------------------------
+
+2. HEAP SORT
+
+Goal:
+Array ko ascending order mein sort karna using Heap.
+
+Approach:
+Step 1:
+BuildHeap() call karke array ko Max Heap banao.
+
+Step 2:
+Bar-bar maximum element (root) remove karo.
+
+Step 3:
+Jo element remove hua use array ke end mein store karo.
+
+Step 4:
+Heap size continuously kam hoti rahegi aur sorted elements array ke end mein bharte jayenge.
+
+Step 5:
+Jab heap empty ho jaye, array ascending order mein sorted mil jayega.
+
+Example:
+
+Original Array:
+
+[10, 50, 20, 5, 30]
+
+After Build Heap:
+
+[50, 30, 20, 5, 10]
+
+Pop 50 → place at last
+
+[_, _, _, _, 50]
+
+Pop 30 → place at second last
+
+[_, _, _, 30, 50]
+
+Pop 20
+
+[_, _, 20, 30, 50]
+
+Pop 10
+
+[_, 10, 20, 30, 50]
+
+Pop 5
+
+[5, 10, 20, 30, 50]
+
+Final Sorted Array:
+
+[5, 10, 20, 30, 50]
+
+
+--------------------------------------------------
+
+HEAP SORT FLOW
+
+Unsorted Array
+       ↓
+Build Heap
+       ↓
+Max Heap
+       ↓
+Repeated Pop
+       ↓
+Store at End
+       ↓
+Sorted Array
+
+
+--------------------------------------------------
+
+COMPLEXITIES
+
+Build Heap      → O(n)
+
+Each Pop        → O(log n)
+
+Total Pops      → n
+
+Heap Sort       → O(n log n)
+
+Space Complexity → O(1)
+(In-place sorting)
+
+
+--------------------------------------------------
+
+INTERVIEW / EXAM POINTS
+
+• Heap Sort uses Max Heap.
+• First step is Build Heap.
+• Largest element is always at root.
+• After every deletion, heapify is required.
+• Build Heap complexity = O(n).
+• Heap Sort complexity = O(n log n).
+• Heap Sort is an in-place sorting algorithm.
+• Heap Sort is not a stable sorting algorithm.
+
+#Code:
+
+ public void buildHeap(int b[]) {
+        if (b.length > capacity) return;
+        for(int i = 0; i<b.length; i++) {
+            a[i] = b[i];
+        }
+        size = b.length;
+        for(int i = size/2; i>=0; i--) {
+            heapify(i);
+        }
+        for(int i = 0; i<b.length; i++) {
+            b[i] = a[i];
+        }
+    }
+
+    public void heapSort(int b[]) throws Exception {
+        buildHeap(b);
+        for(int i = b.length-1; i>=0; i--) {
+            b[i] = pop();
+        }
+    }
