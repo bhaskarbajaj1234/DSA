@@ -1,0 +1,218 @@
+#Approach:
+
+FIND K LARGEST ELEMENTS USING MIN HEAP
+
+Idea:
+Hume array ke sirf K largest elements chahiye.
+Agar hum saare elements sort karenge to O(n log n) lagega.
+
+Better approach:
+Size K ka Min Heap maintain karo.
+
+Reason:
+• Heap ka root hamesha heap ka smallest element hoga.
+• Heap mein sirf K largest elements rakhenge.
+• Agar koi bada element aata hai to smallest ko remove kar denge.
+
+--------------------------------------------------
+
+STEP-BY-STEP APPROACH
+
+1. Empty Min Heap banao.
+
+PriorityQueue<Integer> pq = new PriorityQueue<>();
+
+(Java ka default PriorityQueue Min Heap hota hai.)
+
+--------------------------------------------------
+
+2. Array traverse karo.
+
+for(int e : arr)
+
+Har element ko heap mein add karo.
+
+pq.add(e);
+
+--------------------------------------------------
+
+3. Heap size K se bada ho jaye to root remove karo.
+
+if(pq.size() > k)
+    pq.poll();
+
+Why?
+
+Kyuki root heap ka smallest element hota hai.
+
+Agar heap mein K+1 elements ho gaye,
+to smallest element future K largest answer ka part
+nahi ho sakta.
+
+Isliye usse remove kar dete hain.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Array:
+
+[12, 5, 787, 1, 23]
+K = 2
+
+Insert 12
+
+Heap:
+[12]
+
+--------------------------------------------------
+
+Insert 5
+
+Heap:
+[5, 12]
+
+--------------------------------------------------
+
+Insert 787
+
+Heap:
+[5, 12, 787]
+
+Size > K
+
+Remove smallest (5)
+
+Heap:
+[12, 787]
+
+--------------------------------------------------
+
+Insert 1
+
+Heap:
+[1, 787, 12]
+
+Size > K
+
+Remove smallest (1)
+
+Heap:
+[12, 787]
+
+--------------------------------------------------
+
+Insert 23
+
+Heap:
+[12, 23, 787]
+
+Size > K
+
+Remove smallest (12)
+
+Heap:
+[23, 787]
+
+--------------------------------------------------
+
+Final Heap:
+
+[23, 787]
+
+Ye hi array ke 2 largest elements hain.
+
+--------------------------------------------------
+
+4. Heap ke elements list mein nikaalo.
+
+while(pq.size() > 0)
+{
+    list.add(pq.poll());
+}
+
+List:
+
+[23, 787]
+
+Ye ascending order mein aayega
+kyuki Min Heap smallest pehle deta hai.
+
+--------------------------------------------------
+
+5. Reverse karo.
+
+Collections.reverse(list);
+
+Result:
+
+[787, 23]
+
+Required output mil gaya.
+
+--------------------------------------------------
+
+WHY MIN HEAP?
+
+Max Heap:
+• Saare N elements store karne padenge.
+• Space = O(N)
+
+Min Heap of size K:
+• Sirf K elements store hote hain.
+• Space = O(K)
+
+More efficient when K << N.
+
+--------------------------------------------------
+
+COMPLEXITY ANALYSIS
+
+For every element:
+• Insert = O(log K)
+• Poll (if needed) = O(log K)
+
+N elements ke liye:
+
+Time Complexity = O(N log K)
+
+Space Complexity = O(K)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+"Keep only K largest elements in a Min Heap.
+Whenever heap size exceeds K, remove the smallest element.
+At the end, heap contains exactly the K largest elements."
+
+#Code:
+
+import java.util.*;
+
+public class Solution
+{
+    public static ArrayList<Integer> kLargest(int arr[], int n, int k)
+    {
+      //You can code here
+      PriorityQueue<Integer> pq = new PriorityQueue<>();
+
+      for(int e : arr){
+        pq.add(e);
+
+        if(pq.size() > k){
+          pq.poll();
+        }
+      }
+
+      ArrayList<Integer> list = new ArrayList<>();
+
+      while(pq.size() > 0){
+        list.add(pq.poll());
+      }
+
+      Collections.reverse(list);
+      return list;
+        
+    }
+}
