@@ -1,0 +1,192 @@
+#Approach:
+
+MINIMUM COST OF ROPES
+
+Idea:
+Har baar do ropes connect karne ka cost unki lengths ka sum hota hai.
+
+Agar hum bade ropes ko jaldi connect kar denge,
+to unka cost baar-baar future calculations mein add hoga,
+jisse total cost badh jayega.
+
+Isliye hamesha do smallest ropes ko pehle connect karna chahiye.
+
+Min Heap use karke ye efficiently kar sakte hain.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Saari rope lengths ko Min Heap mein daal do.
+
+PriorityQueue<Long> pq
+
+Heap ka root hamesha smallest rope hoga.
+
+--------------------------------------------------
+
+2. Jab tak ek se zyada ropes hain:
+
+• Do smallest ropes nikalo.
+• Unhe connect karo.
+• Connection cost calculate karo.
+• Cost ko answer mein add karo.
+• Nayi rope ko wapas heap mein daal do.
+
+Code Logic:
+
+first = pq.poll();
+second = pq.poll();
+
+newRope = first + second;
+
+sum += newRope;
+
+pq.add(newRope);
+
+--------------------------------------------------
+
+EXAMPLE
+
+Array:
+
+[4, 3, 2, 6]
+
+Initial Min Heap:
+
+[2, 3, 4, 6]
+
+--------------------------------------------------
+
+Step 1
+
+Take:
+
+2, 3
+
+Cost = 5
+
+Total Cost = 5
+
+Heap:
+
+[4, 5, 6]
+
+--------------------------------------------------
+
+Step 2
+
+Take:
+
+4, 5
+
+Cost = 9
+
+Total Cost:
+
+5 + 9 = 14
+
+Heap:
+
+[6, 9]
+
+--------------------------------------------------
+
+Step 3
+
+Take:
+
+6, 9
+
+Cost = 15
+
+Total Cost:
+
+14 + 15 = 29
+
+Heap:
+
+[15]
+
+Only one rope remains.
+
+Answer = 29
+
+--------------------------------------------------
+
+WHY MIN HEAP?
+
+Greedy Choice:
+
+"Hamesha do smallest ropes ko connect karo."
+
+Reason:
+• Chhoti lengths ka contribution future costs mein kam rahega.
+• Total cost minimum banta hai.
+
+Ye exactly Huffman Coding wali greedy strategy hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+Building Heap:
+O(N)
+
+For every merge:
+Poll + Poll + Add
+
+O(log N)
+
+Total merges:
+
+N - 1
+
+Time Complexity:
+O(N log N)
+
+Space Complexity:
+O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINTS
+
+• Always connect the two smallest ropes first.
+• Min Heap is used to efficiently get the smallest ropes.
+• After connecting, the new rope is inserted back into the heap.
+• Similar concept is used in Huffman Coding.
+• Time Complexity = O(N log N).
+• Space Complexity = O(N).
+
+#Code:
+
+import java.util.*;
+
+public class Solution
+{
+    long minCost(long arr[], int n) 
+    {
+      //You can code here
+
+      PriorityQueue<Long> pq = new PriorityQueue<>();
+
+      for(long e : arr){
+        pq.add(e);
+      }
+
+      long sum = 0;
+
+      while(pq.size() != 1){
+        long first = pq.poll();
+        long second = pq.poll();
+
+        long sum1 = first + second;
+
+        sum += sum1;
+        pq.add(sum1);
+      }
+      
+      return sum;
+    }
+}
