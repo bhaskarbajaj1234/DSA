@@ -1,0 +1,208 @@
+#Approach:
+
+MERGE K SORTED LINKED LISTS
+
+Idea:
+K sorted linked lists di gayi hain.
+Hume sabhi lists ko merge karke ek sorted linked list
+banani hai.
+
+Min Heap (Priority Queue) use karte hain taaki hamesha
+smallest available node quickly mil sake.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Min Heap banao.
+
+Heap node ki value ke basis par sort hoga.
+
+PriorityQueue<ListNode>
+
+--------------------------------------------------
+
+2. Har linked list ke first node (head)
+   ko heap mein daal do.
+
+Kyuki har list sorted hai,
+smallest element us list ke head par hi milega.
+
+--------------------------------------------------
+
+3. Dummy node create karo.
+
+Dummy node final merged list banane mein help karta hai.
+
+dummy -> null
+
+tail = dummy
+
+--------------------------------------------------
+
+4. Jab tak heap empty na ho:
+
+• Heap se smallest node nikalo.
+• Use merged list ke end mein attach karo.
+• Tail ko aage move karo.
+
+--------------------------------------------------
+
+5. Agar removed node ka next node exist karta hai:
+
+tail.next != null
+
+To us next node ko heap mein daal do.
+
+Kyuki ab wahi apni list ka next smallest candidate hai.
+
+--------------------------------------------------
+
+EXAMPLE
+
+List 1:
+1 → 4 → 5
+
+List 2:
+1 → 3 → 4
+
+List 3:
+2 → 6
+
+--------------------------------------------------
+
+Initial Heap:
+
+[1, 1, 2]
+
+Remove 1
+
+Merged:
+1
+
+Add next node 4
+
+Heap:
+[1, 2, 4]
+
+--------------------------------------------------
+
+Remove 1
+
+Merged:
+1 → 1
+
+Add next node 3
+
+Heap:
+[2, 3, 4]
+
+--------------------------------------------------
+
+Remove 2
+
+Merged:
+1 → 1 → 2
+
+Add next node 6
+
+Heap:
+[3, 4, 6]
+
+--------------------------------------------------
+
+Continue...
+
+Final List:
+
+1 → 1 → 2 → 3 → 4 → 4 → 5 → 6
+
+--------------------------------------------------
+
+WHY MIN HEAP?
+
+• Heap ka root hamesha smallest node deta hai.
+• K lists mein se smallest element efficiently mil jata hai.
+• Har step par sorting maintain rehti hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+Let:
+
+K = Number of Lists
+N = Total Nodes in all Lists
+
+Each node:
+• Insert once
+• Remove once
+
+Heap operations:
+
+O(log K)
+
+Total:
+
+Time Complexity = O(N log K)
+
+Space Complexity = O(K)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+"Store the head of every sorted list in a Min Heap.
+Repeatedly pick the smallest node, add it to the answer,
+and insert its next node into the heap. This produces a
+fully sorted merged list in O(N log K) time."
+
+#Code:
+
+package priorityQueue4;
+
+import java.util.PriorityQueue;
+
+public class MainClass {
+
+    public class ListNode {
+        int val;
+        ListNode next;
+
+        ListNode() {
+        }
+
+        ListNode(int val) {
+            this.val = val;
+        }
+
+        ListNode(int val, ListNode next) {
+            this.val = val;
+            this.next = next;
+        }
+    }
+
+    class Solution {
+        public ListNode mergeKLists(ListNode[] lists) {
+            PriorityQueue<ListNode> pq = new PriorityQueue<>((o1, o2) -> o1.val - o2.val);
+
+            for (ListNode head : lists) {
+                if (head != null) pq.add(head);
+            }
+
+            ListNode dummy = new ListNode();
+            ListNode tail = dummy;
+
+            while (!pq.isEmpty()) {
+                tail.next = pq.poll();
+                tail = tail.next;
+
+                if (tail.next != null) {
+                    pq.add(tail.next);
+                }
+            }
+
+            return dummy.next;
+        }
+    }
+}
