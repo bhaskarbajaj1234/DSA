@@ -1,0 +1,119 @@
+#Approach:
+
+PUT MARBLES IN BAGS
+
+Idea:
+Har partition (cut) between two marbles contributes:
+
+weights[i] + weights[i+1]
+
+Total score ka difference sirf selected cuts par depend karta hai.
+
+K bags banane ke liye exactly (K-1) cuts chahiye.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Har adjacent pair ka sum nikalo:
+
+   pairSum = weights[i] + weights[i+1]
+
+2. Saare pair sums ko:
+   • Min Heap mein daalo
+   • Max Heap mein daalo
+
+3. Minimum score ke liye:
+   • (K-1) smallest pair sums lo
+
+4. Maximum score ke liye:
+   • (K-1) largest pair sums lo
+
+5. Answer:
+
+   maxSum - minSum
+
+--------------------------------------------------
+
+EXAMPLE
+
+weights = [1,3,5,1]
+k = 2
+
+Pair Sums:
+
+1+3 = 4
+3+5 = 8
+5+1 = 6
+
+[4, 8, 6]
+
+Min Score Contribution:
+4
+
+Max Score Contribution:
+8
+
+Answer:
+
+8 - 4 = 4
+
+--------------------------------------------------
+
+WHY HEAP?
+
+• Hume (K-1) smallest aur largest pair sums chahiye.
+• Min Heap gives smallest quickly.
+• Max Heap gives largest quickly.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = weights.length
+
+Time:
+O(N log N)
+
+Space:
+O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+Instead of thinking about bags, think about cuts.
+Each cut contributes (weights[i] + weights[i+1]).
+Pick (K-1) smallest cuts for minimum score and
+(K-1) largest cuts for maximum score.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public long putMarbles(int[] weights, int k) {
+        //You can code here
+
+        PriorityQueue<Long> minHeap = new PriorityQueue<>();
+        PriorityQueue<Long> maxHeap = new PriorityQueue<>(Comparator.reverseOrder());
+        
+        int n = weights.length;
+        for(int i=0; i<n-1; i++){
+          long pairSum = (long) weights[i] + weights[i+1];
+
+          minHeap.add(pairSum);
+          maxHeap.add(pairSum);
+        }
+
+        long minSum = 0;
+        long maxSum = 0;
+        
+        for(int i=0; i<k-1; i++){
+          minSum += minHeap.poll();
+          maxSum += maxHeap.poll();
+        }
+
+        return (maxSum - minSum);
+    }
+}
