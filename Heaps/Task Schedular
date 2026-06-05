@@ -1,0 +1,119 @@
+#Approach:
+
+TASK SCHEDULER
+
+Idea:
+Same tasks ke beech minimum gap = n hona chahiye.
+
+Greedy idea:
+Sabse frequent task ko pehle place karo, kyuki wahi maximum idle space create karta hai.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Frequency count karo (HashMap).
+
+2. Max Heap banao (frequencies ke basis par).
+
+3. Highest frequency task nikal ke “framework” banao:
+
+   gap = maxFreq - 1
+   idle slots = gap * n
+
+4. Baaki tasks se idle slots fill karo:
+
+   • Har remaining task se min(freq, gap) fill hota hai
+   • idle reduce hota hai
+
+5. Final answer:
+
+   tasks.length + idle
+
+--------------------------------------------------
+
+EXAMPLE
+
+tasks = ["A","A","A","B","B","B"], n = 2
+
+Freq:
+A = 3
+B = 3
+
+Max freq = 3
+
+gap = 2
+idle = 2 * 2 = 4
+
+Fill with B:
+
+idle -= 2
+
+Final idle = 2
+
+Answer:
+
+6 + 2 = 8
+
+--------------------------------------------------
+
+WHY MAX HEAP?
+
+• Always pick most frequent task first.
+• It creates structure with maximum spacing.
+• Helps minimize idle time.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = number of tasks
+
+Time:
+O(N log K)
+
+K = distinct tasks
+
+Space:
+O(K)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+Use greedy + max heap on frequencies.
+Most frequent task decides structure, others fill gaps to reduce idle time.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int leastInterval(char[] a, int k) {
+        //You can code here
+
+        //Map creation having freq
+        HashMap<Character, Integer> map = new HashMap<>();
+        for(char e : a){
+          map.put(e, map.getOrDefault(e, 0)+1);
+        }
+
+        //Priority creation
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());
+
+        pq.addAll(map.values());
+
+        int gap = pq.poll() - 1;
+        int idle = gap * k;
+
+        while(!pq.isEmpty()){
+          int freq = pq.poll();
+
+          idle -= Math.min(freq, gap);
+        }
+
+        if(idle < 0) idle = 0;
+
+        return a.length + idle;
+    }
+}
