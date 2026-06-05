@@ -1,0 +1,128 @@
+#Approach:
+
+FIND K CLOSEST ELEMENTS
+
+Idea:
+Har element ka distance x se nikalte hain:
+|arr[i] - x|
+
+Hume sirf K closest elements chahiye.
+
+Isliye worst (farthest) elements ko remove karte hue
+sirf best K maintain karte hain using heap.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Har element ke liye:
+
+   diff = |arr[i] - x|
+
+2. Max Heap use karo (size = K)
+
+   Store:
+   [diff, value]
+
+   Priority:
+   • Bigger diff first (remove priority)
+   • If tie → larger value first
+
+3. Add elements one by one:
+
+   • Insert into heap
+   • If size > K → poll (remove farthest)
+
+4. Heap ke elements collect karo
+   and sort ascending.
+
+--------------------------------------------------
+
+EXAMPLE
+
+arr = [5,4,1,2,3], k = 4, x = 3
+
+Diffs:
+
+5 → 2
+4 → 1
+1 → 2
+2 → 1
+3 → 0
+
+Heap keeps closest 4 elements:
+
+[1,2,3,4]
+
+Sorted answer:
+
+[1,2,3,4]
+
+--------------------------------------------------
+
+WHY MAX HEAP?
+
+• We want K closest elements.
+• So we remove farthest elements first.
+• Max heap keeps farthest on top → easy eviction.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = size of array
+
+Each insert:
+O(log K)
+
+Total:
+O(N log K)
+
+Final sorting:
+O(K log K)
+
+Space:
+O(K)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+Maintain a Max Heap of size K based on distance from x.
+Whenever size exceeds K, remove the farthest element.
+Finally sort remaining elements.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+
+    public List<Integer> findClosestElements(int[] arr, int k, int x) {
+        //You can code here
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b) -> {
+                if (a[0] != b[0]) return b[0] - a[0]; // max distance first (for eviction)
+                return b[1] - a[1]; // larger value first
+            }); 
+        //min heap, pair -> diff and element sorted on the basis of difference
+
+        for(int e : arr){
+          int diff = Math.abs(x - e);
+
+          pq.add(new int[]{diff, e});
+
+          if(pq.size() > k) pq.poll();
+        }
+
+        List<Integer> ans = new ArrayList<>();
+
+        while(!pq.isEmpty()){
+          ans.add(pq.poll()[1]);
+        }
+
+        Collections.sort(ans);
+
+        return ans;        
+    }
+}
