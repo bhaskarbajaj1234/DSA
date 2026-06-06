@@ -1,0 +1,121 @@
+#Approach:
+
+💡 IDEA
+- Pehle k elements reverse karne hain.
+- Baaki elements ka relative order same rehna chahiye.
+- Helper Deque use karenge:
+  - Front se nikaalenge.
+  - Back se wapas daalenge.
+- Isse first k elements reverse ho jayenge.
+
+⚙️ APPROACH
+1. First k elements queue se nikaal kar helper deque me daalo.
+2. Helper ke back se elements nikaal kar queue me daalo.
+   - First k elements reverse ho jayenge.
+3. Ab reversed elements queue ke rear me hain.
+4. Remaining original elements ko front se nikaal kar rear me daalte jao.
+5. Is rotation ke baad reversed k elements front par aa jayenge.
+
+📝 EXAMPLE
+
+Queue:
+[10,20,30,40,50]
+k = 3
+
+Step 1:
+
+Queue:
+[40,50]
+
+Helper:
+[10,20,30]
+
+----------------
+
+Step 2:
+Back se dequeue
+
+30 → Queue
+20 → Queue
+10 → Queue
+
+Queue:
+[40,50,30,20,10]
+
+----------------
+
+Step 3:
+
+diff = 5 - 3 = 2
+
+Rotate 2 times
+
+40 -> rear
+
+Queue:
+[50,30,20,10,40]
+
+50 -> rear
+
+Queue:
+[30,20,10,40,50]
+
+Final Answer:
+[30,20,10,40,50]
+
+❓ WHY HELPER DEQUE
+- Queue se sirf front access milta hai.
+- Reverse karne ke liye last inserted element pehle chahiye.
+- Deque ka pollLast() reverse order provide karta hai.
+- Isliye first k elements easily reverse ho jaate hain.
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+Reason:
+- k elements helper me
+- k elements wapas queue me
+- (n-k) rotations
+
+Total = O(N)
+
+Space : O(K)
+
+🎯 INTERVIEW POINT
+- Reverse karne ke baad k elements rear me chale jaate hain.
+- Isliye rotation step mandatory hai.
+- diff = n - k elements ko rotate karke order fix karte hain.
+- Pattern:
+  Extract → Reverse → Rotate.
+- Queue reversal problems me ye bahut common trick hai.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+	public static Queue<Integer> reverseQueueFirstKElements(int k, Queue<Integer> queue) {
+		//You can code here
+    if (queue.isEmpty() || k <= 0) return queue;
+    int diff = queue.size() - k;
+
+    //Step-1: first k elements dequeue krke helper queue mei daalo
+    ArrayDeque<Integer> helper = new ArrayDeque<>();
+    for(int i=0; i<k; i++){
+      helper.offerLast(queue.poll());
+    }
+
+    //step-2: deque ke peeche se nikaalkr queue ke andr enqueue krdo
+    while(!helper.isEmpty()){
+      queue.offer(helper.pollLast());
+    }
+
+    //Step-3: bche hue elements ko ghuma kr peeche le aao
+    for(int i=0; i<diff; i++){
+      int temp = queue.poll();
+      queue.offer(temp);
+    }
+
+    return queue;
+	}
+}
