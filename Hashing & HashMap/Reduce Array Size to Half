@@ -1,0 +1,94 @@
+#Approach:
+
+================================================================================
+PROBLEM: Reduce Array Size to Half (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Goal: Hame kam se kam aise unique numbers choose karke delete karne hain jisse 
+   array ki length aadhi (`n / 2`) ya usse bhi kam ho jaye.
+2. Greedy Strategy: Agar hum sabse bade frequency wale elements ko pehle delete 
+   karenge, toh array ka size bohot tezi se chhota hoga. Isse hamare set ka size 
+   minimum rahega.
+3. Step 1 (Frequency Map): Sabse pehle poori array par ghumkar har ek element ka 
+   count (frequency) ek HashMap me store kar lo.
+4. Step 2 (Sort Frequencies): Map ke saare unique elements ki frequencies ko nikal 
+   kar ek ArrayList me daal do. Phir is list ko bade se chhete order me 
+   (`Collections.reverseOrder()`) sort kar lo.
+5. Step 3 (Greedy Removal): Ek-ek karke sabse badi frequency ko total length (`temp`) 
+   me se minus karte jao aur apne `ans` set ka count `1` badhate jao.
+6. Jaise hi `temp <= n / 2` (yaani bache hue elements aadhi length ke barabar ya 
+   kam) ho jaye, loop ko tod do aur `ans` return kar do.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input Array: arr = [3,3,3,3,5,5,5,2,2,7] -> n = 10, Target Size <= 5
+
+Step 1: Frequency Map Build Karna
+- Map: {3:4, 5:3, 2:2, 7:1}
+
+Step 2: Frequencies nikalna aur Reverse Sort karna
+- ArrayList me daala: [4, 3, 2, 1]
+- Reverse Sort ke baad bhi list rahegi: [4, 3, 2, 1]
+
+Step 3: Elements remove karna (Initial temp = 10, ans = 0)
+- i = 0: Freq = 4
+  -> temp = 10 - 4 = 6
+  -> ans = 1
+  -> Check: Kya 6 <= 5 hai? Nahi. Continue...
+- i = 1: Freq = 3
+  -> temp = 6 - 3 = 3
+  -> ans = 2
+  -> Check: Kya 3 <= 5 hai? Haan hai! Match mil gaya, loop breaks.
+
+👉 Result: Return 2
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(N log N) -> Map banane me O(N) laga, par frequencies ki list ko 
+  sort karne me O(K log K) laga (jahan K unique elements ki ginti hai, max N).
+- Space Complexity: O(N) -> HashMap aur ArrayList me elements store karne ke liye.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int minSetSize(int[] arr) 
+    {
+        //You can code here
+        int n = arr.length;
+        int temp = n;
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+
+        for(int i=0; i<n; i++){
+          map.put(arr[i], map.getOrDefault(arr[i], 0)+1);
+        }
+
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int key : map.keySet()){
+          int freq = map.get(key);
+          list.add(freq);
+        }
+
+        list.sort(Collections.reverseOrder());
+        int ans = 0;
+
+        for(int i=0; i<list.size(); i++){
+          temp = temp - list.get(i);
+          ans += 1;
+          if(temp <= n/2){
+            break;
+          }
+        }
+
+        return ans;
+
+        
+    }
+}
