@@ -1,0 +1,195 @@
+#Approach:
+
+💡 IDEA
+- Direct simulation karna mushkil hai:
+  "Card 1 bahar aaye, phir Card 2, phir Card 3..."
+
+- Isliye reverse socho:
+
+  "Card i ko kis position par rakhna chahiye
+   taaki simulation me wo i-th card bankar nikle?"
+
+- Queue positions maintain karegi.
+- Har step par ek index choose karenge aur waha current card place kar denge.
+
+⚙️ APPROACH
+1. Queue me saare indices daal do.
+
+   q = [0,1,2,3,...]
+
+2. Card i (1 → N) ke liye:
+
+   a) Queue ko i times rotate karo.
+      front → rear
+
+   b) Front index nikalo.
+
+   c) ans[index] = i
+
+3. End me ans array hi required deck arrangement hai.
+
+📝 EXAMPLE
+
+N = 4
+
+Initially:
+
+Indices Queue
+
+[0,1,2,3]
+
+--------------------------------
+
+i = 1
+
+Rotate 1 time
+
+[1,2,3,0]
+
+Take front
+
+index = 1
+
+ans[1] = 1
+
+Queue:
+[2,3,0]
+
+--------------------------------
+
+i = 2
+
+Rotate 2 times
+
+[0,2,3]
+
+Take front
+
+index = 0
+
+ans[0] = 2
+
+Queue:
+[2,3]
+
+--------------------------------
+
+i = 3
+
+Rotate 3 times
+
+[3,2]
+
+Take front
+
+index = 3
+
+ans[3] = 3
+
+Queue:
+[2]
+
+--------------------------------
+
+i = 4
+
+Rotate 4 times
+
+[2]
+
+Take front
+
+index = 2
+
+ans[2] = 4
+
+Final:
+
+[2,1,4,3]
+
+✅ Answer
+
+❓ WHY QUEUE
+- Question me continuously front element rear me move ho raha hai.
+- Queue exactly isi behavior ko represent karti hai.
+
+Operations:
+
+poll()  -> front remove
+offer() -> rear insert
+
+Queue rotation = card rotation
+
+⏱️ COMPLEXITY
+Time  : O(N²)
+
+Reason:
+- For card i,
+  i rotations kar rahe hain.
+
+Total:
+
+1 + 2 + 3 + ... + N
+
+= O(N²)
+
+Space : O(N)
+
+- Queue
+- Answer Array
+
+🎯 INTERVIEW POINT
+- Sabse important observation:
+
+  Hum actual cards simulate nahi kar rahe.
+
+  Hum positions simulate kar rahe hain.
+
+- Queue stores indices, not card values.
+
+- Jab index milta hai:
+
+  ans[index] = current card
+
+- Reverse construction technique hai:
+  Pehle se decide kar rahe hain ki card 1,2,3... kis position par hone chahiye.
+
+- Queue Rotation + Position Assignment
+  = Complete Solution.
+
+#Code:
+
+import java.util.*;
+
+public class Solution{
+    
+    public ArrayList<Integer> rotation(int n){
+      //You can code here
+
+      int[] ans = new int[n];
+      Queue<Integer> q = new LinkedList<>();
+
+      for(int i=0; i<n; i++){
+        q.offer(i);
+      }
+
+      for(int i=1; i<=n; i++){
+        //Step-1: rotate queue i times
+        for(int j=1; j<=i; j++){
+          q.offer(q.poll());
+        }
+
+        //Step-2: peek index is the index where the current element will be stored in the new array
+        int index = q.poll();
+        ans[index] = i;
+      }
+
+      ArrayList<Integer> result = new ArrayList<>();
+      for(int num : ans){
+        result.add(num);
+      }
+
+      return result;
+       
+   }
+}
