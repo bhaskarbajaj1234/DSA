@@ -1,0 +1,152 @@
+#Approach:
+
+💡 IDEA
+- Har window ka maximum chahiye.
+- Brute Force me har window scan karenge → O(N*K).
+- Deque ko decreasing order me maintain karenge.
+- Front par hamesha current window ka maximum rahega.
+
+⚙️ APPROACH
+1. First k elements ke liye deque build karo.
+   - Jab tak last element current element se chhota hai:
+     remove from back.
+   - Current element insert karo.
+
+2. Ab har new element ke liye:
+   - Deque front = current window max → answer me add karo.
+   - Agar outgoing element (nums[i-k]) deque front hai:
+     usko remove karo.
+   - Back se saare smaller elements remove karo.
+   - Current element insert karo.
+
+3. Last window ka maximum bhi add kar do.
+
+📝 EXAMPLE
+
+nums = [1,3,-1,-3,5,3,6,7]
+k = 3
+
+First Window: [1,3,-1]
+
+1 → [1]
+
+3:
+1 smaller hai
+remove 1
+Deque = [3]
+
+-1:
+Deque = [3,-1]
+
+Max = 3
+
+----------------
+
+New Element = -3
+
+Window = [3,-1,-3]
+
+Max = 3
+
+Deque:
+[3,-1,-3]
+
+----------------
+
+New Element = 5
+
+Outgoing = 3
+
+Front = 3
+remove it
+
+Deque:
+[-1,-3]
+
+5 aaya
+
+-3 remove
+-1 remove
+
+Deque:
+[5]
+
+Max = 5
+
+Isi tarah continue...
+
+Answer:
+[3,3,5,5,6,7]
+
+❓ WHY DEQUE
+- Front se maximum instantly milta hai.
+- Back se useless smaller elements remove kar sakte hain.
+- Deque decreasing order maintain karta hai.
+
+Example:
+
+[5,3,2]
+
+Agar 6 aaya:
+
+5,3,2 sab future me kabhi max nahi ban sakte.
+
+Direct remove karke:
+
+[6]
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+Reason:
+- Har element maximum ek baar insert hota hai.
+- Har element maximum ek baar remove hota hai.
+
+Space : O(K)
+
+🎯 INTERVIEW POINT
+- Deque always decreasing order me maintain hota hai.
+- Front = current window maximum.
+- Smaller elements back se remove karna sabse important observation hai.
+- Ye code values store kar raha hai, indices nahi.
+- Outgoing element remove tabhi hoga jab wo deque ke front par ho.
+- Sliding Window Maximum ka standard pattern:
+  "Monotonic Decreasing Deque".
+
+#Code:
+
+import java.util.*;
+
+public class Solution
+{
+    public static List<Integer> maxSlidingWindow(int[] nums, int k)
+    {
+        //You can code here
+        ArrayDeque<Integer> dq = new ArrayDeque<>();
+        List<Integer> ans = new ArrayList<>();
+
+        int i = 0;
+        while(i < k){
+          while(!dq.isEmpty() && dq.getLast() < nums[i]){
+            dq.pollLast();
+          }
+          dq.offerLast(nums[i]);
+          i++;
+        }
+        int n = nums.length;
+        for(; i<n; i++){
+          ans.add(dq.peekFirst());
+          if(dq.peekFirst() == nums[i-k]){
+            dq.pollFirst();
+          }
+          while(!dq.isEmpty() && dq.getLast() < nums[i]){
+            dq.pollLast();
+          }
+          dq.offerLast(nums[i]);
+        }
+        ans.add(dq.peekFirst());
+
+        return ans;
+      
+    }
+}
