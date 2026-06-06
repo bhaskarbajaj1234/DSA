@@ -1,0 +1,162 @@
+#Approach:
+
+💡 IDEA
+- Binary numbers tree ki tarah grow hote hain.
+
+       1
+      / \
+    10   11
+    / \  / \
+100 101 ...
+
+- Har binary string se 2 naye binary numbers bante hain:
+  - Append '0'
+  - Append '1'
+
+- Queue use karke level-order (BFS) traversal karenge.
+- Isi order me binary numbers 1,2,3,4... generate hote jaate hain.
+
+⚙️ APPROACH
+1. Queue me "1" daal do.
+
+2. Jab tak N numbers generate na ho jaye:
+
+   a) Queue se front string nikalo.
+
+   b) Answer me add karo.
+
+   c) temp + "0" queue me daalo.
+
+   d) temp + "1" queue me daalo.
+
+3. Final answer return karo.
+
+📝 EXAMPLE
+
+N = 5
+
+Initially
+
+Queue:
+[1]
+
+--------------------------------
+
+Take 1
+
+Answer:
+[1]
+
+Insert:
+10,11
+
+Queue:
+[10,11]
+
+--------------------------------
+
+Take 10
+
+Answer:
+[1,10]
+
+Insert:
+100,101
+
+Queue:
+[11,100,101]
+
+--------------------------------
+
+Take 11
+
+Answer:
+[1,10,11]
+
+Insert:
+110,111
+
+Queue:
+[100,101,110,111]
+
+--------------------------------
+
+Take 100
+
+Answer:
+[1,10,11,100]
+
+--------------------------------
+
+Take 101
+
+Answer:
+[1,10,11,100,101]
+
+Done (5 numbers)
+
+❓ WHY QUEUE
+- Binary numbers level-order generate karne hain.
+- Queue BFS order maintain karti hai.
+
+Process:
+
+1
+↓
+10,11
+↓
+100,101,110,111
+
+Exactly same order as decimal:
+
+1,2,3,4,5,6,7...
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+- Har iteration me ek string process kar rahe hain.
+
+Space : O(N)
+
+- Queue + Answer list
+
+🎯 INTERVIEW POINT
+- Binary tree imagine karo:
+
+      x
+     / \
+   x0   x1
+
+- Har binary string apne 2 children generate karti hai.
+- Queue BFS traversal ki wajah se correct binary order milta hai.
+- Most important lines:
+
+  q.offer(temp + "0");
+  q.offer(temp + "1");
+
+- Pattern:
+  "Generate Next States using Queue (BFS)"
+
+#Code:
+
+import java.util.*;
+
+public class Solution{
+    
+    public static ArrayList<String> generate(int N)
+    {
+      //You can code here
+      ArrayList<String> ans = new ArrayList<>();
+      Queue<String> q = new LinkedList<>();
+      q.offer("1");
+      while(N-- > 0){
+        String temp = q.poll();
+
+        ans.add(temp);
+
+        q.offer(temp + "0");
+        q.offer(temp + "1");
+      }
+      return ans;
+    }
+}
