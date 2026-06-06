@@ -1,0 +1,126 @@
+#Approach:
+
+💡 IDEA
+- Queue me FRONT element remove karna hota hai.
+- Stack me sirf TOP remove kar sakte hain.
+- Isliye s1 → s2 transfer karte hain.
+- Transfer ke baad oldest element s2 ke top par aa jata hai.
+- Usko pop karte hain aur remaining elements wapas s1 me daal dete hain.
+
+⚙️ APPROACH
+Push(x):
+1. Direct s1 me push kar do.
+
+Pop():
+1. Agar s1 empty hai → return -1.
+2. Saare elements s1 se s2 me transfer karo.
+3. s2 ka top pop karo (ye queue ka front hoga).
+4. Remaining elements s2 se wapas s1 me transfer karo.
+5. Popped value return karo.
+
+📝 EXAMPLE
+
+Push(5)
+Push(10)
+Push(15)
+
+s1:
+
+Top
+15
+10
+5
+
+Pop()
+
+Transfer s1 → s2
+
+s2:
+
+Top
+5
+10
+15
+
+Now:
+pop() from s2 = 5
+
+Remaining:
+
+Top
+10
+15
+
+Transfer back to s1
+
+s1:
+
+Top
+15
+10
+
+Returned Answer = 5
+
+Queue after pop = [10,15]
+
+❓ WHY TWO STACKS
+- First reversal:
+  s1 → s2
+
+- Oldest element top par aa jata hai.
+
+- Second reversal:
+  s2 → s1
+
+- Original queue order preserve ho jata hai.
+
+⏱️ COMPLEXITY
+Push : O(1)
+
+Pop  : O(N)
+       (Transfer twice)
+
+Space: O(N)
+
+🎯 INTERVIEW POINT
+- s1 stores queue elements.
+- s1 → s2 transfer order reverse karta hai.
+- s2 ka top = Queue Front.
+- Pop ke baad elements wapas s1 me daalne padte hain because question specifically bolta hai final elements s1 me hone chahiye.
+- Ye "Push Efficient, Pop Costly" implementation hai.
+
+#Code:
+
+import java.util.Stack;
+
+class MyQueue {
+
+    Stack<Integer> s1 = new Stack<Integer>();
+    Stack<Integer> s2 = new Stack<Integer>();
+
+    void Push(int x) {
+        //You can code here
+        s1.push(x);
+    }
+
+    int Pop() {
+        //You can code here
+
+        if(s2.isEmpty()){
+          if(s1.isEmpty()){
+            return -1;
+          }
+          while(!s1.isEmpty()){
+            s2.push(s1.pop());
+          }
+        }
+        int ans = s2.pop();
+
+        //now pushing back all elements to s1 stack
+        while(!s2.isEmpty()){
+          s1.push(s2.pop());
+        }
+
+        return ans;
+    }
+}
