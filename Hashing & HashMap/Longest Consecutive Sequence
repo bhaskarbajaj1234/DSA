@@ -1,0 +1,96 @@
+#Approach:
+
+================================================================================
+PROBLEM: Longest Consecutive Sequence (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Base Case: Agar array empty hai (`n == 0`), toh sidhe `-1` return kar do (ya fir 
+   0, depending on edge cases).
+2. Step 1 (HashSet me dalna): Array ke saare elements ko ek HashSet me daal do. 
+   Isse do fayde honge: duplicates hat jayenge aur hum kisi bhi number ko `O(1)` 
+   time me check kar payenge.
+3. Step 2 (Sequence ka START dhoondna): Set ke upar loop chalao. Hum har number `it` 
+   par khade hoke check karte hain ki: Kya ye number sequence ka "starting point" hai?
+   - Agar `set.contains(it - 1)` sach hai, iska matlab `it` se pehle wala number 
+     bhi array me hai. Toh ye start nahi ho sakta, isko skip karo.
+   - Agar `it - 1` set me nahi hai, iska matlab haan, ye ek nayi consecutive 
+     sequence ka starting point ban sakta hai!
+4. Step 3 (Sequence extend karna): Jab hame ek valid start (`it`) mil jata hai, 
+   toh hum ek `while` loop chalakar aage ke numbers (`it + 1`, `it + 2`, ...) ko 
+   set me dhoondte hain aur apna `cnt` badhate rehte hain.
+5. Har sequence ke khatam hone par, global `len` ko maximum value se update 
+   karte hain (`Math.max(len, cnt)`).
+
+---
+
+### 🔍 Dry Run / Testcase
+Input Array: A = [1, 2, 0, 1]
+HashSet: {0, 1, 2} (Duplicates automatic hat gaye)
+Initial len = 1
+
+Set ke elements par Iteration:
+- Pehla element, it = 0:
+  -> Check karo: Kya `it - 1` (-1) set me hai? Nahi hai! (Matlab 0 ek START point hai).
+  -> Loop chalega:
+     - x = 1 -> Set me hai? Haan. cnt = 2, x = 2
+     - x = 2 -> Set me hai? Haan. cnt = 3, x = 3
+     - x = 3 -> Set me hai? Nahi. Loop ends.
+  -> len = Math.max(1, 3) = 3
+
+- Agla element, it = 1:
+  -> Check karo: Kya `it - 1` (0) set me hai? Haan hai! (Matlab 1 start nahi hai). Skip!
+
+- Agla element, it = 2:
+  -> Check karo: Kya `it - 1` (1) set me hai? Haan hai! (Matlab 2 bhi start nahi hai). Skip!
+
+👉 Result: Return 3
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(N) -> Dekhne me nested loop lagta hai, par har element set me 
+  sirf do hi baar touch hota hai (ek baar start dhoondne me aur ek baar sequence 
+  count karne me).
+- Space Complexity: O(N) -> Array ke elements ko unique rakhne ke liye HashSet ka space.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution
+{
+    public int longestConsecutive(int[] A)
+    {
+        //You can code here
+        int n = A.length;
+
+        if(n == 0){
+          return -1;
+        }
+
+        HashSet<Integer> set = new HashSet<>();
+
+        for(int i=0; i<n; i++){
+          set.add(A[i]);
+        }
+
+        int len = 1;
+
+        for(int it : set){
+          if(!set.contains(it-1)){
+            int cnt = 1;
+            int x = it + 1;
+            while(set.contains(x)){
+              cnt++;
+              x++;
+            }
+            len = Math.max(len, cnt);
+          }
+        }
+        return len;
+      
+    }
+}
