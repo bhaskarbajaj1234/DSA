@@ -1,0 +1,65 @@
+#Approach:
+
+================================================================================
+PROBLEM: First Non-Repeating Character (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Do baar string par traverse karna hai:
+   - Loop 1 (Count/Frequency): Poori string par ghumo aur har character ki 
+     frequency (count) ko HashMap me store karlo.
+   - Loop 2 (Find First Unique): Phir se string par shuru se (left to right) 
+     ghumo. Jis bhi character ka count map me '1' mil jaye, wahi hamara pehla 
+     non-repeating character hai. Turant use return kar do.
+2. Agar loop khatam hone tak koi aisa character nahi mila jiska count 1 ho, 
+   to '#' return kar do.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input String: S = "hehllo"
+
+Step 1: Frequency Map Build Karna (Loop 1)
+- 'h' -> count = 1
+- 'e' -> count = 1
+- 'h' -> count = 2  (h repeat hua)
+- 'l' -> count = 1
+- 'l' -> count = 2  (l repeat hua)
+- 'o' -> count = 1
+Final Map: {h:2, e:1, l:2, o:1}
+
+Step 2: First Unique Dhoondna (Loop 2 - Left to Right)
+- i = 0: S[0] = 'h' -> Map me count 2 hai (Not 1, skip)
+- i = 1: S[1] = 'e' -> Map me count 1 hai! Match mil gaya!
+👉 Result: Return 'e'
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(N) -> Do baar string scan ki (N + N = 2N)
+- Space Complexity: O(1) -> Map me max 26 unique lowercase characters hi aayenge
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+	public static char nonRepeatingCharacter(String S) {
+		//You can code here
+        HashMap<Character, Integer> map = new HashMap<>();
+
+        for(int i=0; i<S.length(); i++){
+            map.put(S.charAt(i), map.getOrDefault(S.charAt(i), 0)+1);
+        }
+
+        for(int i=0; i<S.length(); i++){
+            if(map.get(S.charAt(i)) == 1){
+                return S.charAt(i);
+            }
+        }
+        return '#';
+      
+	}
+}
