@@ -1,0 +1,121 @@
+#Approach:
+
+💡 IDEA
+- Queue me removal FRONT se hota hai.
+- Lekin Stack sirf TOP se remove kar sakta hai.
+- Isliye recursion se stack ke bottom tak jaate hain.
+- Bottom element hi queue ka FRONT hota hai.
+- Bottom remove karke baaki elements wapas same order me push kar dete hain.
+
+⚙️ APPROACH
+Push(x):
+1. Direct stack me push kar do.
+
+Pop():
+1. Agar stack empty hai → return -1.
+2. Agar stack me sirf 1 element hai:
+   - Yehi queue ka front hai.
+   - Isko pop karke return kar do.
+3. Top element nikaalo.
+4. Recursively Pop() call karo.
+5. Wapas aate waqt removed top ko stack me push kar do.
+6. Recursive call ka answer return kar do.
+
+📝 EXAMPLE
+
+Push(5)
+Push(10)
+Push(15)
+
+Stack:
+Top
+15
+10
+5
+
+Pop()
+
+Step 1:
+remove 15
+
+Stack:
+10
+5
+
+Step 2:
+remove 10
+
+Stack:
+5
+
+Step 3:
+size == 1
+return 5
+
+Backtracking:
+
+push(10)
+push(15)
+
+Stack becomes:
+
+Top
+15
+10
+
+Returned Answer = 5
+
+Queue after pop = [10,15]
+
+❓ WHY RECURSION
+- Queue ka front stack ke bottom par hota hai.
+- Direct bottom access possible nahi hai.
+- Recursion temporarily upper elements ko hata deta hai.
+- Bottom milne ke baad remaining elements restore kar deta hai.
+
+⏱️ COMPLEXITY
+Push : O(1)
+
+Pop  : O(N)
+       (Bottom tak jana padta hai)
+
+Space: O(N)
+       (Recursive call stack)
+
+🎯 INTERVIEW POINT
+- Push cheap, Pop expensive approach.
+- Bottom-most stack element = Queue Front.
+- Recursion stack ko temporary helper stack ki tarah use kar rahi hai.
+- Backtracking ke time elements same order me restore hote hain.
+- Isliye queue order maintain rehta hai using only one stack.
+
+#Code:
+
+import java.util.Stack;
+
+class MyQueue {
+    Stack<Integer> stack = new Stack<>();
+
+    void Push(int x) {
+      //You can code here
+      stack.push(x);
+      return;
+    }
+
+    int Pop() {
+      //You can code here
+
+      if(stack.isEmpty()) return -1;
+
+      //Base case
+      if(stack.size() == 1){
+        return stack.pop();
+      }
+
+      int top = stack.pop();
+      int ans = Pop();
+      stack.push(top);
+
+      return ans;
+    }
+}
