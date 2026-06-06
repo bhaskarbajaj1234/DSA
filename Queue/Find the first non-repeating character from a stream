@@ -1,0 +1,135 @@
+#Approach:
+
+💡 IDEA
+- Har step par current first non-repeating character chahiye.
+- Queue potential answers maintain karegi.
+- Frequency array batayegi character kitni baar aaya hai.
+- Queue ke front par hamesha first non-repeating character rakhne ki koshish karenge.
+
+⚙️ APPROACH
+1. Character stream ko ek-ek karke process karo.
+2. Character ko queue me daalo.
+3. Uski frequency increase karo.
+4. Jab tak queue ka front repeating hai (freq > 1):
+   - Queue se remove kar do.
+5. Agar queue empty ho gayi:
+   - '#' append karo.
+6. Otherwise:
+   - Queue ka front append karo.
+
+📝 EXAMPLE
+
+Input = "abac"
+
+Step 1:
+a
+
+freq[a]=1
+Queue = [a]
+
+Answer = a
+
+----------------
+
+Step 2:
+b
+
+freq[b]=1
+Queue = [a,b]
+
+Answer = a
+
+----------------
+
+Step 3:
+a
+
+freq[a]=2
+Queue = [a,b,a]
+
+Front a repeating hai
+remove a
+
+Queue = [b,a]
+
+Answer = b
+
+----------------
+
+Step 4:
+c
+
+freq[c]=1
+Queue = [b,a,c]
+
+Front b non-repeating hai
+
+Answer = b
+
+Final = "aabb"
+
+❓ WHY QUEUE + FREQ ARRAY
+
+Queue:
+- Arrival order maintain karti hai.
+- First non-repeating candidate front par milta hai.
+
+Frequency Array:
+- O(1) me pata chal jata hai repeating hai ya nahi.
+
+Dono combine karke first valid character instantly mil jata hai.
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+Reason:
+- Har character queue me ek baar enter hota hai.
+- Har character maximum ek baar remove hota hai.
+
+Space : O(N)
+         (Queue)
+
+         + O(26)
+         (Frequency Array)
+
+🎯 INTERVIEW POINT
+- Queue me repeating characters reh sakte hain.
+- Isliye while loop mandatory hai.
+- Queue front ko repeatedly remove karo jab tak non-repeating na mil jaye.
+- Queue = order maintain
+- Freq Array = repetition check
+- Stream problems me Queue + Frequency bahut common pattern hai.
+
+#Code:
+
+import java.util.*; 
+
+public class Solution {
+
+	public static String FirstNonRepeating(String A)
+	{
+		//You can code here
+    StringBuilder sb = new StringBuilder();
+    Queue<Character> q = new LinkedList<>();
+    int[] freq = new int[26];
+
+    for(int i=0; i<A.length(); i++){
+      char c = A.charAt(i);
+
+      q.offer(c);
+      freq[c - 'a']++;
+
+      while(!q.isEmpty() && freq[q.peek() - 'a'] > 1){
+        q.poll();
+      }
+
+      if(q.isEmpty()){
+        sb.append('#');
+      }
+      else{
+        sb.append(q.peek());
+      }
+    }
+    return sb.toString();
+	}
+}
