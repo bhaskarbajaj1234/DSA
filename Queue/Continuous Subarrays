@@ -1,0 +1,248 @@
+#Approach:
+
+💡 IDEA
+- Valid subarray ke andar:
+
+  maxElement - minElement <= 2
+
+- Har window ka minimum aur maximum efficiently track karna hai.
+- Isliye 2 Monotonic Deques use karte hain:
+
+  min deque → increasing order
+  max deque → decreasing order
+
+- Sliding Window maintain karenge.
+- Jitne valid subarrays current r par end hote hain,
+  unko count me add karenge.
+
+⚙️ APPROACH
+1. r ko move karo.
+
+2. nums[r] ko:
+   - min deque me insert karo
+   - max deque me insert karo
+
+3. Window invalid ho gayi?
+
+   max.front - min.front > 2
+
+   Tab tak l move karo jab tak valid na ho jaye.
+
+4. Agar outgoing element deque front ke equal hai,
+   usko remove karo.
+
+5. Current valid window:
+
+   [l ... r]
+
+   Is window ke saare subarrays ending at r valid hain.
+
+   Count += (r - l + 1)
+
+📝 EXAMPLE
+
+nums = [5,4,2,4]
+
+--------------------------------
+
+r = 0
+
+Window = [5]
+
+min = [5]
+max = [5]
+
+Valid
+
+Count += 1
+
+count = 1
+
+--------------------------------
+
+r = 1
+
+Window = [5,4]
+
+min = [4]
+max = [5,4]
+
+max-min = 1
+
+Valid
+
+Count += 2
+
+Subarrays:
+[4]
+[5,4]
+
+count = 3
+
+--------------------------------
+
+r = 2
+
+Window = [5,4,2]
+
+min = [2]
+max = [5,4,2]
+
+max-min = 3
+
+Invalid
+
+Move l
+
+Remove 5
+
+Window = [4,2]
+
+max-min = 2
+
+Valid
+
+Count += 2
+
+Subarrays:
+[2]
+[4,2]
+
+count = 5
+
+--------------------------------
+
+r = 3
+
+Window = [4,2,4]
+
+min = [2,4]
+max = [4,4]
+
+max-min = 2
+
+Valid
+
+Count += 3
+
+Subarrays:
+[4]
+[2,4]
+[4,2,4]
+
+count = 8
+
+Final Answer = 8
+
+❓ WHY TWO DEQUES
+
+Need:
+
+- Current Window Minimum
+- Current Window Maximum
+
+Fast access chahiye.
+
+Min Deque:
+Front = smallest element
+
+Max Deque:
+Front = largest element
+
+Therefore:
+
+max - min
+
+O(1) me mil jata hai.
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+Reason:
+- Har element max ek baar insert hota hai.
+- Har element max ek baar remove hota hai.
+
+Space : O(N)
+(Worst case deques)
+
+🎯 INTERVIEW POINT
+- Condition:
+
+  maxWindow - minWindow <= 2
+
+- Min deque = increasing
+- Max deque = decreasing
+
+- Most important formula:
+
+  count += (r - l + 1)
+
+Why?
+
+Current valid window:
+
+[l ... r]
+
+Agar length = 4
+
+Toh r par end hone wale valid subarrays:
+
+1 length
+2 length
+3 length
+4 length
+
+Total = 4
+
+i.e.
+
+r - l + 1
+
+- This is a classic:
+  "Count Subarrays + Sliding Window + Monotonic Deque" pattern.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public long continuousSubarrays(int[] nums) {
+      //You can code here
+
+      ArrayDeque<Integer> min = new ArrayDeque<>();
+      ArrayDeque<Integer> max = new ArrayDeque<>();
+      long count = 0;
+
+      int l = 0;
+      int n = nums.length;
+      for(int r=0; r<n; r++){
+        //managing min deque
+        while(!min.isEmpty() && min.getLast() > nums[r]){
+          min.pollLast();
+        }
+        min.offerLast(nums[r]);
+
+        //managing max deque
+        while(!max.isEmpty() && max.getLast() < nums[r]){
+          max.pollLast();
+        }
+        max.offerLast(nums[r]);
+
+        //check if absolute difference is greater than 2
+        while(max.peekFirst() - min.peekFirst() > 2){
+          if(min.peekFirst() == nums[l]){
+            min.pollFirst();
+          }
+
+          if(max.peekFirst() == nums[l]){
+            max.pollFirst();
+          }
+          l++;
+        }
+
+        count += (long)(r-l+1);
+      }
+      return count;
+       
+    }
+}
