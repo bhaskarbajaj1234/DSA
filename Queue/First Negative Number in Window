@@ -1,0 +1,152 @@
+#Approach:
+
+💡 IDEA
+- Har window ka first negative number chahiye.
+- Queue me sirf negative numbers store karenge.
+- Queue ka front hamesha current window ka first negative hoga.
+
+⚙️ APPROACH
+1. First k elements process karo.
+   - Agar element negative hai → queue me daalo.
+
+2. Ab har new window ke liye:
+   - Queue empty hai → answer = 0
+   - Otherwise → answer = queue.front
+
+3. Window slide karo:
+   - Agar outgoing element queue ke front ke equal hai:
+     usko remove karo.
+   - Agar new incoming element negative hai:
+     queue me add karo.
+
+4. Last window ka answer bhi add kar do.
+
+📝 EXAMPLE
+
+arr = [-8, 2, 3, -6, 10]
+k = 2
+
+First Window:
+[-8, 2]
+
+Queue = [-8]
+
+Answer = -8
+
+----------------
+
+Slide
+
+Window:
+[2, 3]
+
+Outgoing = -8
+
+Queue Front = -8
+remove it
+
+Queue = []
+
+No negative present
+
+Answer = 0
+
+----------------
+
+Slide
+
+Window:
+[3, -6]
+
+Insert -6
+
+Queue = [-6]
+
+Answer = -6
+
+----------------
+
+Slide
+
+Window:
+[-6, 10]
+
+Queue Front = -6
+
+Answer = -6
+
+Final:
+[-8, 0, -6, -6]
+
+❓ WHY QUEUE
+- Queue arrival order maintain karti hai.
+- First negative hamesha front par milta hai.
+- Positive numbers completely ignore kar sakte hain.
+- Sirf useful (negative) elements store hote hain.
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+Reason:
+- Har negative element maximum ek baar add hota hai.
+- Har negative element maximum ek baar remove hota hai.
+
+Space : O(K)
+         (Worst case: poori window negative)
+
+🎯 INTERVIEW POINT
+- Queue me sirf negative numbers store ho rahe hain.
+- Front = current window ka first negative.
+- Outgoing element remove tabhi karna hai jab wo queue ke front par ho.
+- Positive elements queue me kabhi nahi jaate.
+- Sliding Window + Queue ka classic pattern:
+  "Store only useful candidates".
+
+#Code:
+
+import java.util.*;
+
+public class Solution
+{
+    public List<Integer> firstNegative(int[] arr, int n, int k)
+    {
+        //You can code here
+        ArrayDeque<Integer> dq = new ArrayDeque<>();
+        List<Integer> ans = new ArrayList<>();
+
+        int i = 0;
+        while(i < k){
+          if(arr[i] < 0){
+            dq.offerLast(arr[i]);
+          }
+          i++;
+        }
+
+        for(; i<n; i++){
+          //if dq is empty
+          if(dq.isEmpty()){
+            ans.add(0);
+          }else{
+            ans.add(dq.peekFirst());
+          }
+
+          if(!dq.isEmpty() && dq.peekFirst() == arr[i-k]){
+            dq.pollFirst();
+          }
+
+          if(arr[i] < 0){
+            dq.offerLast(arr[i]);
+          }
+        }
+
+        //putting element based on last window
+        if(dq.isEmpty()){
+          ans.add(0);
+        }
+        else{
+          ans.add(dq.peekFirst());
+        }
+        return ans;
+      
+    }
+}
