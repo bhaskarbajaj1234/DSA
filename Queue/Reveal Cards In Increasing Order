@@ -1,0 +1,177 @@
+#Approach:
+
+💡 IDEA
+- Hume aisa deck arrange karna hai ki reveal sequence:
+
+  2,3,5,7,11,13,17 ...
+
+  increasing order me aaye.
+
+- Actual cards ko simulate karne ki jagah,
+  reveal hone wali positions simulate karte hain.
+
+- Queue me indices store karenge.
+
+- Jo index sabse pehle reveal hoga,
+  usme smallest card rakhenge.
+
+- Jo index second reveal hoga,
+  usme second smallest card rakhenge.
+
+⚙️ APPROACH
+1. Deck ko sort karo.
+
+2. Queue me saare indices daal do.
+
+   q = [0,1,2,3...]
+
+3. Har sorted card ke liye:
+
+   a) Queue front index nikalo.
+
+   b) Us position par current smallest card rakho.
+
+   c) Front index remove karo.
+
+   d) Agar queue empty nahi hai:
+      next front index ko rear me move karo.
+
+4. Final ans array return karo.
+
+📝 EXAMPLE
+
+deck = [17,13,11,2,3,5,7]
+
+After Sorting:
+
+[2,3,5,7,11,13,17]
+
+Indices Queue:
+
+[0,1,2,3,4,5,6]
+
+--------------------------------
+
+Place 2
+
+index = 0
+
+ans:
+
+[2,_,_,_,_,_,_]
+
+Move next index:
+
+Queue:
+
+[2,3,4,5,6,1]
+
+--------------------------------
+
+Place 3
+
+index = 2
+
+ans:
+
+[2,_,3,_,_,_,_]
+
+Move next index
+
+Queue:
+
+[4,5,6,1,3]
+
+--------------------------------
+
+Place 5
+
+index = 4
+
+ans:
+
+[2,_,3,_,5,_,_]
+
+...
+
+Final:
+
+[2,13,3,11,5,17,7]
+
+❓ WHY QUEUE
+Reveal Process:
+
+1. Reveal top card
+2. Move next card to bottom
+
+Exactly queue behavior hai:
+
+Reveal:
+poll()
+
+Move next to bottom:
+offer(poll())
+
+Queue naturally reveal order generate kar deti hai.
+
+⏱️ COMPLEXITY
+Time  : O(N log N)
+
+- Sorting = O(N log N)
+- Queue Simulation = O(N)
+
+Space : O(N)
+
+- Queue
+- Answer Array
+
+🎯 INTERVIEW POINT
+- Most important observation:
+
+  Cards place nahi kar rahe,
+  Reveal Positions fill kar rahe hain.
+
+- Queue stores indices, not card values.
+
+- Reveal order of positions:
+
+  0 → 2 → 4 → ...
+
+- Smallest card first revealed honi chahiye,
+  isliye sorted deck use karte hain.
+
+- Classic reverse-thinking problem:
+
+  "Reveal sequence given hai,
+   initial arrangement construct karni hai."
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int[] deckRevealedIncreasing(int[] deck) {
+      //You can code here
+      int n = deck.length;
+      Arrays.sort(deck);
+      int[] ans = new int[n];
+
+      Queue<Integer> q = new LinkedList<>();
+
+      //filling queue with indexes
+      for(int i=0; i<n; i++){
+        q.offer(i);
+      }
+
+      for(int i=0; i<n; i++){
+        ans[q.peek()] = deck[i];
+        q.poll();
+
+        if(!q.isEmpty()){
+          q.offer(q.poll());
+        }
+      }
+
+      return ans;
+    }
+}
