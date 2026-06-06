@@ -1,0 +1,276 @@
+#Approach:
+
+=========================================
+COLORFUL NUMBER
+(HashSet + Contiguous Subsequences)
+=========================================
+
+🔹 Idea
+
+Har contiguous subsequence ka digit product
+unique hona chahiye.
+
+Agar koi product repeat ho gaya,
+number colorful nahi hai.
+
+HashSet use karke saare products track karenge.
+
+-----------------------------------------
+
+🔹 What is a Contiguous Subsequence?
+
+A = 324
+
+Possible contiguous parts:
+
+3
+2
+4
+32
+24
+324
+
+Non-contiguous allowed nahi:
+
+34 ❌
+
+-----------------------------------------
+
+🔹 Approach
+
+1. Number ko digits array me convert karo.
+2. Har index ko starting point banao.
+3. Product = 1 se start karo.
+4. Aage extend karte jao:
+
+      product *= currentDigit
+
+5. Agar product pehle se HashSet me hai
+
+      return 0
+
+6. Otherwise set me add karo.
+
+7. Sab products unique rahe
+
+      return 1
+
+-----------------------------------------
+
+🔹 Example
+
+A = 23
+
+Digits:
+
+[2,3]
+
+set = {}
+
+---------------------------------
+
+Start i=0
+
+product = 1
+
+j=0
+
+product = 2
+
+set = {2}
+
+-----------------
+
+j=1
+
+product = 2 × 3 = 6
+
+set = {2,6}
+
+---------------------------------
+
+Start i=1
+
+product = 1
+
+j=1
+
+product = 3
+
+set = {2,6,3}
+
+No duplicate product found
+
+Answer = 1
+
+-----------------------------------------
+
+🔹 Example 2
+
+A = 541
+
+Digits:
+
+[5,4,1]
+
+---------------------------------
+
+5  -> product = 5
+
+4  -> product = 4
+
+1  -> product = 1
+
+54 -> product = 20
+
+41 -> product = 4  ❌
+
+4 already exists
+
+Duplicate product found
+
+Answer = 0
+
+-----------------------------------------
+
+🔹 Why Nested Loops?
+
+Har possible contiguous subsequence
+generate karni hai.
+
+Outer Loop:
+Starting index
+
+Inner Loop:
+Ending index
+
+Classic "Generate all subarrays/substrings"
+pattern.
+
+-----------------------------------------
+
+🔹 Why Product Variable is Not Reset Inside Inner Loop?
+
+Instead of calculating product from scratch:
+
+For [3,2,4]
+
+3
+
+3×2 = 6
+
+6×4 = 24
+
+Previous product reuse ho raha hai.
+
+This avoids extra work.
+
+-----------------------------------------
+
+🔹 Why HashSet?
+
+Need:
+
+"Has this product appeared before?"
+
+HashSet lookup = O(1) average.
+
+-----------------------------------------
+
+🔹 Pattern to Remember
+
+for every start index
+
+    product = 1
+
+    keep extending
+
+    product *= currentDigit
+
+    if(product already exists)
+         return 0
+
+    store product
+
+-----------------------------------------
+
+🔹 Complexity
+
+Let D = number of digits
+
+Time  : O(D²)
+
+Space : O(D²)
+
+(Maximum products stored)
+
+Since A ≤ 10⁹
+
+D ≤ 10
+
+So extremely fast.
+
+-----------------------------------------
+
+🔹 Interview Point
+
+This is a:
+
+"Generate all contiguous subsequences
+ + detect duplicates"
+
+pattern.
+
+Whenever question says:
+
+- All subarrays/substrings
+- Unique products/sums
+- Detect repeated values
+
+Think:
+
+"NESTED LOOP + HASHSET"
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int colorful(int A) 
+    {
+        //You can code here
+        HashSet<Integer> set = new HashSet<>();
+
+        //converting integer A into an array
+        //first count digits
+        int temp = A;
+        int cnt = 0;
+        while(temp>0){
+            cnt++;
+            temp = temp/10;
+        }
+
+        //now create array of cnt size and then convert that into array of integer
+        int[] arr = new int[cnt];
+
+        for(int i=cnt-1; i>=0; i--){
+            arr[i] = A % 10;
+            A /= 10;
+        }
+
+        // we have arr ready
+
+        for(int i=0; i<arr.length; i++){
+            int product = 1;
+            for(int j=i; j<arr.length; j++){
+                product *= arr[j];
+                if(set.contains(product)){
+                    return 0;
+                }
+                set.add(product);
+            }
+        }
+        return 1;
+
+    }
+}
