@@ -1,0 +1,88 @@
+==================== QUEUE ====================
+
+💡 WHAT IS QUEUE?
+Queue ek linear data structure hai jo FIFO principle follow karti hai.
+
+FIFO = First In First Out
+
+Jo element sabse pehle enter karega,
+wohi sabse pehle bahar niklega.
+
+Real Life Example:
+- Ticket Counter
+- ATM Line
+- Food Order Queue
+
+Line me jo pehle aaya, uska kaam pehle hoga.
+
+------------------------------------------------
+
+📌 OPERATIONS
+
+1. offer(x) / add(x)
+   -> Element ko rear (end) me insert karna
+
+2. poll()
+   -> Front se element remove karna
+
+3. peek()
+   -> Front element dekhna without removing
+
+4. isEmpty()
+   -> Queue khaali hai ya nahi
+
+------------------------------------------------
+
+📝 EXAMPLE
+
+offer(10)
+offer(20)
+offer(30)
+
+Front -> [10, 20, 30] <- Rear
+
+poll()
+
+Front -> [20, 30] <- Rear
+
+Kyuki 10 sabse pehle aaya tha,
+isliye sabse pehle remove hua.
+
+------------------------------------------------
+
+⚙️ JAVA IMPLEMENTATION
+
+Queue<Integer> q = new LinkedList<>();
+
+q.offer(10);
+q.offer(20);
+q.offer(30);
+
+q.poll();      // removes 10
+q.peek();      // returns 20
+
+------------------------------------------------
+
+🎯 WHERE DO WE USE QUEUE?
+
+1. BFS (Breadth First Search)
+2. Level Order Traversal in Trees
+3. Scheduling Problems
+4. Simulation Problems
+5. Sliding Window Variations
+6. Topological Sorting (Kahn's Algorithm)
+
+------------------------------------------------
+
+🧠 INTERVIEW MEMORY TRICK
+
+STACK  = LIFO
+(Last In First Out)
+
+QUEUE  = FIFO
+(First In First Out)
+
+Stack -> Plate Stack 🍽️
+Queue -> People Line 🚶🚶🚶
+
+================================================
