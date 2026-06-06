@@ -1,0 +1,224 @@
+#Approach:
+
+💡 IDEA
+- Brute Force me actual k elements flip karenge → O(N*K).
+- Observation:
+
+  Hume actual flips store karne ki zaroorat nahi hai.
+
+  Sirf ye jaana hai ki current index par
+  kitni active flips ka effect chal raha hai.
+
+- Queue active flip windows maintain karegi.
+
+- Queue size odd hai →
+  current bit effectively flipped hai.
+
+- Queue size even hai →
+  current bit original state me hai.
+
+⚙️ APPROACH
+1. Array traverse karo.
+
+2. Queue size odd hai?
+   - Current bit ko virtually flip kar do.
+
+   nums[i] ^= 1
+
+3. Agar current bit abhi bhi 0 hai:
+   - Yahin se flip start karna mandatory hai.
+   - Count increase karo.
+   - Queue me flip ending index store karo.
+
+     i + k - 1
+
+4. Agar flip window array ke bahar ja rahi hai:
+   - Return -1
+
+5. Agar koi flip current index par expire ho rahi hai:
+   - Queue se remove kar do.
+
+6. Total flips return karo.
+
+📝 EXAMPLE
+
+nums = [0,1,0]
+k = 1
+
+--------------------------------
+
+i = 0
+
+Queue = []
+
+Bit = 0
+
+Need flip
+
+count = 1
+
+Queue:
+[0]
+
+Flip ends at index 0
+
+Expire:
+
+Queue becomes []
+
+--------------------------------
+
+i = 1
+
+Bit = 1
+
+No flip needed
+
+--------------------------------
+
+i = 2
+
+Bit = 0
+
+Need flip
+
+count = 2
+
+Queue:
+[2]
+
+Expire:
+
+Queue becomes []
+
+Answer = 2
+
+✅
+
+------------------------------------------------
+
+nums = [1,1,0]
+k = 2
+
+i = 0
+
+Bit = 1
+
+No flip
+
+----------------
+
+i = 1
+
+Bit = 1
+
+No flip
+
+----------------
+
+i = 2
+
+Bit = 0
+
+Need flip
+
+But:
+
+i + k = 4
+
+n = 3
+
+Window exist hi nahi karti.
+
+Return -1
+
+❓ WHY QUEUE
+Queue stores:
+
+Flip Ending Indices
+
+Example:
+
+Flip started at i = 3
+k = 4
+
+Effect rahega:
+
+3,4,5,6
+
+Queue me store:
+
+6
+
+Jab i = 6 aayega,
+flip expire ho jayegi.
+
+Thus queue batati hai:
+kitni flips abhi active hain.
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+Reason:
+- Har flip ek baar queue me jaati hai.
+- Har flip ek baar remove hoti hai.
+
+Space : O(N)
+(Worst Case)
+
+🎯 INTERVIEW POINT
+- Most important observation:
+
+  Queue size % 2
+
+  Even → original bit
+  Odd  → flipped bit
+
+- Actual k elements flip nahi kar rahe.
+- Sirf active flip ranges track kar rahe hain.
+
+- Greedy Decision:
+
+  Agar current effective bit 0 hai,
+  toh isi index se flip start karna mandatory hai.
+
+  Future me koi flip is index ko affect nahi kar sakti.
+
+- This is the classic:
+  "Sliding Window + Lazy Flipping + Queue"
+  optimization.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+      public int minKBitFlips(int[] nums, int k) {
+        //You can code here
+
+        Queue<Integer> q = new LinkedList<>();
+        int n = nums.length;
+        int count = 0;
+
+        for(int i=0; i<n; i++){
+          if(q.size() % 2 != 0){
+            //if odd then flip the current bit
+            nums[i] = nums[i] ^ 1;
+          }
+
+          if(nums[i] == 0){
+            if(i + k > n){
+              return -1;
+            }
+            count++;
+            q.offer(i+k-1);
+          }
+
+          if(!q.isEmpty() && q.peek() == i){
+            q.poll();
+          }
+        }
+
+        return count;
+    }
+}
