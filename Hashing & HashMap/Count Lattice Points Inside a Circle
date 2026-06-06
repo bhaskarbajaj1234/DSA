@@ -1,0 +1,79 @@
+#Approach:
+
+================================================================================
+PROBLEM: Count Lattice Points Inside a Circle (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Goal: Hame saare unique lattice points (integer coordinates wale points) dhoondne 
+   hain jo kam se kam ek circle ke andar ya uski boundary par aate hon.
+2. Kyuki ek point multiple circles ke andar ho sakta hai, isliye hum duplicates se 
+   bachne ke liye ek `HashSet<String>` ka use karte hain. Points ko `"X,Y"` string 
+   format me set me save karenge.
+3. Step 1 (Bounding Box Loop): Har circle ke liye, hum uske aaspas ke area par hi scan 
+   marte hain (poore grid par ghumne ki zaroorat nahi hai).
+   - X-axis par range hogi: `x - r` se lekar `x + r` tak.
+   - Y-axis par range hogi: `y - r` se lekar `y + r` tak.
+4. Step 2 (Circle Equation Check): Bounding box ke har point `(i, j)` ke liye check 
+   karo ki kya wo circle ke andar hai. Iske liye standard circle formula lagate hain:
+   - `(i - x)^2 + (j - y)^2 <= r^2`
+   - Agar ye condition true hai, toh point circle ke andar ya boundary par hai. Use 
+     `set.add(i + "," + j)` karke set me daal do.
+5. Saare circles ke khatam hone par, unique points ka total count `set.size()` se 
+   return kar do.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input Circles: circles = [[2, 2, 1]] (Center=(2,2), Radius=1)
+HashSet: {}
+
+Loop Ranges for this circle:
+- i (X-axis): 2 - 1 to 2 + 1  -> 1 se 3 tak
+- j (Y-axis): 2 - 1 to 2 + 1  -> 1 se 3 tak
+
+Kuch Points ka Verification:
+- Point (2, 2): (2-2)^2 + (2-2)^2 = 0 <= 1^2 (True) -> Set me gaya: {"2,2"}
+- Point (1, 2): (1-2)^2 + (2-2)^2 = 1 <= 1^2 (True) -> Set me gaya: {"2,2", "1,2"}
+- Point (1, 1): (1-2)^2 + (1-2)^2 = 1 + 1 = 2 <= 1^2 (False) -> Skip hua.
+
+Aise hi check karte-karte kul 5 points match karenge: (1,2), (2,1), (2,2), (2,3), aur (3,2).
+👉 Result: Return 5
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(N * R^2) -> N yahan number of circles hai, aur har circle ke 
+  liye hum uske box me (2R + 1) * (2R + 1) baar loop chalate hain.
+- Space Complexity: O(U) -> Jahan U unique lattice points ki ginti hai jo HashSet me 
+  store hote hain.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int countLatticePoints(int[][] circles) {
+        //You can code here
+
+        HashSet<String> set = new HashSet<>();
+
+        for(int[] circle : circles){
+          int x = circle[0];
+          int y = circle[1];
+          int r = circle[2];
+
+          for(int i = x - r; i <= x + r; i++){
+            for(int j = y - r; j <= y + r; j++){
+
+              if(((i - x) * (i - x)) + ((j - y) * (j - y)) <= (r * r)){
+                set.add(i + "," + j);
+              }
+            }
+          }
+        }
+        return set.size();        
+    }
+}
