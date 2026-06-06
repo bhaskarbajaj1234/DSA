@@ -1,0 +1,138 @@
+#Approach:
+
+💡 IDEA
+- Friends circle me baithe hain.
+- Har round me k-th friend eliminate hota hai.
+- Queue circular movement ko simulate karegi.
+- First (k-1) friends ko front se nikaal kar rear me daal do.
+- Jo k-th friend front par aayega, usko remove kar do.
+
+⚙️ APPROACH
+1. Queue me 1 se n tak saare friends daal do.
+2. Jab tak ek se zyada friend bache:
+   - (k-1) times:
+     front friend ko rear me move karo.
+   - Ab front par k-th friend hai.
+   - Use remove kar do.
+3. Last remaining friend winner hoga.
+
+📝 EXAMPLE
+
+n = 5
+k = 2
+
+Initial:
+
+[1,2,3,4,5]
+
+----------------
+
+Move 1 friend
+
+2,3,4,5,1
+
+Remove front
+
+remove 2
+
+Queue:
+[3,4,5,1]
+
+----------------
+
+Move 1 friend
+
+4,5,1,3
+
+Remove front
+
+remove 4
+
+Queue:
+[5,1,3]
+
+----------------
+
+Move 1 friend
+
+1,3,5
+
+Remove front
+
+remove 1
+
+Queue:
+[3,5]
+
+----------------
+
+Move 1 friend
+
+5,3
+
+Remove front
+
+remove 5
+
+Queue:
+[3]
+
+Winner = 3
+
+❓ WHY QUEUE
+- Queue naturally circular movement simulate kar sakti hai.
+- Front se nikaal kar rear me daalne se clockwise rotation ho jata hai.
+- Elimination process exactly queue operations se match karta hai.
+
+⏱️ COMPLEXITY
+Time  : O(N × K)
+
+Reason:
+- Har elimination ke liye (k-1) rotations.
+- Total (n-1) eliminations.
+
+Space : O(N)
+
+🎯 INTERVIEW POINT
+- Circular traversal ko queue rotation se simulate karte hain.
+
+  temp = q.poll();
+  q.offer(temp);
+
+- (k-1) rotations ke baad:
+  Front = k-th friend
+
+- Front ko remove karna hi elimination hai.
+
+- Ye Josephus Problem ka simulation-based solution hai.
+
+- Mathematical Josephus solution O(N) me hota hai,
+  but queue simulation interview me sabse intuitive approach hai.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int findTheWinner(int n, int k) {
+      //You can code here
+      Queue<Integer> q = new LinkedList<>();
+
+      for(int i=1; i<=n; i++){
+        q.offer(i);
+      }
+
+      while(q.size() > 1){
+
+        for(int j=1; j<=k-1; j++){
+          int temp = q.poll();
+          q.offer(temp);
+        }
+
+        q.poll();
+      }
+      
+      return q.poll();
+
+    }
+}
