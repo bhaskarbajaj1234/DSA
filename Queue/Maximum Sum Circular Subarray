@@ -1,0 +1,219 @@
+#Approach:
+
+💡 IDEA
+- Circular array me answer 2 jagah se aa sakta hai:
+
+1. Normal Subarray
+   → Standard Kadane (maxSum)
+
+2. Circular Subarray
+   → Middle ka minimum sum part hata do.
+   → Remaining prefix + suffix milkar max circular sum bana denge.
+
+Formula:
+
+Circular Sum =
+Total Sum - Minimum Subarray Sum
+
+Final Answer =
+max(maxSum, total - minSum)
+
+⚙️ APPROACH
+1. Kadane laga kar maximum subarray sum nikalo.
+   → maxSum
+
+2. Reverse Kadane (Min Kadane) laga kar minimum subarray sum nikalo.
+   → minSum
+
+3. Total array sum calculate karo.
+   → total
+
+4. Circular answer:
+   total - minSum
+
+5. Return:
+   max(maxSum, total - minSum)
+
+6. Edge Case:
+   Agar saare elements negative hain,
+   toh circular formula 0 de dega (wrong).
+   Isliye directly maxSum return karo.
+
+📝 EXAMPLE 1
+
+nums = [5,-3,5]
+
+Normal Kadane:
+
+maxSum = 7
+[5,-3,5]
+
+----------------
+
+Total Sum:
+
+total = 7
+
+----------------
+
+Minimum Subarray:
+
+[-3]
+
+minSum = -3
+
+----------------
+
+Circular Sum:
+
+7 - (-3)
+= 10
+
+Answer:
+
+max(7,10)
+= 10
+
+Subarray:
+
+[5] + [5]
+(wrap around)
+
+------------------------------------------------
+
+📝 EXAMPLE 2
+
+nums = [1,-2,3,-2]
+
+maxSum = 3
+
+total = 0
+
+minSum = -2
+
+Circular Sum
+
+0 - (-2)
+= 2
+
+Answer
+
+max(3,2)
+= 3
+
+❓ WHY TOTAL - MINSUM WORKS
+
+Circular subarray:
+
+[5,-3,5]
+
+Instead of finding what to take,
+
+Think:
+"What should I remove?"
+
+Remove:
+[-3]
+
+Remaining:
+
+[5] + [5]
+
+Sum = 10
+
+That's exactly:
+
+Total - MinSubarray
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+- Max Kadane = O(N)
+- Min Kadane = O(N)
+- Total Sum = O(N)
+
+Space : O(1)
+
+🎯 INTERVIEW POINT
+- Circular answer = Total Sum - Minimum Subarray Sum.
+- Problem ko "maximum choose karna" nahi,
+  "minimum remove karna" socho.
+- Most important edge case:
+
+  All Negative Array
+
+Example:
+
+[-3,-2,-5]
+
+maxSum = -2
+minSum = -10
+total = -10
+
+total - minSum = 0 ❌
+
+Empty subarray ban jaayega.
+
+Isliye:
+
+if(maxSum < 0)
+    return maxSum;
+
+- Standard Kadane + Min Kadane = Complete Solution.
+
+#Code:
+
+public class Solution {
+
+    private int MaxKadane(int[] arr){
+      int sum = 0;
+      int maxi = Integer.MIN_VALUE;
+
+      for(int i=0; i<arr.length; i++){
+        sum += arr[i];
+        if(sum > maxi){
+          maxi = sum;
+        }
+        if(sum < 0){
+          sum = 0;
+        }
+      }
+      return maxi;
+    }
+
+    private int MinKadane(int[] arr){
+      int sum = 0;
+      int mini = Integer.MAX_VALUE;
+
+      for(int i=0; i<arr.length; i++){
+        sum += arr[i];
+        if(sum < mini){
+          mini = sum;
+        }
+        if(sum > 0){
+          sum = 0;
+        }
+      }
+      return mini;
+    }
+
+    public int maxSubarraySumCircular(int[] a) {
+      //You can code here
+      int maxSum = MaxKadane(a);
+      int minSum = MinKadane(a);
+
+      int total = 0;
+
+      for(int i=0; i<a.length; i++){
+        total += a[i];
+      }
+
+      //edge case
+      if(maxSum < 0){
+        return maxSum;
+      }
+
+      return Math.max(maxSum, total - minSum);
+      
+    }
+}
