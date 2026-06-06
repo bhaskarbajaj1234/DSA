@@ -1,0 +1,186 @@
+#Approach:
+
+=========================================
+PAIR WITH GIVEN SUM (UNSORTED ARRAY)
+(HashMap / Two Sum Pattern)
+=========================================
+
+🔹 Idea
+
+Har element ke liye check karo:
+
+"Isko X banane ke liye aur kitna number chahiye?"
+
+moreNeeded = X - arr[i]
+
+Agar wo number pehle se HashMap me present hai,
+to pair mil gaya.
+
+-----------------------------------------
+
+🔹 Approach
+
+1. HashMap maintain karo.
+2. Har element par:
+   
+   moreNeeded = X - arr[i]
+
+3. Check karo kya moreNeeded already map me hai.
+
+   Yes → Pair mil gaya → return true
+
+4. Nahi mila to current element map me store kar do.
+
+5. Pure array me pair na mile to return false.
+
+-----------------------------------------
+
+🔹 Example
+
+arr = [1,4,45,6,10,8]
+X = 16
+
+i=0
+
+num = 1
+need = 15
+
+map = {}
+
+15 present ?
+No
+
+Store 1
+
+map = {1}
+
+-----------------
+
+i=1
+
+num = 4
+need = 12
+
+12 present ?
+No
+
+Store 4
+
+map = {1,4}
+
+-----------------
+
+i=2
+
+num = 45
+need = -29
+
+Not present
+
+map = {1,4,45}
+
+-----------------
+
+i=3
+
+num = 6
+need = 10
+
+10 present ?
+No
+
+Store 6
+
+map = {1,4,45,6}
+
+-----------------
+
+i=4
+
+num = 10
+need = 6
+
+6 present ?
+YES
+
+Pair = (6,10)
+
+Return true
+
+-----------------------------------------
+
+🔹 Why HashMap?
+
+Need:
+Fast lookup of previously seen numbers.
+
+Without HashMap:
+For every element search another element
+→ O(N²)
+
+With HashMap:
+Lookup becomes O(1) average.
+
+-----------------------------------------
+
+🔹 Pattern to Remember
+
+For Pair Sum questions:
+
+need = target - currentElement
+
+if(need already exists)
+    answer found
+
+else
+    store currentElement
+
+-----------------------------------------
+
+🔹 Complexity
+
+Time  : O(N)
+Space : O(N)
+
+-----------------------------------------
+
+🔹 Interview Point
+
+This is the classic:
+
+"TWO SUM HASHMAP PATTERN"
+
+Whenever question says:
+
+- Pair Sum
+- Two Sum
+- Find Complement
+- Target Sum
+
+Think:
+
+need = target - currentElement
+HashMap lookup
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public boolean hasArrayTwoCandidates(int arr[], int n, int x) {
+        //You can code here
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+
+        for(int i=0; i<n; i++){
+            int moreNeeded = x - arr[i];
+
+            if(map.containsKey(moreNeeded)){
+                return true;
+            }
+            map.put(arr[i], i);
+        }
+
+        return false;
+    }
+}
