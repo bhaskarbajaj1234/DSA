@@ -1,0 +1,278 @@
+#Approach
+
+=========================================
+LARGEST SUBARRAY WITH ZERO SUM
+(Prefix Sum + HashMap)
+=========================================
+
+🔹 Idea
+
+Zero Sum Subarray wale concept ko extend karna hai.
+
+Wahan sirf existence check kar rahe the.
+
+Yahan longest length nikalni hai.
+
+Agar same Prefix Sum dobara mile,
+to beech ka subarray sum = 0.
+
+Length calculate karke maximum maintain karo.
+
+-----------------------------------------
+
+🔹 Key Observation
+
+If:
+
+PrefixSum(i) = PrefixSum(j)
+
+Then:
+
+Subarray (i+1 ... j)
+
+has sum = 0
+
+Length:
+
+j - i
+
+-----------------------------------------
+
+🔹 Important Trick
+
+HashMap me prefix sum ka
+
+FIRST occurrence
+
+store karna hai.
+
+Kyuki earliest index se hi
+maximum length milegi.
+
+Isliye:
+
+if(sum not present)
+    store it
+
+Agar already present hai,
+update nahi karna.
+
+-----------------------------------------
+
+🔹 Approach
+
+1. Running Prefix Sum maintain karo.
+2. Agar sum == 0
+
+      Length = i + 1
+
+3. Agar same sum pehle mila tha
+
+      Length = i - firstOccurrence
+
+4. Maximum length update karo.
+
+5. Agar sum first time mila
+
+      map me store karo.
+
+-----------------------------------------
+
+🔹 Example
+
+arr = [15,-2,2,-8,1,7,10,23]
+
+---------------------------------
+
+i=0
+
+sum = 15
+
+map = {15:0}
+
+---------------------------------
+
+i=1
+
+sum = 13
+
+map = {15:0,13:1}
+
+---------------------------------
+
+i=2
+
+sum = 15
+
+15 already present at index 0
+
+len = 2 - 0 = 2
+
+maxi = 2
+
+---------------------------------
+
+i=3
+
+sum = 7
+
+map = {15:0,13:1,7:3}
+
+---------------------------------
+
+i=4
+
+sum = 8
+
+map = {15:0,13:1,7:3,8:4}
+
+---------------------------------
+
+i=5
+
+sum = 15
+
+15 already present at index 0
+
+len = 5 - 0 = 5
+
+maxi = 5
+
+Subarray:
+
+[-2,2,-8,1,7]
+
+-----------------------------------------
+
+🔹 Why Same Prefix Sum Works?
+
+Suppose:
+
+PrefixSum at index 0 = 15
+
+PrefixSum at index 5 = 15
+
+Difference:
+
+15 - 15 = 0
+
+So elements between them
+must have sum = 0.
+
+-----------------------------------------
+
+🔹 Visual Formula
+
+PrefixSum(j) - PrefixSum(i)
+
+= Subarray Sum
+
+If
+
+PrefixSum(j) = PrefixSum(i)
+
+Then
+
+Subarray Sum = 0
+
+Length = j - i
+
+-----------------------------------------
+
+🔹 Why Store First Occurrence?
+
+Example:
+
+sum = 10
+
+First seen at index 1
+
+Again at index 8
+
+Length = 8 - 1 = 7
+
+If we overwrite and store latest index,
+length becomes smaller.
+
+For longest subarray,
+always keep first occurrence.
+
+-----------------------------------------
+
+🔹 Why HashMap?
+
+Need to know quickly:
+
+"Where was this prefix sum first seen?"
+
+HashMap lookup = O(1) average.
+
+-----------------------------------------
+
+🔹 Pattern to Remember
+
+sum += arr[i]
+
+if(sum == 0)
+    maxi = i+1
+
+if(sum seen before)
+    len = i - firstIndex
+
+else
+    store firstIndex
+
+-----------------------------------------
+
+🔹 Complexity
+
+Time  : O(N)
+Space : O(N)
+
+-----------------------------------------
+
+🔹 Interview Point
+
+Progression:
+
+1. Zero Sum Subarray
+   → Existence
+
+2. Largest Zero Sum Subarray
+   → Same Prefix Sum + Max Length
+
+Think:
+
+"REPEATED PREFIX SUM ⇒ ZERO SUM SUBARRAY"
+
+Store FIRST occurrence for longest length.
+
+#Code:
+
+import java.util.*;
+
+public class Solution 
+{
+    public int maxLen(int arr[], int n)
+    {
+        //You can code here
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int sum = 0;
+        int maxi = 0;
+
+        for(int i=0; i<n; i++){
+            sum += arr[i];
+            if(sum == 0){
+                maxi = Math.max(maxi, i+1);
+            }
+
+            if(map.containsKey(sum)){
+                int len = i - map.get(sum);
+                maxi = Math.max(maxi, len);
+            }else{
+                map.put(sum, i);
+            }
+        }
+        return maxi;       
+    }
+}
