@@ -1,0 +1,92 @@
+#Approach:
+
+================================================================================
+PROBLEM: Buddy Strings (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Base Conditions Check:
+   - Agar dono strings ki length alag hai, toh characters swap karke kabhi same 
+     nahi bana sakte. Turant `false` return karo.
+2. Case 1: Agar dono strings pehle se bilkul SAME hain (`s.equals(goal)`)
+   - Hame tabhi `true` mil sakta hai agar string me kam se kam ek character repeat 
+     ho raha ho (jaise "aa" me 'a'). Un do duplicate characters ko aapas me swap 
+     karke string bilkul same rahegi.
+   - Ek 26 size ka frequency array banakar check karte hain, agar kisi ka bhi 
+     count > 1 ho jaye toh `true`, nahi toh `false`.
+3. Case 2: Agar dono strings ALAG hain
+   - Dono strings ko shuru se end tak compare karo aur jahan bhi characters 
+     mismatch ho rahe hain, un indices ko ek `diff` naam ki ArrayList me daal do.
+   - Ab valid swap ke liye sirf 2 hi mismatches hone chahiye (`diff.size() == 2`).
+   - Agar exact 2 mismatches hain (let's say index `i` aur `j`), toh check karo ki 
+     `s[i] == goal[j]` aur `s[j] == goal[i]` hai ya nahi (cross-matching). Agar 
+     hai toh `true`, nahi toh `false`.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input: s = "aaaaaaabc", goal = "aaaaaaacb"
+
+Step 1: Length aur Equality check
+- Dono ki length 9 hai. Par dono strings equal nahi hain. (Case 2 chalega)
+
+Step 2: Mismatch indices dhoondna (Loop)
+- Index 0 se 6 tak sab same hain ('a').
+- Index 7 par: s.charAt(7) = 'b', goal.charAt(7) = 'c' -> Mismatch! `diff = [7]`
+- Index 8 par: s.charAt(8) = 'c', goal.charAt(8) = 'b' -> Mismatch! `diff = [7, 8]`
+
+Step 3: Swap Validation
+- `diff.size()` exact 2 hai.
+- Check cross-match:
+  -> s.charAt(7) ('b') == goal.charAt(8) ('b') -> True
+  -> s.charAt(8) ('c') == goal.charAt(7) ('c') -> True
+👉 Result: Return true
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(N) -> Ek single loop me dono strings ko scan kiya hai.
+- Space Complexity: O(N) -> Mismatch indices store karne ke liye list banayi hai.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public boolean buddyStrings(String s, String goal) {
+      //You can code here
+
+      if(s.length() != goal.length()) return false;
+
+      if(s.equals(goal)){
+        int[] freq = new int[26];
+        for(int i=0; i<s.length(); i++){
+          char ch = s.charAt(i);
+          freq[ch - 'a']++;
+          if(freq[ch - 'a'] > 1) return true;
+        }
+
+        return false;
+      }
+
+      ArrayList<Integer> diff = new ArrayList<>();
+
+      for(int i=0; i<s.length(); i++){
+        if(s.charAt(i) != goal.charAt(i)){
+          diff.add(i);
+        }
+      }
+
+      if(diff.size() == 2){
+        int i = diff.get(0);
+        int j = diff.get(1);
+
+        return (s.charAt(i) == goal.charAt(j) && s.charAt(j) == goal.charAt(i));
+      }
+
+      return false;
+        
+    }
+}
