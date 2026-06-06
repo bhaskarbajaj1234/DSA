@@ -1,0 +1,99 @@
+#Approach:
+
+================================================================================
+PROBLEM: Degree of an Array (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Kisi bhi element ka same degree (max frequency) wala shortest subarray hamesha 
+   us element ke sabse "pehle occurrence" se lekar sabse "aakhri occurrence" 
+   tak ka hissa hota hai.
+2. Isliye hume teen alag-alag HashMaps ki zaroorat padti hai:
+   - `first`: Har element ka sabse pehla index store karne ke liye.
+   - `last`: Har element ka sabse aakhri index store karne ke liye.
+   - `freq`: Har element ka kul frequency (count) rakhne ke liye.
+3. Step 1 (Loop 1): Array par traverse karke teenon maps ko bharte hain. Agar element 
+   `first` map me nahi hai, tabhi uska index daalte hain. `last` map me har baar 
+   index update karte rehte hain taaki aakhri wala save ho jaye.
+4. Step 2: `freq` map ki values se sabse badi frequency (`maxFreq`) nikalte hain.
+5. Step 3: Phir se saare elements ko check karte hain. Jis-jis element ki frequency 
+   `maxFreq` ke barabar hai, unka subarray length nikalte hain: `lastIndex - firstIndex + 1`.
+6. Jo bhi sabse chhota (`minLen`) milega, wahi hamara final answer hoga.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input Array: nums = [1, 2, 2, 3, 1]
+
+Step 1: Maps Build Karna
+- i = 0, num = 1 -> first={1:0}, last={1:0}, freq={1:1}
+- i = 1, num = 2 -> first={1:0, 2:1}, last={1:0, 2:1}, freq={1:1, 2:1}
+- i = 2, num = 2 -> first={1:0, 2:1}, last={1:0, 2:2}, freq={1:1, 2:2}
+- i = 3, num = 3 -> first={1:0, 2:1, 3:3}, last={1:0, 2:2, 3:3}, freq={1:1, 2:2, 3:1}
+- i = 4, num = 1 -> first={1:0, 2:1, 3:3}, last={1:4, 2:2, 3:3}, freq={1:2, 2:2, 3:1}
+
+Step 2: Max Frequency Nikalna
+- Frequencies hain: [2, 2, 1]. So, maxFreq = 2 (Elements '1' aur '2' dono ki hai).
+
+Step 3: Smallest Subarray Length Nikalna
+- Key = 1 (freq = 2 == maxFreq):
+  -> len = last.get(1) - first.get(1) + 1 = 4 - 0 + 1 = 5
+  -> minLen = 5
+- Key = 2 (freq = 2 == maxFreq):
+  -> len = last.get(2) - first.get(2) + 1 = 2 - 1 + 1 = 2
+  -> minLen = Math.min(5, 2) = 2
+- Key = 3 (freq = 1 != maxFreq): Skip.
+
+👉 Result: Return 2
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(N) -> Array aur maps par linear scans kiye hain.
+- Space Complexity: O(N) -> Teen maps use kiye hain max N unique elements ke liye.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int findShortestSubArray(int[] nums) {
+        //You can code here
+        int n = nums.length;
+
+        HashMap<Integer, Integer> first = new HashMap<>();
+        HashMap<Integer, Integer> last = new HashMap<>();
+        HashMap<Integer, Integer> freq = new HashMap<>();
+
+        //step-1: Getting first and last index and freq of each element
+        for(int i=0; i<n; i++){
+          if(!first.containsKey(nums[i])){
+            first.put(nums[i], i);
+          }
+
+          last.put(nums[i], i);
+
+          freq.put(nums[i], freq.getOrDefault(nums[i], 0)+1);
+        }
+
+        //Step-2: Getting highest freq
+        int maxFreq = 0;
+        for(int f : freq.values()){
+          maxFreq = Math.max(maxFreq, f);
+        }
+
+        //Step-3: checking for smallest subArray
+        int minLen = Integer.MAX_VALUE;
+
+        for(int key : freq.keySet()){
+          if(freq.get(key) == maxFreq){
+            int len = last.get(key) - first.get(key) + 1;
+            minLen = Math.min(minLen, len);
+          }
+        }
+
+        return minLen;
+    }
+}
