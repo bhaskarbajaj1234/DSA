@@ -1,0 +1,83 @@
+#Approach:
+
+================================================================================
+PROBLEM: Brick Wall (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Goal: Hame ek aisi vertical line kheenchti hai jo sabse kam bricks ko kaate (cross kare).
+2. Idea: Agar line kisi brick ke kinare (edge) se guzregi, toh wo brick nahi kategi. Iska 
+   matlab, jahan sabse zyada brick ke edges aapas me match karenge, wahan se line nikalne 
+   par sabse kam bricks katengi.
+3. Step 1 (Edges ka map banana): Hum har ek row me left se right travel karte hain aur 
+   brick ki widths ko jodkar unka prefix sum nikalte hain. Ye prefix sum hame batata hai 
+   ki left wall se us edge ki doori (position) kitni hai.
+   - IMP: Har row ki aakhri brick ko chord dete hain (`size()-1` tak loop chalate hain) 
+     kyunki poori wall ka aakhri corner check karne ki ijaazat nahi hai.
+   - Har edge position ko HashMap me daal kar uska count (frequency) badhate rehte hain.
+4. Step 2 (Max edges dhoondna): Map ke saare keys par ghumkar check karte hain ki kis 
+   position par sabse zyada edges (`maxEdges`) mile hain.
+5. Step 3 (Ans nikalna): Total rows me se `maxEdges` ko minus kar dete hain (`n - ans`). 
+   Jitni rows me edge mil gaya wahan brick nahi kategi, bachi hui rows me brick kat jayegi.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input Wall: wall = [[1, 2, 2, 1], [3, 1, 2]]
+Total Rows (n) = 2
+
+Step 1 & 2: Loop chalakar Edges ka Map banana
+- Row 0: [1, 2, 2, 1] -> (Aakhri element '1' ko skip karenge)
+  -> Edge 1: position = 1 -> Map: {1:1}
+  -> Edge 2: position = 1 + 2 = 3 -> Map: {1:1, 3:1}
+  -> Edge 3: position = 3 + 2 = 5 -> Map: {1:1, 3:1, 5:1}
+
+- Row 1: [3, 1, 2] -> (Aakhri element '2' ko skip karenge)
+  -> Edge 1: position = 3 -> Map: {1:1, 3:2, 5:1} (3 ka count 2 ho gaya)
+  -> Edge 2: position = 3 + 1 = 4 -> Map: {1:1, 3:2, 5:1, 4:1}
+
+Step 3: Answer nikalna
+- Map me sabse bada count (ans) = 2 (Position 3 par do edges mil rahe hain).
+- Final Result: n - ans = 2 - 2 = 0 (Matlab position 3 par line kheencho toh ek bhi brick nahi kategi).
+
+👉 Result: Return 0
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(N) -> Jahan N wall ke andar ki kul saari bricks ka sum hai. Hum har 
+  brick par ek hi baar traverse kar rahe hain.
+- Space Complexity: O(W) -> W yahan unique edge positions ki ginti hai jo map me store hoti hai.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int leastBricks(List<List<Integer>> wall) {
+      //You can code here
+      HashMap<Integer, Integer> map = new HashMap<>();
+
+      int ans = 0;
+      int n = wall.size();
+
+      for(int i=0; i<n; i++){
+        int sum = 0;
+        for(int j=0; j<wall.get(i).size()-1; j++){
+          sum += wall.get(i).get(j);
+          map.put(sum, map.getOrDefault(sum, 0)+1);
+        }
+      }
+
+      //getting highest index frequency in ans
+      for(int key : map.keySet()){
+        int freq = map.get(key);
+        ans = Math.max(freq, ans);
+      }
+
+      return n - ans;
+
+    }
+}
