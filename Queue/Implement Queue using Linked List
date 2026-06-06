@@ -1,0 +1,154 @@
+#Approach:
+
+💡 IDEA
+- Queue ko Linked List se implement karna hai.
+- front -> Queue ka first node (jahan se pop hoga).
+- rear -> Queue ka last node (jahan push hoga).
+- Push -> tail/rear par insert.
+- Pop -> head/front se remove.
+
+⚙️ APPROACH
+1. Push(x):
+   - New node banao.
+   - Agar queue empty hai:
+     front = rear = newNode
+   - Otherwise:
+     rear.next = newNode
+     rear = newNode
+
+2. Pop():
+   - Agar queue empty hai → return -1.
+   - Agar sirf 1 node hai:
+     value store karo.
+     front = rear = null.
+     return value.
+   - Otherwise:
+     front value store karo.
+     front = front.next.
+     return stored value.
+
+📝 EXAMPLE
+
+Operations:
+push(2)
+push(3)
+pop()
+push(4)
+pop()
+
+Initially:
+front = null
+rear = null
+
+push(2)
+
+front,rear
+    ↓
+   [2]
+
+push(3)
+
+front      rear
+ ↓          ↓
+[2] -> [3]
+
+pop()
+
+remove 2
+
+front,rear
+ ↓          ↓
+[3]
+
+push(4)
+
+front       rear
+ ↓           ↓
+[3] -> [4]
+
+pop()
+
+remove 3
+
+front,rear
+ ↓           ↓
+[4]
+
+Remaining Queue = [4]
+
+❓ WHY LINKED LIST
+- Queue me insertion rear par aur deletion front se hota hai.
+- Linked List me dono operations direct pointer update se ho jaate hain.
+- Array ki tarah shifting ki need nahi hoti.
+- Dynamic size milta hai.
+
+⏱️ COMPLEXITY
+Push  : O(1)
+Pop   : O(1)
+Space : O(N)
+
+🎯 INTERVIEW POINT
+- Queue efficiently banane ke liye front + rear dono pointers maintain karte hain.
+- Push rear par hota hai.
+- Pop front se hota hai.
+- Last node remove karte waqt:
+  front = rear = null karna bahut important hai.
+- Empty queue condition:
+  front == null
+  (rear bhi null hoga).
+
+#Code:
+
+class MyQueue {
+
+    class QueueNode
+    {
+        int data;
+        QueueNode next;
+        QueueNode(int a)
+        {
+            data = a;
+            next = null;
+        }
+    }
+
+    QueueNode front;
+    QueueNode rear;
+
+    void push(int a) {
+        //You can code here
+        //pushing means inserting at the end of the LL
+
+        QueueNode newNode = new QueueNode(a);
+        if(front == null){
+          front = newNode;
+          rear = newNode;
+          return;
+        }
+
+        rear.next = newNode;
+        rear = rear.next;
+        
+    }
+
+    int pop() {
+        //You can code here
+
+        if(front == null && rear == null){
+          return -1;
+        }
+
+        //Check if it is the last node
+        if(front == rear){
+          int temp = front.data;
+          front = null;
+          rear = null;
+          return temp;
+        }
+
+        int x = front.data;
+        front = front.next;
+        return x;
+
+    }
+}
