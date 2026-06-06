@@ -1,0 +1,89 @@
+#Approach:
+
+================================================================================
+PROBLEM: Ransom Note (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Base Condition Check:
+   - Agar `ransomNote` ki length `magazine` se badi hai, toh magazine ke letters 
+     se note banna bilkul namkin hai. Turant `false` return kar do.
+2. Step 1 (Loop 1): 
+   - `ransomNote` ke saare characters ko unki frequency (count) ke sath ek 
+     HashMap me bhar lo. Isse hame pata chal jayega ki kaunsa letter kitni baar chahiye.
+3. Step 2 (Loop 2):
+   - `magazine` ke characters par ek-ek karke ghumo. Agar magazine ka koi character 
+     hamare map me maujood hai, toh map me uska count ek se kam (`-1`) kar do. 
+     Iska matlab humne wo letter magazine se lekar use kar liya.
+4. Step 3 (Validation Loop):
+   - Aakhri me map ki saari values ko check karo. Agar kisi bhi character ka count 
+     abhi bhi `> 0` hai, iska matlab magazine me us letter ki kami thi. Toh `false` 
+     return kar do. Agar saare counts 0 ya usse kam hain, toh `true` return karo.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input: ransomNote = "aa", magazine = "ab"
+
+Step 1: Length check aur Map Build Karna (ransomNote se)
+- ransomNote.length() (2) > magazine.length() (2) -> False (Condition skip hui)
+- 'a' aaya -> map = {a: 1}
+- 'a' phir se aaya -> map = {a: 2}
+Final Map: {a: 2}
+
+Step 2: Magazine ke characters se map update karna
+- i = 0, ch = 'a': Map me 'a' hai. Count kam kiya -> map = {a: 1}
+- i = 1, ch = 'b': Map me 'b' nahi hai. Kuch nahi badla.
+Final Map after loop: {a: 1}
+
+Step 3: Map values validation
+- Map me 'a' ki value `1` hai (jo ki > 0 hai). Iska matlab ek 'a' kam pad gaya!
+👉 Result: Return false
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(M + N) -> Jahan M ransomNote ki length hai aur N magazine ki. 
+  Dono strings ko ek-ek baar scan kiya.
+- Space Complexity: O(1) -> Map me max 26 unique lowercase characters hi store honge, 
+  jo ki constant space hai.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public boolean canConstruct(String ransomNote, String magazine) {
+      //You can code here
+      if(ransomNote.length() > magazine.length()) return false;
+
+      HashMap<Character, Integer> map = new HashMap<>();
+
+      //ism bharenge ransomNote ke characters + unki freq
+      for(int i=0; i<ransomNote.length(); i++){
+        char ch = ransomNote.charAt(i);
+
+        map.put(ch, map.getOrDefault(ch, 0)+1);
+      }
+
+      for(int i=0; i<magazine.length(); i++){
+        char ch = magazine.charAt(i);
+
+        if(map.containsKey(ch)){
+          map.put(ch, map.get(ch)-1);
+        }
+        
+      }
+
+      for(int val : map.values()){
+        if(val > 0){
+          return false;
+        }
+      }
+
+      return true;
+
+    }
+}
