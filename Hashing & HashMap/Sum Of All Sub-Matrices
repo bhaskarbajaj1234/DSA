@@ -1,0 +1,102 @@
+#Approach:
+
+================================================================================
+PROBLEM: Sum Of All Sub-Matrices (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Goal: 2D Matrix ke andar aise kitne submatrices hain jinka sum exact `target` 
+   ke barabar hai?
+2. 2D Problem ko 1D me Convert Karna: Hum pure 2D matrix par brute force lagane 
+   ke bajaye, columns ke har possible pair `(i, j)` ko fix kar lete hain. Iske baad 
+   ye problem "Subarray Sum Equals K" jaisi ban jaati hai jise HashMap se solve 
+   kiya ja sakta hai.
+3. Step 1 (Row-wise Prefix Sum): Sabse pehle matrix ki har row ke andar left-to-right 
+   prefix sum nikal lete hain (`M[i][j] += M[i][j-1]`). Isse hum kisi bhi row me 
+   col `i` se col `j` tak ke elements ka sum O(1) me nikal sakte hain.
+4. Step 2 (Column Pairs aur Map Logic):
+   - Do nested loops chalakar column pairs `(i, j)` fix karte hain.
+   - Har pair ke liye ek `sum = 0` aur naya HashMap lete hain. Map me shuru me 
+     `map.put(0, 1)` daalte hain.
+   - Phir teesra loop `k` chalate hain top row se bottom row tak.
+   - `sum` me row `k` ke column `i` se `j` tak ke hisse ka sum jodte hain: 
+     `M[k][j] - M[k][i-1]`.
+   - Ab hum map me `sum - target` dhoondte hain. Agar wo pehle aaya hai, toh uski 
+     frequency ko `ans` me jod dete hain.
+   - Current `sum` ko map me update/insert kar dete hain.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input: Matrix = [[1, 2, 3], [3, 2, 1]], Target (T) = 6
+Rows = 2, Cols = 3
+
+Step 1: Row-wise Prefix Sum ke baad Matrix:
+Row 0: [1, 1+2, 3+3] -> [1, 3, 6]
+Row 1: [3, 3+2, 5+1] -> [3, 5, 6]
+
+Step 2: Column Pairs Iteration (Kuch important pairs):
+- Let's check Column pair i = 0, j = 2 (Poori width):
+  -> Map clear aur initialization: {0:1}, sum = 0
+  -> Row k = 0: 
+     * Row sum (col 0 to 2) = M[0][2] - 0 = 6
+     * New sum = 0 + 6 = 6
+     * Check map for (sum - T) -> 6 - 6 = 0. Map me '0' ka count 1 hai! -> ans = 1
+     * Map me '6' daala -> Map: {0:1, 6:1}
+  -> Row k = 1: 
+     * Row sum (col 0 to 2) = M[1][2] - 0 = 6
+     * New sum = 6 + 6 = 12
+     * Check map for (sum - T) -> 12 - 6 = 6. Map me '6' ka count 1 hai! -> ans = 1 + 1 = 2
+     * Map me '12' daala -> Map: {0:1, 6:1, 12:1}
+
+Aise hi baaki column pairs check karne par aur koi match nahi milega.
+👉 Result: Return 2
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(M * M * N) -> Do loops columns ke liye (M) aur ek loop rows 
+  ke liye (N).
+- Space Complexity: O(N) -> Har column pair ke liye maximum N rows ke sums HashMap 
+  me store ho sakte hain.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int sumEqualTarget(int[][] M, int T) {
+        //You can code here
+
+        //Preprocessing like prefix sum
+        int rows = M.length;
+        int cols = M[0].length;
+        for(int i=0; i<rows; i++){
+          for(int j=1; j<cols; j++){
+            M[i][j] += M[i][j-1];
+          }
+        }
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int ans = 0;
+
+        for(int i=0; i<cols; i++){
+          for(int j=i; j<cols; j++){
+            //yha humne colums ke pairs bnae hai
+            int sum = 0;
+            map.clear();
+            map.put(0,1);
+
+            for(int k=0; k<rows; k++){
+              sum += (M[k][j] - (i > 0 ? M[k][i-1] : 0));
+              int freq = map.getOrDefault(sum - T, 0);
+              ans += freq;
+              map.put(sum, map.getOrDefault(sum, 0)+1);
+            }
+          }
+        }
+        return ans;
+    }
+}
