@@ -1,0 +1,194 @@
+#Approach:
+
+💡 IDEA
+- Queue ko actually maintain karne ki zaroorat nahi hai.
+- Sirf left aur right boundary track karo.
+
+Initially:
+
+[1,2,3,4,5,...,N]
+
+Left person = i
+Right person = j
+
+- Kabhi first K log tickets lete hain.
+- Kabhi last K log tickets lete hain.
+- Ticket milne ke baad log queue se remove ho jaate hain.
+
+- Isliye bas pointers shrink karte raho.
+
+⚙️ APPROACH
+1. i = 1 (front)
+   j = N (back)
+
+2. flag maintain karo:
+   true  → front se remove
+   false → back se remove
+
+3. K log remove karo.
+
+4. K removals complete hone ke baad:
+   - Direction change karo.
+   - Counter reset karo.
+
+5. Jab i == j:
+   - Sirf ek person bacha hai.
+   - Wahi answer hai.
+
+📝 EXAMPLE
+
+N = 9
+K = 3
+
+Initial:
+
+[1,2,3,4,5,6,7,8,9]
+
+i = 1
+j = 9
+
+--------------------------------
+
+Front se 3 remove
+
+1 removed
+2 removed
+3 removed
+
+i = 4
+
+Remaining:
+
+[4,5,6,7,8,9]
+
+--------------------------------
+
+Back se 3 remove
+
+9 removed
+8 removed
+7 removed
+
+j = 6
+
+Remaining:
+
+[4,5,6]
+
+--------------------------------
+
+Front se 3 remove
+
+4 removed
+5 removed
+
+Now:
+
+i = j = 6
+
+Answer = 6
+
+✅
+
+------------------------------------------------
+
+N = 5
+K = 1
+
+[1,2,3,4,5]
+
+Remove 1
+
+[2,3,4,5]
+
+Remove 5
+
+[2,3,4]
+
+Remove 2
+
+[3,4]
+
+Remove 4
+
+[3]
+
+Answer = 3
+
+✅
+
+❓ WHY TWO POINTERS
+- Actual queue operations unnecessary hain.
+- Log sirf front ya back se remove ho rahe hain.
+- Beech ke logon ki relative position matter nahi karti.
+
+Isliye:
+
+Front removal → i++
+Back removal  → j--
+
+Bas boundaries maintain karna enough hai.
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+Reason:
+- Har person exactly ek baar remove hota hai.
+
+Space : O(1)
+
+🎯 INTERVIEW POINT
+- Queue tag misleading hai.
+- Queue banane ki zaroorat hi nahi.
+
+- Key observation:
+
+  Sirf dono ends se removals ho rahe hain.
+
+- Therefore:
+
+  Queue Simulation → O(N) space
+
+  Two Pointers → O(1) space
+
+- Most important variables:
+
+  i    → current front person
+  j    → current back person
+  flag → kis side se ticket distribute ho raha hai
+
+- This is actually a Two Pointer Simulation problem disguised as a Queue problem.
+
+#Code:
+
+public class Solution {
+    public static int distributeTicket(int N,int K) {
+        //You can code here
+
+        int i = 1;
+        int j = N;
+        boolean flag = true;
+        int cnt = K;
+        while(i <= j){
+          
+          if(i == j){
+            return i;
+          }
+
+          if(flag){
+            i++;
+            cnt--;
+          }
+          else{
+            j--;
+            cnt--;
+          }
+
+          if(cnt == 0){
+            cnt = K;
+            flag = (!flag);
+          }
+        }
+        return 1;        
+    }
+}
