@@ -1,0 +1,160 @@
+#Approach:
+
+💡 IDEA
+- Substring me koi character repeat nahi hona chahiye.
+- Sliding Window [l...r] maintain karenge.
+- Hash array me har character ka latest index store karenge.
+- Repeat milte hi left pointer ko jump karwa denge.
+
+⚙️ APPROACH
+1. hash[] ko -1 se initialize karo.
+   - hash[ch] = last seen index.
+
+2. r pointer se string traverse karo.
+
+3. Agar current character pehle dekha gaya hai:
+   - Aur uska index current window ke andar hai:
+     l = lastIndex + 1
+
+4. Current window length:
+   r - l + 1
+
+5. maxLen update karo.
+
+6. Current character ka latest index update karo.
+
+📝 EXAMPLE
+
+s = "abcabcbb"
+
+Initially:
+
+l = 0
+r = 0
+
+----------------
+
+r = 0 ('a')
+
+Window = "a"
+
+Length = 1
+
+maxLen = 1
+
+hash[a] = 0
+
+----------------
+
+r = 1 ('b')
+
+Window = "ab"
+
+Length = 2
+
+maxLen = 2
+
+hash[b] = 1
+
+----------------
+
+r = 2 ('c')
+
+Window = "abc"
+
+Length = 3
+
+maxLen = 3
+
+hash[c] = 2
+
+----------------
+
+r = 3 ('a')
+
+'a' already seen at index 0
+
+0 >= l (0)
+
+Move:
+l = 0 + 1 = 1
+
+Window becomes:
+"bca"
+
+Length = 3
+
+maxLen = 3
+
+----------------
+
+Continue similarly...
+
+Final Answer = 3
+
+❓ WHY HASH ARRAY
+- O(1) me latest occurrence mil jata hai.
+- Repeat character milte hi direct jump kar sakte hain.
+- Window ko ek-ek step shrink nahi karna padta.
+
+⏱️ COMPLEXITY
+Time  : O(N)
+
+Reason:
+- r sirf forward move karta hai.
+- l bhi sirf forward move karta hai.
+
+Space : O(256)
+       ≈ O(1)
+
+🎯 INTERVIEW POINT
+- Sabse important line:
+
+  if(lastIndex >= l)
+
+- Kyuki repeat character current window ke andar hona chahiye.
+
+Example:
+
+"abba"
+
+At second 'a':
+lastIndex = 0
+
+But l already 2 hai.
+
+Toh l ko peeche nahi le ja sakte.
+
+- Hash stores latest index, not frequency.
+- This is the optimized Sliding Window approach.
+- Better than Set-based approach because l directly jump karta hai instead of moving one-by-one.
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int lengthOfLongestSubstring(String s) {
+      //You can code here
+      
+      int hash[] = new int[256];
+      Arrays.fill(hash, -1);
+
+      int l = 0;
+      int r = 0;
+      int maxLen = 0;
+      int n = s.length();
+
+      while(r < n){
+        if(hash[s.charAt(r)] != -1){
+          if(hash[s.charAt(r)] >= l){
+            l = hash[s.charAt(r)] + 1;
+          }
+        }
+        maxLen = Math.max(maxLen, r-l+1);
+        hash[s.charAt(r)] = r;
+        r++;
+      }
+      return maxLen;
+    }
+}
