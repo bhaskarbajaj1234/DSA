@@ -1,0 +1,211 @@
+#Approach:
+
+=========================================
+ZERO SUM SUBARRAY
+(Prefix Sum + HashMap)
+=========================================
+
+🔹 Idea
+
+Prefix Sum use karo.
+
+Agar same prefix sum dobara mil jaye,
+to beech ka subarray ka sum = 0 hoga.
+
+Reason:
+
+PrefixSum(j) - PrefixSum(i) = 0
+
+⇒ PrefixSum(j) = PrefixSum(i)
+
+-----------------------------------------
+
+🔹 Key Observation
+
+Zero Sum Subarray exist karta hai if:
+
+1. Prefix Sum = 0
+   (Starting se current index tak sum 0)
+
+OR
+
+2. Same Prefix Sum repeat ho jaye
+   (Beech ka portion 0 ban jayega)
+
+-----------------------------------------
+
+🔹 Approach
+
+1. Running Prefix Sum maintain karo.
+2. Har index par sum update karo.
+3. Agar sum == 0
+      return true
+4. Agar same sum pehle bhi aa chuka hai
+      return true
+5. Warna sum HashMap me store kar do.
+6. End tak kuch na mile
+      return false
+
+-----------------------------------------
+
+🔹 Example
+
+arr = [4, 2, -3, 1, 6]
+
+sum = 0
+map = {}
+
+-----------------
+
+4
+
+sum = 4
+
+map = {4}
+
+-----------------
+
+2
+
+sum = 6
+
+map = {4,6}
+
+-----------------
+
+-3
+
+sum = 3
+
+map = {4,6,3}
+
+-----------------
+
+1
+
+sum = 4
+
+4 already present ?
+
+YES
+
+Return true
+
+-----------------------------------------
+
+🔹 Why Repeated Prefix Sum Works?
+
+Index 0 → sum = 4
+
+Index 3 → sum = 4
+
+Same prefix sum again.
+
+Means:
+
+(4 + 2 - 3 + 1)
+-
+(4)
+
+= 0
+
+Subarray:
+
+[2, -3, 1]
+
+-----------------------------------------
+
+🔹 Visual Formula
+
+PrefixSum(j) - PrefixSum(i) = SubarraySum
+
+If
+
+PrefixSum(j) = PrefixSum(i)
+
+Then
+
+SubarraySum = 0
+
+-----------------------------------------
+
+🔹 Why HashMap?
+
+Need to quickly know:
+
+"Have I seen this prefix sum before?"
+
+HashMap lookup = O(1) average.
+
+-----------------------------------------
+
+🔹 Pattern to Remember
+
+Prefix Sum Questions:
+
+sum += arr[i]
+
+if(sum == target)
+    answer found
+
+if(prefixSum already seen)
+    answer found
+
+Store current prefix sum
+
+-----------------------------------------
+
+🔹 Complexity
+
+Time  : O(N)
+Space : O(N)
+
+-----------------------------------------
+
+🔹 Interview Point
+
+Whenever question says:
+
+- Zero Sum Subarray
+- Subarray Sum = K
+- Longest Subarray Sum K
+- Count Subarray Sum K
+
+Think:
+
+"PREFIX SUM + HASHMAP"
+
+#Code:
+
+import java.util.*;
+
+public class Solution
+{
+    public static boolean findsum(int arr[], int n)
+    {
+        //You can code here
+
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int sum = 0;
+
+        for(int i=0; i<n; i++){
+            sum += arr[i];
+
+            if(sum == 0){
+                return true;
+            }
+
+            if(map.containsKey(sum)){
+                return true;
+            }
+            else{
+                map.put(sum, i);
+            }
+        }
+
+        return false;
+
+
+
+    }
+}
