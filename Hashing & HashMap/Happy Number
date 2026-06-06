@@ -1,0 +1,90 @@
+#Approach:
+
+================================================================================
+PROBLEM: Happy Number (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Kisi bhi number ke digits ke squares ka sum baar-baar nikalte jana hai.
+2. Agar ye process karte-karte number '1' ban jata hai, to wo Happy Number hai 
+   (Return true).
+3. Agar number '1' nahi banta, to wo ek endless loop (cycle) me phas jayega. 
+   Is cycle ko pakadne ke liye hum HashSet ka use karte hain.
+4. Loop ke andar check karo:
+   - Agar current number pehle se HashSet me hai, iska matlab loop start ho gaya hai 
+     aur ye kabhi '1' nahi banega. Turant return false kar do.
+   - Agar nahi hai, to use set me add karo aur number ko uske "sum of squares" 
+     se replace kar do.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input Number: n = 19
+HashSet: {} (Initial)
+
+- Iteration 1: n = 19 (Not 1, Not in Set)
+  -> Set me dala: {19}
+  -> Sum of Squares: 1^2 + 9^2 = 1 + 81 = 82
+  -> New n = 82
+
+- Iteration 2: n = 82 (Not 1, Not in Set)
+  -> Set me dala: {19, 82}
+  -> Sum of Squares: 8^2 + 2^2 = 64 + 4 = 68
+  -> New n = 68
+
+- Iteration 3: n = 68 (Not 1, Not in Set)
+  -> Set me dala: {19, 82, 68}
+  -> Sum of Squares: 6^2 + 8^2 = 36 + 64 = 100
+  -> New n = 100
+
+- Iteration 4: n = 100 (Not 1, Not in Set)
+  -> Set me dala: {19, 82, 68, 100}
+  -> Sum of Squares: 1^2 + 0^2 + 0^2 = 1
+  -> New n = 1
+
+- Loop Ends! Kyuki n == 1 ho gaya hai.
+👉 Result: Return true
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(log N) -> Digits ke square ka sum bohot tezi se chhota hota hai.
+- Space Complexity: O(log N) -> Unique sums ko store karne ke liye HashSet ka space.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+
+    private int sumOfSquares(int n){
+        int temp = n;
+        int ans = 0;
+        while(temp > 0){
+            ans += Math.pow(temp % 10, 2);
+            temp /= 10;
+        }
+        return ans;
+    }
+
+    public boolean isHappy(int n) {
+        //You can code here
+
+        HashSet<Integer> set = new HashSet<>();
+
+        while(n != 1){
+            if(set.contains(n)){
+                return false;
+            }
+            set.add(n);
+            n = sumOfSquares(n);
+        }
+
+        if(n == 1){
+            return true;
+        }
+        return true;
+    }
+}
