@@ -1,0 +1,251 @@
+#Approach:
+
+💡 IDEA
+- Celebrity ke 2 properties:
+
+1. Celebrity kisi ko nahi jaanta.
+2. Sab log celebrity ko jaante hain.
+
+- Brute Force:
+  Har person ke row aur column check karo.
+  → O(N²)
+
+- Better Idea:
+
+  Ek comparison me ek person ko eliminate kar sakte hain.
+
+⚙️ ELIMINATION LOGIC
+
+Suppose:
+
+top knows bottom
+
+M[top][bottom] = 1
+
+=> top celebrity nahi ho sakta.
+=> top ko eliminate karo.
+
+--------------------------------
+
+M[top][bottom] = 0
+
+=> bottom celebrity nahi ho sakta.
+=> bottom ko eliminate karo.
+
+Why?
+
+Celebrity ko sab jaante hain.
+
+Agar top bottom ko nahi jaanta,
+toh bottom celebrity nahi ho sakta.
+
+--------------------------------
+
+Har comparison me ek person eliminate ho raha hai.
+
+Eventually sirf 1 candidate bachega.
+
+⚙️ APPROACH
+
+Phase 1: Find Candidate
+
+top = 0
+bottom = n-1
+
+while(top < bottom)
+
+    if(top knows bottom)
+        top++
+
+    else
+        bottom--
+
+After loop:
+
+top == bottom
+
+Ye celebrity candidate hai.
+
+--------------------------------
+
+Phase 2: Verify Candidate
+
+Candidate = top
+
+Check for every person i:
+
+1. Candidate kisi ko na jaanta ho
+
+   M[top][i] == 0
+
+2. Sab candidate ko jaante ho
+
+   M[i][top] == 1
+
+Agar koi condition fail:
+
+return -1
+
+Else:
+
+return top
+
+📝 EXAMPLE
+
+M =
+
+    0 1 1 0
+    0 0 0 0
+    1 1 0 0
+    0 1 1 0
+
+Persons:
+
+0 1 2 3
+
+--------------------------------
+
+top = 0
+bottom = 3
+
+M[0][3] = 0
+
+=> 3 eliminate
+
+bottom = 2
+
+--------------------------------
+
+top = 0
+bottom = 2
+
+M[0][2] = 1
+
+=> 0 eliminate
+
+top = 1
+
+--------------------------------
+
+top = 1
+bottom = 2
+
+M[1][2] = 0
+
+=> 2 eliminate
+
+bottom = 1
+
+--------------------------------
+
+Candidate = 1
+
+Verification:
+
+Row 1:
+
+0 0 0 0
+
+Knows nobody ✅
+
+Column 1:
+
+1
+0
+1
+1
+
+Everyone knows 1 ✅
+
+Answer = 1
+
+❓ WHY ELIMINATION WORKS
+
+Comparison between A and B:
+
+Case 1:
+
+A knows B
+
+=> A cannot be celebrity
+
+--------------------------------
+
+Case 2:
+
+A does not know B
+
+=> B cannot be celebrity
+
+So one comparison always removes one candidate.
+
+⏱️ COMPLEXITY
+
+Phase 1:
+O(N)
+
+Phase 2:
+O(N)
+
+Total:
+O(N)
+
+Space:
+O(1)
+
+🎯 INTERVIEW POINT
+
+- Most important observation:
+
+  One comparison eliminates one person.
+
+- Similar to Stack solution internally,
+  but Two Pointer version gives:
+
+  O(N) Time
+  O(1) Space
+
+- Verification step is mandatory.
+
+  Candidate milna ≠ Celebrity milna
+
+- Final Celebrity Conditions:
+
+  Row → all 0s
+
+  Column → all 1s
+           except self
+
+- Classic Interview Line:
+
+  "Use elimination to find a potential celebrity,
+   then verify the candidate."
+
+#Code:
+
+class Solution {
+    public int celebrity(int[][] M) {
+
+        int top = 0;
+        int bottom = M.length - 1;
+
+        while(top < bottom){
+            if(M[top][bottom] == 1){
+                top++;
+            }
+            else{
+                bottom--;
+            }
+        }
+        for(int i=0; i<=M.length - 1; i++){
+            if(i == top){
+                continue;
+            }
+            if(M[top][i] == 1 || M[i][top] == 0){
+                return -1;
+            }
+
+        }
+        return top;
+    }
+}
