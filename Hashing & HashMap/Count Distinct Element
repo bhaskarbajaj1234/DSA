@@ -1,0 +1,112 @@
+#Approach:
+
+=========================================
+COUNT DISTINCT ELEMENTS
+(HashSet)
+=========================================
+
+🔹 Idea
+
+Distinct elements count karne hain.
+
+HashSet duplicate values store nahi karta,
+sirf unique values rakhta hai.
+
+Bas saare elements HashSet me daalo aur
+size return kar do.
+
+-----------------------------------------
+
+🔹 Approach
+
+1. HashSet create karo.
+2. Array traverse karo.
+3. Har element HashSet me add karo.
+4. Duplicate elements automatically ignore ho jayenge.
+5. HashSet size = distinct elements count.
+
+-----------------------------------------
+
+🔹 Example
+
+arr = [10, 20, 20, 10, 30, 10]
+
+Initially:
+set = {}
+
+10 add
+set = {10}
+
+20 add
+set = {10,20}
+
+20 add
+Already present
+set = {10,20}
+
+10 add
+Already present
+set = {10,20}
+
+30 add
+set = {10,20,30}
+
+10 add
+Already present
+
+Final:
+set = {10,20,30}
+
+Answer = 3
+
+-----------------------------------------
+
+🔹 Why HashSet?
+
+Need:
+- Unique elements only
+- Fast insertion
+- Automatic duplicate removal
+
+HashSet provides all in O(1) average.
+
+-----------------------------------------
+
+🔹 Complexity
+
+Time  : O(N)
+Space : O(N)
+
+-----------------------------------------
+
+🔹 Interview Point
+
+Whenever question asks:
+
+- Count Distinct Elements
+- Remove Duplicates
+- Check Uniqueness
+
+Think:
+
+"HASHSET USE KARO"
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+ 
+    public static int distinct(int[] arr, int len)
+    {
+        //You can code here
+
+        Set<Integer> s = new HashSet<>();
+
+        for(int i=0; i<len; i++){
+            s.add(arr[i]);
+        }
+
+        return s.size();
+    }
+}
