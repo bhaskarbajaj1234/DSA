@@ -1,0 +1,60 @@
+#Approach:
+
+================================================================================
+PROBLEM: Find The Missing Number from the Series (Hinglish Notes)
+================================================================================
+
+### 💡 Core Logic (Approach)
+1. Hame array me `0` se lekar `n` tak ke numbers milne chahiye, par ek number missing hai.
+2. Sabse pehle array ke saare elements ko HashMap me daal do taaki unka record mil jaye.
+3. Ab ek loop chalao `0` se lekar `n` tak (yaani `i = 0` se `i <= n`).
+4. Har ek number ko map me check karo:
+   - Jo bhi number `i` map me nahi milega (`!map.containsKey(i)`), wahi hamara missing number hai.
+   - Us number ko turant return kar do.
+
+---
+
+### 🔍 Dry Run / Testcase
+Input Array: nums = [3, 0, 1]  
+Array Size (n) = 3 (Numbers 0 se 3 ke beech hone chahiye)
+
+Step 1: Map Build Karna (Loop 1)
+- Map me saare elements daal diye.
+- Final Map: {3:1, 0:1, 1:1}
+
+Step 2: Missing Number Dhoondna (Loop 2 - 0 se lekar 3 tak)
+- i = 0: Kya map me '0' hai? Haan hai. (Skip)
+- i = 1: Kya map me '1' hai? Haan hai. (Skip)
+- i = 2: Kya map me '2' hai? Nahi hai! Match mil gaya!
+👉 Result: Return 2
+
+---
+
+### ⏱️ Complexity
+- Time Complexity: O(N) -> Ek baar array scan kiya aur ek baar 0 se n tak loop chalaya.
+- Space Complexity: O(N) -> Array ke n elements ko HashMap me store karne ke liye space laga.
+================================================================================
+
+
+#Code:
+
+import java.util.*;
+
+public class Solution {
+    public int missingNumber(int[] nums) {
+        //You can code here
+        int n = nums.length;
+        HashMap<Integer, Integer> map = new HashMap<>();
+        
+        for(int i=0; i<n; i++){
+            map.put(nums[i], map.getOrDefault(nums[i], 0)+1);
+        }
+
+        for(int i=0; i<=n; i++){
+            if(!map.containsKey(i)){
+                return i;
+            }
+        }
+        return 1;
+    }
+}
