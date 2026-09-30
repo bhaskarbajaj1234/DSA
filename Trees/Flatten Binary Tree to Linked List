@@ -1,0 +1,149 @@
+# 114. Flatten Binary Tree to Linked List
+
+## APPROACH: FLATTEN BINARY TREE (REVERSE PREORDER DFS / RIGHT-LEFT-ROOT)
+
+Idea:
+Binary tree ko ek single right-skewed linked list me flatten karna hai jiska order Preorder (`Root -> Left -> Right`) jaisa hona chahiye.
+Left pointers hamesha `null` hone chahiye aur Right pointers next node ko point karenge.
+Problem with standard Preorder:
+Agar `Root -> Left -> Right` chalte hain aur root ke right pointer ko modify karte hain, toh original right subtree ka reference lose ho jata hai.
+Solution (Reverse Preorder Trick):
+Tree ko reverse order me traverse karo: `Right -> Left -> Root`.
+Is tarah jo node linked list ke end me aani chahiye wo pehle process hogi. Ek global `prev` pointer maintain karo aur har step par:
+`root.right = prev`, `root.left = null`, `prev = root`.
+
+--------------------------------------------------
+
+APPROACH (Recursive / Reverse Preorder DFS)
+
+1. Global Tracker:
+   Ek pointer `TreeNode prev = null;` rakho jo recently flattened node ko track karega.
+
+2. Base Case:
+   Agar `root == null` ho jaye, seedha return kar jao:
+   `if (root == null) return;`
+
+3. Reverse Preorder Exploration:
+   - Pehle Right subtree ko flatten karo: `flatten(root.right);`
+   - Fir Left subtree ko flatten karo: `flatten(root.left);`
+
+4. Pointer Rewiring:
+   - Current node ke right ko previously processed node se connect karo:
+     `root.right = prev;`
+   - Left pointer ko explicitly `null` set karo:
+     `root.left = null;`
+   - Current node ko next nodes ke liye `prev` bana do:
+     `prev = root;`
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        1
+       / \
+      2   5
+     / \   \
+    3   4   6
+
+Preorder Order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+Reverse Preorder Process (Right -> Left -> Root):
+
+Dry Run:
+- Step 1: Node 6
+  - 6.right = null, 6.left = null, prev = 6
+- Step 2: Node 5
+  - 5.right = 6, 5.left = null, prev = 5
+- Step 3: Node 4
+  - 4.right = 5, 4.left = null, prev = 4
+- Step 4: Node 3
+  - 3.right = 4, 3.left = null, prev = 3
+- Step 5: Node 2
+  - 2.right = 3, 2.left = null, prev = 2
+- Step 6: Node 1 (Root)
+  - 1.right = 2, 1.left = null, prev = 1
+
+Result Structure:
+1 -> 2 -> 3 -> 4 -> 5 -> 6 (all via right pointers, left is null)
+
+--------------------------------------------------
+
+WHY REVERSE PREORDER (RIGHT -> LEFT -> ROOT)?
+
+- Preorder me connection aage ki taraf banta hai (1 points to 2, 2 points to 3).
+- Reverse Preorder me hum peeche se aage aate hain (6, fir 5 -> 6, fir 4 -> 5 -> 6...).
+- Peeche se aane ka sabse bada fayda yeh hai ki kisi bhi node ke child pointers ko overwrite karte waqt unvisited nodes ka address lose nahi hota.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node exactly ek baar visit aur rewire hoti hai.
+
+Space:
+O(H) -> Recursive call stack tree ki height ke barabar memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Interviewer follow-up: *"Can you do it in O(1) auxiliary space without recursion or stack?"*
+  - **Morris Traversal Approach:**
+    - Jab tak `curr != null`:
+      - Agar `curr.left != null`:
+        - `curr.left` ka rightmost predecessor dhoondho (`prev = curr.left; while(prev.right != null) prev = prev.right;`).
+        - `prev.right = curr.right;` (Right subtree ko predecessor ke aage jod do).
+        - `curr.right = curr.left;` (Left subtree ko right bana do).
+        - `curr.left = null;`
+      - `curr = curr.right;`
+    - Space: Strictly $O(1)$.
+- Classic mistake: `root.left = null` karna bhool jana. Question explicitly bolta hai left child null hona compulsory hai.
+
+--------------------------------------------------
+
+# CODE:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    // Tracks previously processed node in Reverse Preorder
+    TreeNode prev = null;
+
+    public void flatten(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        // 1. Traverse Right Subtree first
+        flatten(root.right);
+
+        // 2. Traverse Left Subtree second
+        flatten(root.left);
+
+        // 3. Rewire pointers: connect to prev and nullify left
+        root.right = prev;
+        root.left = null;
+
+        // 4. Update prev to current node
+        prev = root;
+    }
+}
