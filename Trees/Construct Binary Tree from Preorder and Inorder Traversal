@@ -1,0 +1,180 @@
+# 105. Construct Binary Tree from Preorder and Inorder Traversal
+
+## APPROACH: CONSTRUCT TREE FROM PREORDER & INORDER (DIVIDE & CONQUER + HASHMAP)
+
+Idea:
+1. **Preorder (`Root -> Left -> Right`):** Preorder ka pehla element hamesha current subtree ka **Root** hota hai.
+2. **Inorder (`Left -> Root -> Right`):** Root element ke left side wale saare elements **Left Subtree** banate hain, aur right side wale saare elements **Right Subtree** banate hain.
+3. Inorder me root ka index dhoondhne ke liye repeated linear search avoid karne ke liye ek `HashMap` me `(element -> index)` pre-store kar lete hain ($O(1)$ lookup).
+4. Inorder me root ke index (`inRoot`) se pata chal jata hai ki left subtree me kitne nodes hain (`numsLeft = inRoot - inStart`).
+5. Is count ki madad se preorder aur inorder dono ke index ranges ko recursively left aur right subtrees me divide kar dete hain.
+
+--------------------------------------------------
+
+APPROACH (Recursive Divide & Conquer)
+
+1. Step 1: Pre-hashing:
+   `Map<Integer, Integer> inOrderMap` banao aur `inorder` array ke har value ka index store kar lo:
+   `inOrderMap.put(inorder[i], i)`.
+
+2. Step 2: Helper Function with Boundaries:
+   `helper(preorder, preStart, preEnd, inorder, inStart, inEnd, inOrderMap)`
+   - **Base Case:**
+     Agar pointers cross kar jayein (`preStart > preEnd || inStart > inEnd`), toh valid node nahi hai -> `return null;`.
+
+3. Step 3: Root Node Creation:
+   - Preorder ka pehla element root banega:
+     `TreeNode root = new TreeNode(preorder[preStart]);`
+
+4. Step 4: Index Split Calculation:
+   - Inorder map se root ka index nikalo:
+     `int inRoot = inOrderMap.get(root.val);`
+   - Left subtree me kitne elements hain:
+     `int numsLeft = inRoot - inStart;`
+
+5. Step 5: Recursive Subtree Construction:
+   - **Left Subtree:**
+     - Preorder range: `preStart + 1` se `preStart + numsLeft`
+     - Inorder range: `inStart` se `inRoot - 1`
+     - `root.left = helper(..., preStart + 1, preStart + numsLeft, ..., inStart, inRoot - 1, ...);`
+   - **Right Subtree:**
+     - Preorder range: `preStart + numsLeft + 1` se `preEnd`
+     - Inorder range: `inRoot + 1` se `inEnd`
+     - `root.right = helper(..., preStart + numsLeft + 1, preEnd, ..., inRoot + 1, inEnd, ...);`
+
+6. Step 6: `return root;`.
+
+--------------------------------------------------
+
+EXAMPLE
+
+preorder = [3, 9, 20, 15, 7]
+inorder  = [9, 3, 15, 20, 7]
+
+Dry Run:
+1. Root = preorder[0] = 3.
+2. Inorder me 3 ka index = 1.
+   - Left subtree elements in inorder: [9] (size = 1 - 0 = 1 node).
+   - Right subtree elements in inorder: [15, 20, 7] (size = 3 nodes).
+3. Split Ranges:
+   - Left child call:
+     - Preorder: index 1 to 1 (`[9]`)
+     - Inorder: index 0 to 0 (`[9]`)
+     - Node 9 root banta hai, children null.
+   - Right child call:
+     - Preorder: index 2 to 4 (`[20, 15, 7]`)
+     - Inorder: index 2 to 4 (`[15, 20, 7]`)
+     - Sub-root = preorder[2] = 20.
+     - Inorder me 20 ka index = 3.
+     - Sub-left for 20: [15], Sub-right for 20: [7].
+
+Tree Constructed:
+        3
+       / \
+      9   20
+          /  \
+         15   7
+
+--------------------------------------------------
+
+WHY INORDER TRAVERSAL IS MANDATORY?
+
+- Preorder sirf root identify karta hai, par yeh nahi bata sakta ki kaunse elements left subtree me jayenge aur kaunse right subtree me.
+- Inorder traversal boundary provide karta hai (left of root = left child, right of root = right child).
+- Unique tree build karne ke liye Inorder ka hona **compulsory** hota hai (Preorder + Inorder ya Postorder + Inorder). Preorder + Postorder se unique binary tree nahi ban sakta (unless full binary tree ho).
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N) ->
+- Hash map building: O(N)
+- Har node ke liye recursive call $O(1)$ me split hoti hai kyunki index lookup map se $O(1)$ me milta hai.
+Total Time = O(N).
+
+Space:
+O(N) ->
+- HashMap: O(N) space to store inorder indices.
+- Recursion Call Stack: O(H) where H is height of tree (worst case skewed tree O(N), balanced tree O(log N)).
+Total Space = O(N).
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Trap Question: *"Kya Preorder aur Postorder se unique tree construct ho sakta hai?"*
+  - Answer: Nahi. Unique binary tree banane ke liye **Inorder traversal zaroori hai**, kyunki wahi batata hai ki left subtree kahan khatam hota hai aur right subtree kahan shuru.
+- Unique values constraint:
+  - Constraints me check karo: *"preorder and inorder consist of unique values"*.
+  - Agar duplicate values allow ho jayein, toh HashMap direct index lookup me fail ho jayega aur multiple valid trees ban sakte hain.
+- Direct sibling problem:
+  - LeetCode 106: *Construct Binary Tree from Inorder and Postorder Traversal* - Wahan root postorder ke end (`postEnd`) par milti hai aur ranges peeche se partition hoti hain.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        // Step 1: Saare inorder elements ki index mapping store karo
+        Map<Integer, Integer> inOrderMap = new HashMap<>();
+        for (int i = 0; i < inorder.length; i++) {
+            inOrderMap.put(inorder[i], i);
+        }
+
+        // Step 2: Recursive construction call
+        return helper(preorder, 0, preorder.length - 1, 
+                      inorder, 0, inorder.length - 1, 
+                      inOrderMap);
+    }
+
+    private TreeNode helper(int[] preorder, int preStart, int preEnd, 
+                           int[] inorder, int inStart, int inEnd, 
+                           Map<Integer, Integer> inOrderMap) {
+
+        // Base case: pointers cross kar gaye
+        if (preStart > preEnd || inStart > inEnd) {
+            return null;
+        }
+
+        // Preorder ka pehla element is current subtree root
+        TreeNode root = new TreeNode(preorder[preStart]);
+
+        // Find root's position in inorder array
+        int inRoot = inOrderMap.get(root.val);
+
+        // Count how many nodes lie in left subtree
+        int numsLeft = inRoot - inStart;
+
+        // Recursive call for Left and Right subtrees
+        root.left = helper(preorder, preStart + 1, preStart + numsLeft, 
+                           inorder, inStart, inRoot - 1, 
+                           inOrderMap);
+
+        root.right = helper(preorder, preStart + numsLeft + 1, preEnd, 
+                            inorder, inRoot + 1, inEnd, 
+                            inOrderMap);
+
+        return root;
+    }
+}
