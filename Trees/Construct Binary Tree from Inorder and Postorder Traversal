@@ -1,0 +1,183 @@
+# 106. Construct Binary Tree from Inorder and Postorder Traversal
+
+## APPROACH: CONSTRUCT TREE FROM INORDER & POSTORDER (DIVIDE & CONQUER + HASHMAP)
+
+Idea:
+1. **Postorder (`Left -> Right -> Root`):** Postorder traversal ka sabse aakhiri element (`postEnd`) hamesha current subtree ka **Root** hota hai.
+2. **Inorder (`Left -> Root -> Right`):** Root value ke left side ke saare nodes **Left Subtree** me aate hain, aur right side ke saare nodes **Right Subtree** me aate hain.
+3. Repeated linear search avoid karne ke liye `inorder` array ke elements ka index `HashMap` me store kar lete hain ($O(1)$ lookup).
+4. Inorder me root ka index (`inRoot`) nikaal kar pata chal jata hai ki left subtree me kitne nodes hain:
+   `numsLeft = inRoot - inStart`.
+5. Postorder array me:
+   - Left subtree ke elements: index `postStart` se `postStart + numsLeft - 1` tak honge.
+   - Right subtree ke elements: index `postStart + numsLeft` se `postEnd - 1` tak honge (excluding root at `postEnd`).
+
+--------------------------------------------------
+
+APPROACH (Recursive Divide & Conquer)
+
+1. Step 1: Pre-hashing:
+   `Map<Integer, Integer> inMap` initialize karo aur `inorder` elements ke index store karo:
+   `inMap.put(inorder[i], i)`.
+
+2. Step 2: Helper Function with Boundaries:
+   `helper(inorder, inStart, inEnd, postorder, postStart, postEnd, inMap)`
+   - **Base Case:**
+     Agar pointers cross kar jayein (`inStart > inEnd || postStart > postEnd`), toh `return null;`.
+
+3. Step 3: Root Node Creation:
+   - Postorder array ka aakhiri element root banega:
+     `TreeNode root = new TreeNode(postorder[postEnd]);`
+
+4. Step 4: Index Split Calculation:
+   - Inorder map se root ka index nikalo:
+     `int inRoot = inMap.get(root.val);`
+   - Left subtree me kitne nodes hain calculate karo:
+     `int numsLeft = inRoot - inStart;`
+
+5. Step 5: Recursive Subtree Construction:
+   - **Left Subtree:**
+     - Inorder range: `inStart` to `inRoot - 1`
+     - Postorder range: `postStart` to `postStart + numsLeft - 1`
+     - `root.left = helper(..., inStart, inRoot - 1, ..., postStart, postStart + numsLeft - 1, ...);`
+   - **Right Subtree:**
+     - Inorder range: `inRoot + 1` to `inEnd`
+     - Postorder range: `postStart + numsLeft` to `postEnd - 1`
+     - `root.right = helper(..., inRoot + 1, inEnd, ..., postStart + numsLeft, postEnd - 1, ...);`
+
+6. Step 6: `return root;`.
+
+--------------------------------------------------
+
+EXAMPLE
+
+inorder   = [9, 3, 15, 20, 7]
+postorder = [9, 15, 7, 20, 3]
+
+Dry Run:
+1. Root = postorder[last] = 3.
+2. Inorder me 3 ka index = 1 (`inRoot = 1`).
+   - Left subtree in inorder: [9] (numsLeft = 1 - 0 = 1).
+   - Right subtree in inorder: [15, 20, 7].
+3. Split Ranges:
+   - Left Subtree:
+     - Inorder: index 0 to 0 (`[9]`)
+     - Postorder: index 0 to (0 + 1 - 1) = 0 (`[9]`)
+     - Node 9 root banega, children null.
+   - Right Subtree:
+     - Inorder: index 2 to 4 (`[15, 20, 7]`)
+     - Postorder: index (0 + 1) to (4 - 1) = 1 to 3 (`[15, 7, 20]`)
+     - Sub-root = postorder[3] = 20.
+     - Inorder me 20 ka index = 3 -> sub-left: [15], sub-right: [7].
+
+Tree Constructed:
+        3
+       / \
+      9   20
+          /  \
+         15   7
+
+--------------------------------------------------
+
+PREORDER VS POSTORDER CONSTRUCTION (INDEX COMPARISON)
+
+| Feature | Preorder + Inorder (LC 105) | Postorder + Inorder (LC 106) |
+|---|---|---|
+| **Root Location** | `preorder[preStart]` (First element) | `postorder[postEnd]` (Last element) |
+| **Left Post/Pre Range** | `preStart + 1` to `preStart + numsLeft` | `postStart` to `postStart + numsLeft - 1` |
+| **Right Post/Pre Range** | `preStart + numsLeft + 1` to `preEnd` | `postStart + numsLeft` to `postEnd - 1` |
+| **Inorder Split** | Left: `inStart` to `inRoot - 1`, Right: `inRoot + 1` to `inEnd` | Same: `inStart` to `inRoot - 1`, Right: `inRoot + 1` to `inEnd` |
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N) ->
+- Hash map creation: O(N)
+- Har node ke liye recursive call $O(1)$ partition karti hai.
+Total Time = O(N).
+
+Space:
+O(N) ->
+- HashMap: O(N) space.
+- Recursive Call Stack: O(H) where H is height of tree (worst case skewed tree O(N), balanced tree O(log N)).
+Total Space = O(N).
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Index Off-by-one errors:
+  Is problem me sabse common bug right subtree ki postorder range me hota hai. Hamesha yaad rakho root `postEnd` par baitha hai, isliye right subtree ka postorder end `postEnd - 1` hoga, na ki `postEnd`.
+- Unique Values Guarantee:
+  Preorder/Postorder + Inorder se unique tree sirf tabhi ban sakta hai jab saari node values distinct hon (no duplicates). Constraints me clearly specified hai: *"consist of unique values"*.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        // Step 1: Inorder array ke indices hashmap me store karo
+        Map<Integer, Integer> inMap = new HashMap<>();
+        for (int i = 0; i < inorder.length; i++) {
+            inMap.put(inorder[i], i);
+        }
+
+        // Step 2: Recursive helper call
+        return helper(inorder, 0, inorder.length - 1, 
+                      postorder, 0, postorder.length - 1, 
+                      inMap);
+    }
+
+    private TreeNode helper(int[] inorder, int inStart, int inEnd, 
+                           int[] postorder, int postStart, int postEnd, 
+                           Map<Integer, Integer> inMap) {
+
+        // Base case: pointers cross kar gaye
+        if (inStart > inEnd || postStart > postEnd) {
+            return null;
+        }
+
+        // Postorder ka last element current subtree ka root hota hai
+        TreeNode root = new TreeNode(postorder[postEnd]);
+
+        // Inorder me root ka index dhoondho
+        int inRoot = inMap.get(root.val);
+
+        // Left subtree me kitne nodes aayenge
+        int numsLeft = inRoot - inStart;
+
+        // Recursive call for Left Subtree
+        root.left = helper(inorder, inStart, inRoot - 1, 
+                           postorder, postStart, postStart + numsLeft - 1, 
+                           inMap);
+
+        // Recursive call for Right Subtree
+        root.right = helper(inorder, inRoot + 1, inEnd, 
+                            postorder, postStart + numsLeft, postEnd - 1, 
+                            inMap);
+
+        return root;
+    }
+}
