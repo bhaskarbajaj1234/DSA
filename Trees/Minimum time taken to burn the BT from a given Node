@@ -1,0 +1,203 @@
+# 123. Minimum Time Taken to Burn Binary Tree from a Node
+
+## APPROACH: BURNING TREE / INFECTION TIME (PARENT MAP + RADIAL BFS)
+
+Idea:
+Fire teeno directions me simultaneously failti hai (1 second per step):
+1. Left child
+2. Right child
+3. Parent node (upward direction)
+
+Standard Tree upward travel allow nahi karta, isliye:
+1. Har node ka parent pointer track karne ke liye ek `parentMap` build karo aur simultaneously `targetNode` dhoondho.
+2. `targetNode` se BFS shuru karo.
+3. Ek `boolean flag` maintain karo jo track kare ki current second me fire ne koi nayi unburnt node infect ki ya nahi. Agar haan, toh `time++` karo.
+4. Jab queue empty ho jaye, poora tree burn ho chuka hoga.
+
+--------------------------------------------------
+
+APPROACH (Parent Mapping + Multi-Directional BFS)
+
+1. Edge Case:
+   Agar `root == null` ho, `0` return karo.
+
+2. Step 1: Build Parent Map & Locate Target:
+   - DFS traverse karke har node ka parent store karo: `parentMap.put(node, parent)`.
+   - Node match hone par (`node.data == start`), target node reference save karo.
+
+3. Step 2: Radial BFS setup:
+   - Queue me `targetNode` push karo aur `visited` set me add karo.
+   - `int time = 0` initialize karo.
+
+4. Step 3: BFS Level Processing:
+   - Jab tak queue empty na ho:
+     - `int levelSize = q.size()`
+     - `boolean flag = false` (tracks if fire spread to new nodes in this second)
+     - `levelSize` times loop chalao:
+       - Node pop karo (`curr = q.poll()`).
+       - Agar `curr.left` exist karta hai aur unburnt hai: `q.offer(curr.left)`, `flag = true`.
+       - Agar `curr.right` exist karta hai aur unburnt hai: `q.offer(curr.right)`, `flag = true`.
+       - Agar `parent` exist karta hai aur unburnt hai: `q.offer(parent)`, `flag = true`.
+     - Agar is second me koi nayi node burn hui (`flag == true`), toh `time++` karo.
+
+5. Final `time` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+          1
+        /   \
+       2     3
+      / \   / \
+     6   5 8   4
+
+target = 4
+
+Dry Run:
+- t = 0: Queue = [4], visited = {4}, time = 0
+
+- Second 1:
+  - Poll 4 -> Neighbors: parent 3 unvisited.
+  - Queue = [3], visited = {4, 3}, flag = true -> time = 1
+
+- Second 2:
+  - Poll 3 -> Neighbors: left 8, parent 1 unvisited.
+  - Queue = [8, 1], visited = {4, 3, 8, 1}, flag = true -> time = 2
+
+- Second 3:
+  - Poll 8 -> (no unvisited neighbors)
+  - Poll 1 -> Neighbors: left 2 unvisited.
+  - Queue = [2], visited = {..., 2}, flag = true -> time = 3
+
+- Second 4:
+  - Poll 2 -> Neighbors: left 6, right 5 unvisited.
+  - Queue = [6, 5], visited = {..., 6, 5}, flag = true -> time = 4
+
+- Second 5:
+  - Poll 6 and 5 -> (no unvisited neighbors)
+  - flag = false -> time remains 4
+
+Result: 4
+
+--------------------------------------------------
+
+WHY THE 'flag' VARIABLE IS REQUIRED?
+
+- Last level ke nodes queue se poll hote waqt unka koi unvisited neighbor nahi bachta.
+- Agar hum har while-loop iteration par direct `time++` karte, toh aakhiri level process hote waqt ek extra unnecessary second add ho jata (`time = 5`).
+- `flag` ensure karta hai ki `time` tabhi badhe jab actually fire ne kam se kam ek nayi node ko catch kiya ho.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N) ->
+- Parent mapping + finding target node: O(N)
+- BFS traversal me har node at most ek baar queue me aati hai: O(N)
+Total Time = O(N).
+
+Space:
+O(N) ->
+- `parentMap`: N nodes ka reference -> O(N)
+- `visited` set & Queue: at most N nodes -> O(N)
+Total Space = O(N).
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Equivalent LeetCode Problem:
+  - LeetCode 2385: *Amount of Time for Binary Tree to Be Infected* (Identical logic, variable names change).
+- Common Base Pattern:
+  - LeetCode 863 (*All Nodes Distance K in Binary Tree*) ka direct sibling problem hai.
+  - Distance K me `distance == k` par loop break karte hain, yahan poora tree burn hone tak maximum radial distance (time) nikaalte hain.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int data;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int val) { data = val; left = null; right = null; }
+ * }
+ **/
+
+class Solution {
+    public int timeToBurnTree(TreeNode root, int start) {
+        if (root == null) return 0;
+
+        // Step 1: Upward pointers build karo aur start node locate karo
+        Map<TreeNode, TreeNode> parentMap = new HashMap<>();
+        TreeNode targetNode = buildParentAndFindStart(root, null, parentMap, start);
+
+        // Step 2: BFS setup
+        Queue<TreeNode> q = new LinkedList<>();
+        Set<TreeNode> visited = new HashSet<>();
+
+        q.offer(targetNode);
+        visited.add(targetNode);
+
+        int time = 0;
+
+        // Step 3: Radial BFS
+        while (!q.isEmpty()) {
+            int levelSize = q.size();
+            boolean flag = false;
+
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode curr = q.poll();
+
+                // Direction 1: Left Child
+                if (curr.left != null && visited.add(curr.left)) {
+                    flag = true;
+                    q.offer(curr.left);
+                }
+                // Direction 2: Right Child
+                if (curr.right != null && visited.add(curr.right)) {
+                    flag = true;
+                    q.offer(curr.right);
+                }
+                // Direction 3: Parent Node
+                TreeNode parent = parentMap.get(curr);
+                if (parent != null && visited.add(parent)) {
+                    flag = true;
+                    q.offer(parent);
+                }
+            }
+
+            // Sirf tab time badhao jab nayi nodes infect hui hon
+            if (flag) {
+                time++;
+            }
+        }
+
+        return time;
+    }
+
+    private TreeNode buildParentAndFindStart(TreeNode node, TreeNode parent, Map<TreeNode, TreeNode> parentMap, int start) {
+        if (node == null) return null;
+
+        parentMap.put(node, parent);
+
+        TreeNode target = null;
+        if (node.data == start) {
+            target = node;
+        }
+
+        TreeNode left = buildParentAndFindStart(node.left, node, parentMap, start);
+        TreeNode right = buildParentAndFindStart(node.right, node, parentMap, start);
+
+        return target != null ? target : (left != null ? left : right);
+    }
+}
