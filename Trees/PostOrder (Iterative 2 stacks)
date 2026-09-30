@@ -1,0 +1,158 @@
+# 145. Binary Tree Postorder Traversal (Iterative - 2 Stacks)
+
+## APPROACH: BINARY TREE POSTORDER TRAVERSAL (2 STACKS)
+
+Idea:
+Postorder Traversal follow karta hai: Left -> Right -> Root (L-R-N).
+Isko direct ek stack se karna thoda tricky hota hai, par 2 Stacks se yeh bohot simple ho jata hai.
+Trick:
+Modified Preorder traversal karo: Root -> Right -> Left.
+Isko jab Stack 2 me store karke last me pop karoge, toh exact reverse order mil jayega: Left -> Right -> Root.
+
+--------------------------------------------------
+
+APPROACH (Iterative using 2 Stacks)
+
+1. Edge Case:
+   Agar `root == null` hai, seedha empty `result` list return kar do.
+
+2. Do Stacks initialize karo: `s1` (traversal ke liye) aur `s2` (reverse order store karne ke liye).
+
+3. `root` ko `s1` me push karo.
+
+4. Jab tak `s1` empty na ho jaye (`while(!s1.isEmpty())`):
+   - `s1` se top node nikaalo: `curr = s1.pop()`.
+   - Us node ko turant `s2` me push kar do: `s2.push(curr)`.
+   - **Push Order into s1:**
+     1. Pehle `curr.left` ko `s1` me dalo (agar null na ho).
+     2. Fir `curr.right` ko `s1` me dalo (agar null na ho).
+   - *(Reason: `s1` LIFO hai, isliye Right pehle pop hoke `s2` me jayega. Is tarah `s2` me push hone ka order Root -> Right -> Left banega).*
+
+5. Ab `s2` ko khali karo (`while(!s2.isEmpty())`):
+   - Har element ko pop karke `result.add(s2.pop().val)` karo.
+   - Result automatically `Left -> Right -> Root` order me populate hoga.
+
+6. Final `result` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+      1
+     / \
+    2   3
+
+Dry Run:
+- Initial: s1 = [1], s2 = []
+
+Step 1:
+- Pop 1 from s1 -> push 1 to s2
+- Push left (2) to s1, Push right (3) to s1
+- s1 = [2, 3] (Top = 3)
+- s2 = [1]
+
+Step 2:
+- Pop 3 from s1 -> push 3 to s2
+- Node 3 ke children null hain
+- s1 = [2]
+- s2 = [1, 3] (Top = 3)
+
+Step 3:
+- Pop 2 from s1 -> push 2 to s2
+- Node 2 ke children null hain
+- s1 = []
+- s2 = [1, 3, 2] (Top = 2)
+
+Step 4 (Empty s2 into result):
+- Pop 2 -> result = [2]
+- Pop 3 -> result = [2, 3]
+- Pop 1 -> result = [2, 3, 1]
+
+Result: [2, 3, 1] (Correct Left -> Right -> Root)
+
+--------------------------------------------------
+
+WHY 2 STACKS?
+
+- Direct Postorder (L-R-N) iterative karna hard hai kyunki parent node ko left aur right dono ke visit hone tak hold karna padta hai.
+- Reverse order logic:
+  (L -> R -> N) ka reverse hota hai (N -> R -> L).
+  `s1` se hum `Root -> Right -> Left` nikaal kar `s2` me bharte hain.
+  Jab `s2` ko pop karte hain, toh wo automatically reverse hoke required `Left -> Right -> Root` ban jata hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N) -> Har node `s1` me push/pop hoti hai aur `s2` me push/pop hoti hai.
+
+Space:
+O(N) -> `s2` me ek point par tree ke saare $N$ nodes store hote hain.
+*(Excluding output list result)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Interviewer ka immediate follow-up: *"Can you optimize the space complexity by doing it using only 1 Stack?"*
+  - **1 Stack Approach:** Single stack + ek `prev` (last visited node) pointer maintain karke check karte hain ki right child process ho chuka hai ya abhi traverse karna baki hai.
+- Java specific: `Stack` class ki jagah modern `Deque<TreeNode> s1 = new ArrayDeque<>()` use karna best practice hai.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        Deque<TreeNode> s1 = new ArrayDeque<>();
+        Deque<TreeNode> s2 = new ArrayDeque<>();
+        List<Integer> result = new ArrayList<>();
+
+        if (root == null) {
+            return result;
+        }
+
+        s1.push(root);
+
+        // s1 processes Root -> Right -> Left and pushes into s2
+        while (!s1.isEmpty()) {
+            root = s1.pop();
+            s2.push(root);
+
+            if (root.left != null) {
+                s1.push(root.left);
+            }
+            if (root.right != null) {
+                s1.push(root.right);
+            }
+        }
+
+        // s2 pops in Left -> Right -> Root order
+        while (!s2.isEmpty()) {
+            result.add(s2.pop().val);
+        }
+
+        return result;
+    }
+}
