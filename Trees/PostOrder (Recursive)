@@ -1,0 +1,125 @@
+# 145. Binary Tree Postorder Traversal
+
+## APPROACH: BINARY TREE POSTORDER TRAVERSAL
+
+Idea:
+Postorder Traversal follow karta hai: Left -> Right -> Root (L-R-N).
+Pehle poora left subtree process hoga, fir poora right subtree, aur last me current node ki value add hogi.
+
+--------------------------------------------------
+
+APPROACH (Recursive / DFS)
+
+1. Ek result list (`ans`) initialize karo.
+
+2. Ek recursive helper function call karo: `helper(ans, root)`.
+
+3. Base Case:
+   Agar `root == null` hai, simply `return` kar jao (subtree end).
+
+4. Left child ke liye recursive call karo:
+   `helper(ans, root.left)`
+
+5. Right child ke liye recursive call karo:
+   `helper(ans, root.right)`
+
+6. Dono subtrees complete hone ke baad current node ki value list me add karo:
+   `ans.add(root.val)`
+
+7. Final list `ans` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+    1
+     \
+      2
+     /
+    3
+
+Calls:
+- Call 1 -> Left of 1 is null
+- Call Right of 1 (node 2)
+  - Call Left of 2 (node 3)
+    - Left & Right of 3 are null -> ans.add(3)
+  - Call Right of 2 is null
+  - Node 2 dono side se free -> ans.add(2)
+- Node 1 dono side se free -> ans.add(1)
+
+Result: [3, 2, 1]
+
+--------------------------------------------------
+
+WHY RECURSION?
+
+- Postorder bottom-up process follow karta hai (pehle leaves, fir parents).
+- Recursive call stack bottom-most leaves par pehle execute hoke unwinding ke time parents ko process karta hai, jo natural L-R-N sequence deta hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node exactly ek baar visit hoti hai.
+
+Space:
+O(H) -> Recursive call stack height par depend karta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+*(Excluding output list)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+Postorder means "Node Last Me" (Left -> Right -> Root).
+Use cases: Deleting a tree, bottom-up calculations (like calculating tree height, diameter, or evaluating expression trees).
+Follow-up me interviewer iterative solution maangta hai:
+1. 2 Stacks approach: Modified Preorder (Root -> Right -> Left) ko Stack 1 se Stack 2 me dalo, stack 2 pop karne par (Left -> Right -> Root) deta hai.
+2. 1 Stack approach: Extra `prev` pointer maintain karke track karte hain ki right child visit ho chuka hai ya nahi.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> ans = new ArrayList<>();
+        helper(ans, root);
+        return ans;        
+    }
+
+    private void helper(List<Integer> ans, TreeNode root) {
+        // Base case
+        if (root == null) {
+            return;
+        }
+
+        // Process Left -> Right -> Root
+        helper(ans, root.left);
+        helper(ans, root.right);
+        ans.add(root.val);
+    }
+}
