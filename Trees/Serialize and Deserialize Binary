@@ -1,0 +1,199 @@
+# 297. Serialize and Deserialize Binary Tree
+
+## APPROACH: SERIALIZE AND DESERIALIZE (BFS / LEVEL ORDER WITH DELIMITERS)
+
+Idea:
+Serialization ka matlab hota hai Tree memory object ko ek flattened string me convert karna, aur Deserialization ka matlab usi string se wapas original Tree structure reconstruct karna.
+
+1. **Serialize (Tree -> String):**
+   Standard BFS (Level Order) traversal chalao.
+   - Null children ko explicitly ek sentinel symbol (jaise `#`) se represent karo taaki structure preserve rahe.
+   - Har value ke baad ek delimiter (jaise `,`) lagao taaki multi-digit aur negative numbers safely separate ho sakein.
+
+2. **Deserialize (String -> Tree):**
+   String ko delimiter `,` se split karke tokens array bana lo.
+   - Pehla token `root` banega.
+   - Queue me root daal kar BFS style me nodes poll karte jao aur consecutive 2 tokens ko unke `left` aur `right` children ki tarah attach karte jao (agar token `#` na ho).
+
+--------------------------------------------------
+
+APPROACH (Iterative BFS using Queue)
+
+1. serialize(root):
+   - Agar `root == null` ho, toh empty string `""` return karo.
+   - `StringBuilder sb` aur `Queue<TreeNode> q` banao; root ko queue me push karo.
+   - Jab tak queue empty na ho:
+     - Node poll karo.
+     - Agar `node == null` hai: `sb.append("#,")`.
+     - Agar `node != null` hai: `sb.append(node.val).append(",")` aur uske `node.left` aur `node.right` dono ko bina null-check ke queue me daalo.
+   - String return kar do.
+
+2. deserialize(data):
+   - Agar `data == null || data.isEmpty()` ho, `null` return karo.
+   - `String[] values = data.split(",")`.
+   - `root = new TreeNode(Integer.parseInt(values[0]))`.
+   - `Queue<TreeNode> q` me root daalo; pointer `int i = 1` set karo.
+   - Jab tak queue empty na ho aur `i < values.length`:
+     - Parent node `curr = q.poll()`.
+     - **Left Child (values[i]):**
+       Agar value `#` nahi hai, naya node banao, `curr.left` set karo aur queue me daalo.
+       `i++`.
+     - **Right Child (values[i]):**
+       Agar `i < values.length` aur value `#` nahi hai, naya node banao, `curr.right` set karo aur queue me daalo.
+       `i++`.
+   - Final `root` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        1
+       / \
+      2   3
+         / \
+        4   5
+
+Serialization Process:
+- Queue: [1] -> sb = "1,"
+- Queue: [2, 3] -> sb = "1,2,3,"
+- Children of 2: [null, null] -> sb = "1,2,3,#,#,"
+- Children of 3: [4, 5] -> sb = "1,2,3,#,#,4,5,"
+- Children of 4 & 5: [null, null, null, null] -> sb = "1,2,3,#,#,4,5,#,#,#,#,"
+
+Deserialization Process:
+values = ["1", "2", "3", "#", "#", "4", "5", "#", "#", "#", "#"]
+- Root = 1, q = [1], i = 1
+- Poll 1:
+  - values[1] = "2" -> 1.left = 2, q = [2]
+  - values[2] = "3" -> 1.right = 3, q = [2, 3]
+  - i reaches 3
+- Poll 2:
+  - values[3] = "#" -> 2.left = null
+  - values[4] = "#" -> 2.right = null
+  - i reaches 5
+- Poll 3:
+  - values[5] = "4" -> 3.left = 4, q = [4]
+  - values[6] = "5" -> 3.right = 5, q = [4, 5]
+  - i reaches 7
+- Poll 4 & 5:
+  - values[7..10] all are "#" -> leaves confirmed.
+
+Result: Original Tree Reconstructed!
+
+--------------------------------------------------
+
+WHY DELIMITER AND SENTINEL ARE ESSENTIAL?
+
+- **Sentinel (`#`):** Agar null nodes ko mark na karein, toh ambiguous trees ban jayenge (e.g. `[1, 2]` can mean 2 is left child OR 2 is right child).
+- **Delimiter (`,`):** Agar commas na lagayein, toh `"12"` ka matlab node 1 followed by node 2 bhi ho sakta hai ya ek single node of value 12. Negative numbers (e.g., `-15`) bina delimiter ke corrupt ho jate hain.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N) ->
+- Serialize: Har node queue me exactly ek baar aati hai. Null references bhi count hote hain (at most 2N + 1 calls) -> O(N).
+- Deserialize: String split and single-pass iteration across tokens -> O(N).
+Total Time = O(N).
+
+Space:
+O(N) ->
+- Serialize: Queue aur StringBuilder me O(N) data rehta hai.
+- Deserialize: Tokens array aur Queue O(N) space lete hain.
+Total Space = O(N).
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- DFS (Preorder) Alternative:
+  Interviewer pooch sakta hai: *"Kya DFS se kar sakte hain?"*
+  - Haan! Preorder traversal me `Root -> Left -> Right` serialize karo: `"1,2,#,#,3,4,#,#,5,#,#"`.
+  - Deserialization me tokens ko ek `Queue<String>` me daal kar simple recursive DFS call se tree build ho jata hai bina manual index pointer maintain kiye.
+- Memory Optimization:
+  Trailing `#` symbols serialize string ke end me space waste karte hain, par unhe chhodne se deserialization logic thoda complex ho jata hai. Standard level-order serialization with `#` interview me universal standard maana jata hai.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Codec {
+
+    // Encodes a tree to a single string using BFS.
+    public String serialize(TreeNode root) {
+        if (root == null) return "";
+
+        StringBuilder sb = new StringBuilder();
+        Queue<TreeNode> q = new LinkedList<>();
+        q.offer(root);
+
+        while (!q.isEmpty()) {
+            TreeNode node = q.poll();
+
+            // Null node ko sentinel '#' se mark karo
+            if (node == null) {
+                sb.append("#,");
+            } else {
+                sb.append(node.val).append(",");
+                // Children ko directly offer karo (nulls will be captured next)
+                q.offer(node.left);
+                q.offer(node.right);
+            }
+        }
+        return sb.toString();
+    }
+
+    // Decodes your encoded data to tree using BFS.
+    public TreeNode deserialize(String data) {
+        if (data == null || data.isEmpty()) return null;
+
+        String[] values = data.split(",");
+        TreeNode root = new TreeNode(Integer.parseInt(values[0]));
+
+        Queue<TreeNode> q = new LinkedList<>();
+        q.offer(root);
+
+        int i = 1;
+
+        while (!q.isEmpty() && i < values.length) {
+            TreeNode curr = q.poll();
+
+            // Left Child reconstruction
+            if (!values[i].equals("#")) {
+                TreeNode leftchild = new TreeNode(Integer.parseInt(values[i]));
+                curr.left = leftchild;
+                q.offer(leftchild);
+            }
+            i++;
+
+            // Right Child reconstruction
+            if (i < values.length && !values[i].equals("#")) {
+                TreeNode rightchild = new TreeNode(Integer.parseInt(values[i]));
+                curr.right = rightchild;
+                q.offer(rightchild);
+            }
+            i++;
+        }
+        return root;
+    }
+}
+
+// Your Codec object will be instantiated and called as such:
+// Codec ser = new Codec();
+// Codec deser = new Codec();
+// TreeNode ans = deser.deserialize(ser.serialize(root));
