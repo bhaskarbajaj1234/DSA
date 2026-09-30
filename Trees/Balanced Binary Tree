@@ -1,0 +1,147 @@
+# 110. Balanced Binary Tree
+
+## APPROACH: BALANCED BINARY TREE (OPTIMIZED BOTTOM-UP DFS)
+
+Idea:
+Ek binary tree height-balanced tab hota hai jab har node par:
+`|left_height - right_height| <= 1` ho.
+Brute force me har node par alag se height nikaalenge toh $O(N^2)$ ho jayega.
+Optimized Approach:
+Max Depth (Height) nikaalte waqt hi balance condition check kar lo.
+Agar kisi subtree me balance bigda, toh turant `-1` return kar do (signal of unbalance). Agar balanced hai, toh regular height return karo: `1 + Math.max(lh, rh)`.
+
+--------------------------------------------------
+
+APPROACH (Bottom-Up / DFS)
+
+1. Helper function `check(root)` banao jo:
+   - Node balanced hone par uski **height** return karega.
+   - Node unbalanced hone par **`-1`** return karega.
+
+2. Base Case:
+   Agar `root == null` ho, toh height `0` return karo:
+   `if (root == null) return 0;`
+
+3. Left aur Right Subtree ki height nikaalo:
+   `int lh = check(root.left);`
+   `int rh = check(root.right);`
+
+4. Early Exit Checks:
+   - Agar left ya right subtree already unbalanced tha (`lh == -1 || rh == -1`), toh further check kare bina turant `-1` bubble up kar do.
+   - Agar current node par height difference 1 se zyada hai (`Math.abs(lh - rh) > 1`), toh yahan balance toot gaya, `return -1`.
+
+5. Agar dono subtrees balanced hain aur condition satisfy hoti hai, toh current node ki height return karo:
+   `return 1 + Math.max(lh, rh);`
+
+6. Main function me check karo:
+   `return check(root) != -1;`
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        1
+       / \
+      2   2
+     / \
+    3   3
+   / \
+  4   4
+
+Dry Run:
+- Node 4: lh = 0, rh = 0 -> height = 1
+- Node 3: lh = 1 (from 4), rh = 0 -> height = 2
+- Node 2 (Left):
+  - Left child (3) returns height 2
+  - Right child (3) returns height 2 (similar)
+  - But wait, deep chain par:
+  - Node 2 ke left child (3) ki height = 2, right child = 0
+  - |2 - 0| = 2 > 1 -> return -1!
+- Node 2 turant `-1` return karta hai.
+- Root 1 ko left side se `-1` milta hai, direct `-1` return.
+- Main check: `-1 != -1` -> false.
+
+Result: false
+
+--------------------------------------------------
+
+WHY BOTTOM-UP INSTEAD OF TOP-DOWN?
+
+- **Top-Down (Brute Force):** Har node par `maxDepth()` call karte hain. Har level par tree dobara traverse hota hai -> $O(N^2)$.
+- **Bottom-Up:** Leaves se shuru karke upar aate hain. Har node sirf ek baar visit hoti hai. Subtree unbalanced milte hi `-1` return hoke execution short-circuit ho jata hai -> $O(N)$.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node exactly ek baar visit hoti hai (Postorder bottom-up manner).
+
+Space:
+O(H) -> Recursive call stack height ke barabar memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Interviewer ka favourite counter-question: *"Tumne brute force $O(N^2)$ kyu nahi likha?"*
+  - Answer: Top-down me repeated subproblems solve hoti hain. Bottom-up me hum Postorder traversal follow karke height calculation ke saath hi balance state validate kar lete hain.
+- `-1` as a sentinel value: Negative height possible nahi hoti, isliye `-1` failure flag ki tarah kaam karta hai bina kisi extra boolean flag variable ke.
+- Related problem: Diameter of Binary Tree (LeetCode 543) - wahan bhi same height logic se global maximum track karte hain.
+
+--------------------------------------------------
+
+# CODE:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        // Agar check() -1 return na kare, matlab tree balanced hai
+        return check(root) != -1;
+    }
+
+    private int check(TreeNode root) {
+        // Base case: null node ki height 0 hoti hai
+        if (root == null) {
+            return 0;
+        }
+
+        // Left subtree ki height calculate karo
+        int lh = check(root.left);
+        // Right subtree ki height calculate karo
+        int rh = check(root.right);
+
+        // Agar koi bhi subtree already unbalanced mila ho toh turant -1 return karo
+        if (lh == -1 || rh == -1) {
+            return -1;
+        }
+
+        // Current node par balance condition check karo
+        if (Math.abs(lh - rh) > 1) {
+            return -1;
+        }
+
+        // Balanced hai toh normal height return karo
+        return 1 + Math.max(lh, rh);
+    }
+}
