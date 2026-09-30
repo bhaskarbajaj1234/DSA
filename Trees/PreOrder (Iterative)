@@ -1,0 +1,150 @@
+# 144. Binary Tree Preorder Traversal (Iterative Approach)
+
+## APPROACH: BINARY TREE PREORDER TRAVERSAL (ITERATIVE / STACK)
+
+Idea:
+Preorder Traversal follow karta hai: Root -> Left -> Right (N-L-R).
+Recursion internally call stack use karta hai, yahan hum explicit `Stack` (ya `Deque`) use karke recursion ko simulate karte hain.
+
+--------------------------------------------------
+
+APPROACH (Iterative using Stack)
+
+1. Edge Case:
+   Agar `root == null` hai, seedha empty list return kar do.
+
+2. Ek Stack (`Deque<TreeNode> stack = new ArrayDeque<>()`) initialize karo.
+
+3. Sabse pehle `root` ko stack me `push` karo.
+
+4. Jab tak stack empty na ho jaye (`while(!stack.isEmpty())`):
+   - Top node ko `pop` karo: `currNode = stack.pop()`.
+   - Uski value result list me add karo: `ans.add(currNode.val)`.
+   - **Crucial Step (Push Order):**
+     1. Pehle `currNode.right` ko stack me push karo (agar null na ho).
+     2. Fir `currNode.left` ko stack me push karo (agar null na ho).
+   - *(Reason: Stack LIFO follow karta hai, isliye Left child baad me push hoga taaki wo next iteration me pehle pop ho sake).*
+
+5. Loop end hone par `ans` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+      1
+     / \
+    2   3
+   / \
+  4   5
+
+Dry Run:
+- Initial: Stack = [1], ans = []
+
+Step 1:
+- Pop 1 -> ans = [1]
+- Push Right (3), Push Left (2)
+- Stack = [3, 2] (Top par 2 hai)
+
+Step 2:
+- Pop 2 -> ans = [1, 2]
+- Push Right (5), Push Left (4)
+- Stack = [3, 5, 4] (Top par 4 hai)
+
+Step 3:
+- Pop 4 -> ans = [1, 2, 4] (Children null hain)
+- Stack = [3, 5]
+
+Step 4:
+- Pop 5 -> ans = [1, 2, 4, 5] (Children null hain)
+- Stack = [3]
+
+Step 5:
+- Pop 3 -> ans = [1, 2, 4, 5, 3] (Children null hain)
+- Stack empty
+
+Result: [1, 2, 4, 5, 3]
+
+--------------------------------------------------
+
+WHY STACK & WHY PUSH RIGHT FIRST?
+
+- Stack LIFO (Last In, First Out) order maintain karta hai.
+- Preorder me Left ko Right se pehle process karna hota hai.
+- Isliye hum intentionally Right child ko pehle stack ke bottom me bhejte hain, taaki Left child stack ke top par rahe aur pehle process ho.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node exactly ek baar stack me push aur pop hoti hai.
+
+Space:
+O(H) -> Stack me at any point at most tree ki height ke proportional nodes rahenge.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+*(Excluding output list ans)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Stack selection: Java me `Stack` class legacy aur synchronized (slow) hoti hai, isliye modern code me hamesha `ArrayDeque` prefer karte hain: `Deque<TreeNode> stack = new ArrayDeque<>()`.
+- Interviewer ka classic trap: "Tumne pehle right push kiya ya left?" -> Reason clearly explain karna ki stack LIFO hone ki wajah se Right pehle push hota hai taaki Left pehle bahar nikle.
+- Follow-up: *"Can you do traversal in O(1) space?"* -> Yes, Morris Traversal (Threaded Binary Tree concept).
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> ans = new ArrayList<>();
+        helper(ans, root);
+        return ans;
+    }
+
+    private void helper(List<Integer> ans, TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        Deque<TreeNode> stack = new ArrayDeque<>();
+        stack.push(root);
+
+        while (!stack.isEmpty()) {
+            TreeNode currNode = stack.pop();
+            ans.add(currNode.val);
+
+            // Right child pehle push hoga
+            if (currNode.right != null) {
+                stack.push(currNode.right);
+            }
+            // Left child baad me push hoga taaki pehle pop ho
+            if (currNode.left != null) {
+                stack.push(currNode.left);
+            }
+        }
+    }
+}
