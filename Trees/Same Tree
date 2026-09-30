@@ -1,0 +1,126 @@
+# 100. Same Tree
+
+## APPROACH: SAME TREE (RECURSIVE / DFS)
+
+Idea:
+Do binary trees identical tabhi hote hain jab:
+1. Dono ka structure exactly same ho.
+2. Har corresponding node ki value same ho.
+Dono trees ko saath-saath recursively traverse karte hain. Agar kisi bhi point par structure ya value mismatch ho jaye, toh answer `false` hoga.
+
+--------------------------------------------------
+
+APPROACH (Recursive / DFS)
+
+1. Base Cases (Structural Identity Check):
+   - Agar dono nodes `null` hain (`p == null && q == null`):
+     Dono trees yahan tak identical hain -> `return true`.
+   - Agar unme se koi ek `null` hai aur doosra nahi (`p == null || q == null`):
+     Structure match nahi hua -> `return false`.
+
+2. Value & Subtree Check:
+   - Check karo ki current node ki value match karti hai ya nahi: `p.val == q.val`.
+   - Recursively left subtrees compare karo: `isSameTree(p.left, q.left)`.
+   - Recursively right subtrees compare karo: `isSameTree(p.right, q.right)`.
+
+3. Agar teeno conditions true hain, tabhi trees identical hain:
+   `return (p.val == q.val) && isSameTree(p.left, q.left) && isSameTree(p.right, q.right);`
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree 1 (p):        Tree 2 (q):
+    1                  1
+   / \                / \
+  2   3              2   3
+
+Dry Run:
+- Root level:
+  p(1) != null && q(1) != null
+  p.val == q.val (1 == 1) -> Match!
+
+- Check Left:
+  p(2) != null && q(2) != null
+  p.val == q.val (2 == 2) -> Match!
+  - 2 ke left null == null -> true
+  - 2 ke right null == null -> true
+  - Left subtree returns true
+
+- Check Right:
+  p(3) != null && q(3) != null
+  p.val == q.val (3 == 3) -> Match!
+  - 3 ke left null == null -> true
+  - 3 ke right null == null -> true
+  - Right subtree returns true
+
+- Final Result: true && true && true = true
+
+--------------------------------------------------
+
+WHY THIS BASE CASE ORDER?
+
+- `if (p == null && q == null) return true;` pehle likhna zaroori hai.
+- Agar yeh false hota hai aur fir `if (p == null || q == null)` chalta hai, iska guarantee matlab hota hai ki dono me se exactly ek hi `null` hai, jo direct structural mismatch prove karta hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Number of nodes in the smaller tree
+
+Time:
+O(N) -> Har node pair ko at most ek baar compare karte hain. Short-circuit evaluation mismatch milte hi execution rok deta hai.
+
+Space:
+O(H) -> Recursive call stack height ke barabar memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Interviewer follow-up: *"Can you solve this iteratively?"*
+  - **Iterative Approach:** Ek `Queue<TreeNode>` use karo aur elements ko pairs me push karo: `queue.offer(p); queue.offer(q);`. Har iteration me 2 nodes nikaal kar identical checks perform karo.
+- Closely related problems:
+  1. Symmetric Tree (LeetCode 101) - wahan `p.left` ko `q.right` ke saath aur `p.right` ko `q.left` ke saath compare karte hain (mirror image).
+  2. Subtree of Another Tree (LeetCode 572) - jisme har node par yahi `isSameTree` function call hota hai.
+
+--------------------------------------------------
+
+# CODE:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        // Base case 1: Dono null hain toh identical hain
+        if (p == null && q == null) {
+            return true;
+        }
+
+        // Base case 2: Koi ek null hai toh structure mismatch
+        if (p == null || q == null) {
+            return false;
+        }
+
+        // Current node value match + Left subtree match + Right subtree match
+        return (p.val == q.val) 
+            && isSameTree(p.left, q.left) 
+            && isSameTree(p.right, q.right);
+    }
+}
