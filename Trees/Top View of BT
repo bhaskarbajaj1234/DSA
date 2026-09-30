@@ -1,0 +1,173 @@
+# Top View of Binary Tree
+
+## APPROACH: TOP VIEW OF BINARY TREE (BFS / LEVEL ORDER + VERTICAL LINE HASHMAP)
+
+Idea:
+Upar se dekhne par har vertical column (`col`) me sirf wahi node visible hogi jo sabse pehle (top-most level par) aati hai.
+Horizontal distance concept:
+- Root starts at `col = 0`.
+- Left child goes to `col - 1`.
+- Right child goes to `col + 1`.
+BFS (Level Order Traversal) ensure karta hai ki hum upar se neeche levels visit kar rahe hain.
+Isliye har `col` par aane wali **pehli node** hi uska Top View hoti hai. Baad me aane wale nodes ko ignore kar denge.
+
+--------------------------------------------------
+
+APPROACH (BFS using Queue + TreeMap)
+
+1. Edge Case:
+   Agar `root == null` ho, empty list return kar do.
+
+2. Data Structures:
+   - Helper class `Pair`: `(node, col)` track karne ke liye.
+   - `Queue<Pair> q`: Level order traversal run karne ke liye.
+   - `Map<Integer, Integer> map = new TreeMap<>()`:
+     Key = `col` (Sorted left to right automatically), Value = `node.data`.
+
+3. BFS Traversal:
+   - Queue me root push karo: `q.offer(new Pair(root, 0))`.
+   - Jab tak queue empty na ho:
+     - Element pop karo: `currNode` aur uska `currCol`.
+     - **Core Condition:**
+       Agar `map` me `currCol` pehle se present **nahi** hai (`!map.containsKey(currCol)`):
+       Toh usse map me store kar lo (`map.put(currCol, currNode.data)`).
+       *(Kyunki BFS upar se neeche traverse karta hai, jo pehle aaya wahi top view hai).*
+     - Left child push karo with `currCol - 1`.
+     - Right child push karo with `currCol + 1`.
+
+4. Result Extraction:
+   `TreeMap` keys automatically sorted order me hoti hain (-2, -1, 0, 1, 2...).
+   `map.values()` ko list me daal kar return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        1
+      /   \
+     2     3
+      \     \
+       4     5
+        \
+         6
+
+Vertical Columns:
+- Node 1: col = 0
+- Node 2: col = -1
+- Node 3: col = +1
+- Node 4: col = 0
+- Node 5: col = +2
+- Node 6: col = +1
+
+Dry Run:
+- Process 1 (col 0): map[0] = 1
+- Process 2 (col -1): map[-1] = 2
+- Process 3 (col +1): map[1] = 3
+- Process 4 (col 0): col 0 already exists in map! (Ignored - 1 hides 4 from top)
+- Process 5 (col +2): map[2] = 5
+- Process 6 (col +1): col 1 already exists in map! (Ignored - 3 hides 6 from top)
+
+Sorted Map Keys:
+-1 -> 2
+ 0 -> 1
+ 1 -> 3
+ 2 -> 5
+
+Result: [2, 1, 3, 5]
+
+--------------------------------------------------
+
+WHY BFS AND NOT DFS?
+
+- **BFS (Level Order):** Guarantee karta hai ki upar wale levels pehle process honge. Jaise hi kisi column ka pehla element milta hai, hum lock kar dete hain.
+- **DFS:** Deep branches pehle explore karta hai. Agar DFS use karein, toh hume har column ke sath `level/height` bhi store karke compare karna padega ki current node purani node se upar hai ya neeche. BFS se yeh complexity zero ho jaati hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N log N) -> Har node queue me ek baar aati hai, aur `TreeMap` me insertion $O(\log K)$ leta hai ($K \le N$).
+*(Agar minCol aur maxCol manually track karke normal `HashMap` use karein toh time strictly O(N) ho sakta hai).*
+
+Space:
+O(N) -> Queue aur Map dono me at most $N$ nodes store hote hain.
+*(Excluding output list ans)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Top View vs Bottom View:
+  - **Top View:** `if (!map.containsKey(currCol)) map.put(currCol, val);` (Sirf pehli entry rakho).
+  - **Bottom View:** `map.put(currCol, val);` (Hamesha overwrite karo, jo aakhiri aayega wahi bottom se dikhega).
+- TreeMap Optimization:
+  Interviewer pooch sakta hai: *"TreeMap se $O(N \log N)$ ho raha hai, kya bina TreeMap ke $O(N)$ kar sakte ho?"*
+  - Answer: Normal `HashMap` use karo aur BFS ke dauran `minCol` aur `maxCol` track karte raho. Last me loop chalao `for(int c = minCol; c <= maxCol; c++)` aur seedha list populate kar lo.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int data;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int val) { data = val; left = null; right = null; }
+ * }
+ **/
+
+class Solution {
+
+    class Pair {
+        TreeNode node;
+        int col;
+        Pair(TreeNode node, int col) {
+            this.node = node;
+            this.col = col;
+        }
+    }
+
+    public List<Integer> topView(TreeNode root) {
+        List<Integer> ans = new ArrayList<>();
+        if (root == null) return ans;
+
+        // TreeMap keeps columns sorted from leftmost to rightmost
+        Map<Integer, Integer> map = new TreeMap<>();
+        Queue<Pair> q = new LinkedList<>();
+
+        q.offer(new Pair(root, 0));
+
+        while (!q.isEmpty()) {
+            Pair curr = q.poll();
+            TreeNode currNode = curr.node;
+            int currCol = curr.col;
+
+            // Upar se pehli baar jo node dikhi is column me, usse save karo
+            if (!map.containsKey(currCol)) {
+                map.put(currCol, currNode.data);
+            }
+
+            if (currNode.left != null) {
+                q.offer(new Pair(currNode.left, currCol - 1));
+            }
+            if (currNode.right != null) {
+                q.offer(new Pair(currNode.right, currCol + 1));
+            }
+        }
+
+        // Sorted columns ke values list me extract karo
+        for (int val : map.values()) {
+            ans.add(val);
+        }
+
+        return ans;
+    }
+}
