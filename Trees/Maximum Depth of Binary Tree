@@ -1,0 +1,128 @@
+# 104. Maximum Depth of Binary Tree
+
+## APPROACH: MAXIMUM DEPTH OF BINARY TREE (RECURSIVE / DFS)
+
+Idea:
+Binary tree ki maximum depth (ya height) longest path par present total nodes ka count hoti hai.
+Kisi bhi node ki height uske Left Subtree aur Right Subtree ki heights par depend karti hai:
+Height of Node = 1 + max(left_height, right_height).
+Yeh bottom-up Postorder traversal ka classic example hai.
+
+--------------------------------------------------
+
+APPROACH (Recursive / DFS)
+
+1. Base Case:
+   Agar `root == null` ho jaye, iska matlab koi node exist nahi karti, toh depth `0` return karo:
+   `if (root == null) return 0;`
+
+2. Left Subtree ki maximum depth recursively calculate karo:
+   `int lh = maxDepth(root.left);`
+
+3. Right Subtree ki maximum depth recursively calculate karo:
+   `int rh = maxDepth(root.right);`
+
+4. Current node ko include karke maximum depth return karo:
+   `return 1 + Math.max(lh, rh);`
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+      3
+     / \
+    9   20
+        /  \
+       15   7
+
+Dry Run:
+- Node 9:
+  - left = null (0), right = null (0)
+  - returns 1 + max(0, 0) = 1
+
+- Node 15:
+  - left = null (0), right = null (0)
+  - returns 1 + max(0, 0) = 1
+
+- Node 7:
+  - left = null (0), right = null (0)
+  - returns 1 + max(0, 0) = 1
+
+- Node 20:
+  - lh = 1 (from 15), rh = 1 (from 7)
+  - returns 1 + max(1, 1) = 2
+
+- Root Node 3:
+  - lh = 1 (from 9), rh = 2 (from 20)
+  - returns 1 + max(1, 2) = 3
+
+Result: 3
+
+--------------------------------------------------
+
+WHY RECURSION / POSTORDER?
+
+- Subtree ki problem parent problem ka chhota version hai (Divide & Conquer).
+- Parent node tabhi apni height decide kar sakta hai jab uske dono children (Left aur Right) apni-apni heights return kar chuke hon (Bottom-Up evaluation).
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node exactly ek baar visit hoti hai.
+
+Space:
+O(H) -> Recursive call stack tree ki height ke barabar memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Interviewer follow-up: *"Can you solve this iteratively without recursion?"*
+  - **BFS / Level Order Traversal Approach:** Ek Queue use karo. Har level process karne ke baad ek `levelCount++` maintain karo. Loop end hone par total levels hi answer hoti hain.
+- Common edge case: Empty tree (`root == null`), jiska output `0` aana chahiye.
+- Next related problems jo directly is par based hain:
+  1. Balanced Binary Tree (LeetCode 110)
+  2. Diameter of Binary Tree (LeetCode 543)
+
+--------------------------------------------------
+
+# CODE:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int maxDepth(TreeNode root) {
+        // Base case: null node has depth 0
+        if (root == null) {
+            return 0;
+        }
+
+        // Divide: Left aur Right subtree ki depth lao
+        int lh = maxDepth(root.left);
+        int rh = maxDepth(root.right);
+
+        // Conquer: 1 (current node) + maximum of both subtrees
+        return 1 + Math.max(lh, rh);
+    }
+}
