@@ -1,0 +1,122 @@
+# 144. Binary Tree Preorder Traversal
+
+## APPROACH: BINARY TREE PREORDER TRAVERSAL
+
+Idea:
+Preorder Traversal follow karta hai: Root -> Left -> Right (N-L-R).
+Har node par pehle uski value process karo, fir poora left subtree, fir poora right subtree.
+
+--------------------------------------------------
+
+APPROACH (Recursive / DFS)
+
+1. Ek result list (`ans`) initialize karo.
+
+2. Ek recursive helper function call karo: `helper(ans, root)`.
+
+3. Base Case:
+   Agar `root == null` hai, simply `return` kar jao (subtree end).
+
+4. Current node ki value list me add karo:
+   `ans.add(root.val)`
+
+5. Left child ke liye recursive call karo:
+   `helper(ans, root.left)`
+
+6. Right child ke liye recursive call karo:
+   `helper(ans, root.right)`
+
+7. Final list `ans` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+    1
+     \
+      2
+     /
+    3
+
+Calls:
+- Visit 1 -> ans = [1]
+- Left of 1 is null -> return
+- Right of 1 is 2 -> visit 2 -> ans = [1, 2]
+- Left of 2 is 3 -> visit 3 -> ans = [1, 2, 3]
+- Left & Right of 3 are null -> return
+- Right of 2 is null -> return
+
+Result: [1, 2, 3]
+
+--------------------------------------------------
+
+WHY RECURSION?
+
+- Tree ek recursive data structure hai jisme har subtree apne aap me ek tree hota hai.
+- Call stack naturally call order aur backtracking manage kar leta hai without extra manual pointers.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node exactly ek baar visit hoti hai.
+
+Space:
+O(H) -> Recursive call stack height par depend karta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+*(Excluding output list)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+Preorder means "Node Pehle" (Root -> Left -> Right).
+Follow-up me interviewer iterative solution maang sakta hai.
+Iterative me explicit Stack use karte hain: Root push karo, fir pop karte waqt pehle Right child push karo, fir Left child (kyunki stack LIFO hai, toh Left pehle pop hoga).
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> ans = new ArrayList<>();
+        helper(ans, root);
+        return ans;
+    }
+
+    private void helper(List<Integer> ans, TreeNode root) {
+        // Base case
+        if (root == null) {
+            return;
+        }
+
+        // Process Root -> Left -> Right
+        ans.add(root.val);
+        helper(ans, root.left);
+        helper(ans, root.right);
+    }
+}
