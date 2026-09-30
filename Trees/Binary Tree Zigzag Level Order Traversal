@@ -1,0 +1,171 @@
+# 103. Binary Tree Zigzag Level Order Traversal
+
+## APPROACH: ZIGZAG LEVEL ORDER TRAVERSAL (BFS + DIRECTION FLAG)
+
+Idea:
+Standard Level Order Traversal (BFS) hi follow karna hai, bas alternate levels par traversal ka direction badalna hai:
+- Level 0 (Even level): Left to Right
+- Level 1 (Odd level): Right to Left
+- Level 2 (Even level): Left to Right ... and so on.
+Ek boolean `flag` maintain karo jo har level complete hone ke baad flip (`flag = !flag`) hoga.
+
+--------------------------------------------------
+
+APPROACH (Iterative / BFS using Queue)
+
+1. Edge Case:
+   Agar `root == null` ho, toh seedha empty list return kar do.
+
+2. Ek Queue (`Queue<TreeNode> q`) initialize karo aur `root` ko offer karo.
+   Direction control ke liye `boolean flag = true` set karo (`true` = Left to Right, `false` = Right to Left).
+
+3. Jab tak queue empty na ho jaye (`while(!q.isEmpty())`):
+   - Current level ka size lock karo: `int levelSize = q.size()`.
+   - Temporary list banao: `List<Integer> currLevel = new ArrayList<>()`.
+
+4. Loop chalao `levelSize` times (`for(int i = 0; i < levelSize; i++)`):
+   - Node pop karo: `TreeNode currNode = q.poll()`.
+   - **Direction Handling:**
+     - Agar `flag == true` (L -> R): element ko end me add karo (`currLevel.add(currNode.val)`).
+     - Agar `flag == false` (R -> L): element ko 0-th index par daalo (`currLevel.add(0, currNode.val)`).
+   - Queue me children ka push order hamesha same rahega:
+     - Pehle `currNode.left` (agar non-null ho).
+     - Fir `currNode.right` (agar non-null ho).
+
+5. `currLevel` ko final `result` list me add karo.
+   Direction flip karo: `flag = !flag`.
+
+6. Final `result` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        3
+       / \
+      9   20
+          /  \
+         15   7
+
+Dry Run:
+- Initial: q = [3], flag = true, result = []
+
+Level 1 (flag = true -> L to R):
+- levelSize = 1
+- Poll 3 -> flag is true -> currLevel.add(3) -> currLevel = [3]
+- Queue me 9 aur 20 gaye -> q = [9, 20]
+- result = [[3]], flag = false
+
+Level 2 (flag = false -> R to L):
+- levelSize = 2
+- Poll 9 -> flag is false -> currLevel.add(0, 9) -> currLevel = [9]
+- Poll 20 -> flag is false -> currLevel.add(0, 20) -> currLevel = [20, 9]
+- Queue me 15 aur 7 gaye -> q = [15, 7]
+- result = [[3], [20, 9]], flag = true
+
+Level 3 (flag = true -> L to R):
+- levelSize = 2
+- Poll 15 -> flag is true -> currLevel.add(15) -> currLevel = [15]
+- Poll 7 -> flag is true -> currLevel.add(7) -> currLevel = [15, 7]
+- result = [[3], [20, 9], [15, 7]], flag = false
+
+Result: [[3], [20, 9], [15, 7]]
+
+--------------------------------------------------
+
+WHY KEEP QUEUE PUSH ORDER UNCHANGED?
+
+- Queue hamesha actual tree structure ko level-by-level (left-to-right) naturally traverse karti rahegi.
+- Direction reversal sirf value store karte waqt list me handle kiya jata hai (`add` vs `add(0, ...)` ya `LinkedList.addFirst()`), jisse queue ka sequence kabhi disturb nahi hota.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+W = Maximum width of tree (nodes at a level)
+
+Time:
+O(N) -> Har node queue me exactly ek baar add aur remove hoti hai.
+*(Note: ArrayList me `add(0, val)` $O(K)$ time leta hai shifting ki wajah se. Isko fully $O(1)$ karne ke liye `LinkedList` ya fixed-size array / two pointers use kar sakte hain).*
+
+Space:
+O(N) ya O(W) -> Queue me at most widest level ke nodes aate hain (worst case balanced tree me ~N/2 nodes).
+*(Excluding output list result)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Optimization discussion:**
+  `currLevel.add(0, currNode.val)` ArrayList me elements ko shift karta hai.
+  Interviewer ko optimize karke bata sakte ho:
+  1. `LinkedList<Integer>` use karo aur `addFirst()` call karo ($O(1)$ insertion at front).
+  2. Ya fixed-size array `int[] level = new int[levelSize]` banao aur index calculate karo:
+     - L to R: `index = i`
+     - R to L: `index = levelSize - 1 - i`
+- Core base problem: Binary Tree Level Order Traversal (LeetCode 102).
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (root == null) {
+            return result;
+        }
+
+        Queue<TreeNode> q = new LinkedList<>();
+        q.offer(root);
+        boolean flag = true; // true: L -> R, false: R -> L
+
+        while (!q.isEmpty()) {
+            int levelSize = q.size();
+            List<Integer> currLevel = new ArrayList<>();
+            
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode currNode = q.poll();
+
+                // Direction ke basis par insertion position decide karo
+                if (flag) {
+                    currLevel.add(currNode.val); // Append at end
+                } else {
+                    currLevel.add(0, currNode.val); // Insert at start
+                }
+
+                // Children hamesha Left -> Right order me hi queue me jayenge
+                if (currNode.left != null) {
+                    q.offer(currNode.left);
+                }
+                if (currNode.right != null) {
+                    q.offer(currNode.right);
+                }
+            }
+
+            result.add(currLevel);
+            flag = !flag; // Direction flip karo next level ke liye
+        }
+
+        return result;        
+    }
+}
