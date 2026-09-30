@@ -1,0 +1,134 @@
+# 101. Symmetric Tree
+
+## APPROACH: SYMMETRIC TREE (RECURSIVE / MIRROR DFS)
+
+Idea:
+Ek tree tabhi symmetric (apne center ke around mirror image) hota hai jab:
+1. Root ke Left Subtree aur Right Subtree ek dusre ke mirror reflections hon.
+2. Mirror ka rule:
+   - Left subtree ka left child == Right subtree ka right child (Outers match).
+   - Left subtree ka right child == Right subtree ka left child (Inners match).
+   - Dono corresponding nodes ki values equal honi chahiye.
+
+--------------------------------------------------
+
+APPROACH (Recursive / DFS)
+
+1. Edge Case:
+   Agar `root == null` ho, toh tree naturally symmetric hota hai (`return true`).
+   Otherwise, helper function call karo: `helper(root.left, root.right)`.
+
+2. Helper Function `helper(left, right)`:
+   - **Base Case 1 (Structural Null Check):**
+     Agar dono me se koi bhi node `null` hai:
+     `if (left == null || right == null) return (left == right);`
+     *(Dono null hain toh `true` return hoga, agar ek null aur ek non-null hai toh mismatch hone par `false` return hoga).*
+
+   - **Base Case 2 (Value Check):**
+     Agar dono nodes ki value match nahi karti:
+     `if (left.val != right.val) return false;`
+
+   - **Recursive Calls (Mirror Check):**
+     1. Outer branches compare karo: `helper(left.left, right.right)`
+     2. Inner branches compare karo: `helper(left.right, right.left)`
+     Dono conditions `true` aani chahiye:
+     `return helper(left.left, right.right) && helper(left.right, right.left);`
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        1
+       / \
+      2   2
+     / \ / \
+    3  4 4  3
+
+Dry Run:
+- Root 1 -> helper(Node 2-Left, Node 2-Right)
+- Values compare: 2 == 2 (Match!)
+- Check 1 (Outers): helper(3, 3)
+  - Values match (3 == 3)
+  - Left & right of both are null -> returns true
+- Check 2 (Inners): helper(4, 4)
+  - Values match (4 == 4)
+  - Left & right of both are null -> returns true
+- Node 2 level returns true && true = true.
+
+Result: true
+
+--------------------------------------------------
+
+WHY (left == right) SHORTCUT WORKS?
+
+- `if (left == null || right == null)` par aane ka matlab hai kam se kam ek node `null` zaroor hai.
+- Agar dono `null` hain, toh `left == right` evaluate hoke `true` de dega.
+- Agar sirf ek `null` hai aur doosra valid node hai, toh `left == right` evaluate hoke `false` de dega.
+- Yeh single-line clean syntax redundant `if-else` blocks ko replace karta hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node pair exactly ek baar visit aur compare hota hai. Short-circuit mismatch milte hi execution rok deta hai.
+
+Space:
+O(H) -> Recursive call stack tree ki height ke barabar memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Difference between Same Tree (LeetCode 100) and Symmetric Tree (LeetCode 101):
+  - Same Tree me parallel traverse karte hain: `(p.left, q.left)` aur `(p.right, q.right)`.
+  - Symmetric Tree me cross / mirror traverse karte hain: `(left.left, right.right)` aur `(left.right, right.left)`.
+- Interviewer follow-up: *"Iterative approach kaise karoge?"*
+  - **Iterative (Queue):** Ek `Queue<TreeNode>` lo. Starting me `queue.offer(root.left)` aur `queue.offer(root.right)` dalo. Loop me do-do nodes poll karke mirror order me children push karte jao: `(left.left, right.right)` then `(left.right, right.left)`.
+
+--------------------------------------------------
+
+# CODE:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        // Root null hai toh symmetric hai, warna left aur right subtree mirror check karo
+        return (root == null) || helper(root.left, root.right);        
+    }
+
+    private boolean helper(TreeNode left, TreeNode right) {
+        // Agar koi ek ya dono null hain: dono null honge toh true dega, ek null hoga toh false
+        if (left == null || right == null) {
+            return (left == right);
+        }
+
+        // Values match honi chahiye
+        if (left.val != right.val) {
+            return false;
+        }
+
+        // Mirror comparison: Outer pairs match && Inner pairs match
+        return helper(left.left, right.right) && helper(left.right, right.left);
+    }
+}
