@@ -1,0 +1,139 @@
+# 236. Lowest Common Ancestor of a Binary Tree
+
+## APPROACH: LOWEST COMMON ANCESTOR (POSTORDER / DFS)
+
+Idea:
+Lowest Common Ancestor (LCA) wo sabse lowest node hoti hai jiske descendants me `p` aur `q` dono aate hon (node khud ka bhi descendant ho sakti hai).
+Bottom-Up DFS follow karenge:
+Har node apne left aur right subtrees se poochti hai: "Kya tumhe `p` ya `q` mila?"
+1. Agar kisi node ko ek taraf se `p` aur doosri taraf se `q` mile (dono side non-null), toh wahi node turning point / LCA hai (`return root`).
+2. Agar sirf ek side se answer mile aur doosri side `null` ho, toh wahi non-null answer upar pass kar do.
+
+--------------------------------------------------
+
+APPROACH (Recursive / DFS)
+
+1. Base Cases:
+   - Agar `root == null` ho, `null` return karo.
+   - Agar current node hi `p` ya `q` ke barabar ho (`root == p || root == q`), toh current `root` ko hi return kar do.
+   Combined:
+   `if (root == null || root == p || root == q) return root;`
+
+2. Recursive Calls (Divide):
+   - Left subtree me search karo:
+     `TreeNode left = lowestCommonAncestor(root.left, p, q);`
+   - Right subtree me search karo:
+     `TreeNode right = lowestCommonAncestor(root.right, p, q);`
+
+3. Result Combination (Conquer):
+   - Agar `left == null` hai:
+     Matlab left subtree me na `p` mila na `q`, toh jo right se mila hai usse return karo (`return right`).
+   - Agar `right == null` hai:
+     Matlab right subtree me kuch nahi mila, toh left wala return karo (`return left`).
+   - Agar dono non-null hain (`left != null && right != null`):
+     Ek target left subtree me mila aur ek right subtree me, iska matlab current node hi inka common ancestor hai -> `return root`.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+          3
+        /   \
+       5     1
+      / \   / \
+     6   2 0   8
+        / \
+       7   4
+
+Find LCA of p = 5, q = 4:
+
+Dry Run:
+- Call on 3:
+  - Left call on 5:
+    - 5 == p (Match!) -> returns 5 immediately
+  - Right call on 1:
+    - 1 ke left (0) -> returns null
+    - 1 ke right (8) -> returns null
+    - 1 returns null
+- At root 3:
+  - left = 5, right = null
+  - Condition: right == null -> return left (5)
+
+Result: 5 (Node 5 itself is the ancestor of 4)
+
+Find LCA of p = 5, q = 1:
+- Left subtree of 3 returns 5
+- Right subtree of 3 returns 1
+- At root 3: left != null && right != null -> return 3
+
+Result: 3
+
+--------------------------------------------------
+
+WHY THIS BASE CASE WORKS IF ONE NODE IS UNDER ANOTHER?
+
+- E.g. agar `p = 5` aur `q = 4` (jo 5 ke neeche hai):
+- Jaise hi hum node 5 par pahuche, `root == p` hit ho gaya aur humne turant 5 return kar diya bina 4 ko dhoonde.
+- Yeh isliye safe hai kyunki constraints me diya hai ki **dono nodes tree me guarantee exist karte hain**. Agar 4 node 5 ke neeche tha, toh 5 hi unka common ancestor banega.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Worst case me har node exactly ek baar visit hoti hai.
+
+Space:
+O(H) -> Recursive call stack height ke barabar memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Constraint check zaroori hai:
+  - "Kya `p` aur `q` tree me hamesha exist karenge?"
+  - Agar answer YES hai, toh yeh O(N) bottom-up approach perfect hai.
+  - Agar answer NO hai (node missing ho sakti hai), toh yeh approach fail ho sakti hai (kyunki agar ek mil jaye toh doosre ko search nahi karta). Us case me full traversal + counter/boolean flags maintain karne padte hain.
+- BST Variant:
+  - Lowest Common Ancestor of a BST (LeetCode 235) - Wahan BST properties (left < root < right) use karke bina poora tree traverse kiye O(H) time me solve ho jata hai.
+
+--------------------------------------------------
+
+# CODE:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        // Base case: null mile ya target node (p ya q) mil jaye
+        if (root == null || root == p || root == q) {
+            return root;
+        }
+
+        // Left aur Right subtrees me search karo
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+
+        // Result combination
+        if (left == null) {
+            return right; // Left me kuch nahi mila, right wala answer hoga
+        } else if (right == null) {
+            return left;  // Right me kuch nahi mila, left wala answer hoga
+        } else {
+            return root;  // Dono taraf se node mili, toh current root hi LCA hai
+        }
+    }
+}
