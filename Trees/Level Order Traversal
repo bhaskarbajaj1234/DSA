@@ -1,0 +1,151 @@
+# 102. Binary Tree Level Order Traversal
+
+## APPROACH: BINARY TREE LEVEL ORDER TRAVERSAL
+
+Idea:
+Tree ko horizontally level-by-level traverse karna hai (Breadth First Search - BFS).
+Pehle Level 0 (root), fir Level 1 (root ke children), fir Level 2, and so on.
+Har level ke elements ko ek separate list me store karna hai.
+
+--------------------------------------------------
+
+APPROACH (Iterative / BFS using Queue)
+
+1. Edge Case:
+   Agar `root == null` hai, seedha empty list return kar do.
+
+2. Ek Queue (`Queue<TreeNode>`) banao aur root ko insert (`offer`) karo.
+
+3. Jab tak queue empty na ho jaye (`while(!queue.isEmpty())`):
+   - Current level ka size nikaalo: `levelSize = queue.size()`.
+     (Yeh step critical hai: isse pata chalta hai ki current level me kitne nodes hain).
+   - Ek temporary list banao: `currLevel`.
+
+4. Exactly `levelSize` times loop chalao (`for(int i = 0; i < levelSize; i++)`):
+   - Queue se node bahar nikaalo (`poll`).
+   - Uski value `currLevel` me add karo.
+   - Agar uska `left` child exist karta hai, usse queue me dalo.
+   - Agar uska `right` child exist karta hai, usse queue me dalo.
+
+5. Loop khatam hone par `currLevel` list ko main `result` list me add kar do.
+
+6. Final `result` return karo.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+      3
+     / \
+    9   20
+        /  \
+       15   7
+
+Dry Run:
+- Initial: Queue = [3], result = []
+
+Level 1:
+- levelSize = 1
+- Poll 3 -> currLevel = [3]
+- Queue me 9 aur 20 add huye -> Queue = [9, 20]
+- result = [[3]]
+
+Level 2:
+- levelSize = 2
+- Poll 9 -> currLevel = [9] (9 ke children null hain)
+- Poll 20 -> currLevel = [9, 20] (20 ke children 15 aur 7 queue me gaye)
+- Queue = [15, 7]
+- result = [[3], [9, 20]]
+
+Level 3:
+- levelSize = 2
+- Poll 15 -> currLevel = [15]
+- Poll 7 -> currLevel = [15, 7]
+- Queue empty
+- result = [[3], [9, 20], [15, 7]]
+
+--------------------------------------------------
+
+WHY QUEUE?
+
+- Level order traversal FIFO (First In, First Out) principle follow karta hai.
+- Jo node pehle level par aayi hai, uske children ko baad ke levels ke liye queue ke end me daalna hota hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+W = Maximum width of binary tree (maximum nodes at any level)
+
+Time:
+O(N) -> Har node queue me exactly ek baar insert aur ek baar remove hoti hai.
+
+Space:
+O(N) ya O(W) -> Queue me at most kisi level ke saare nodes rahenge.
+Full binary tree ke case me last level par lagbhag N/2 nodes hote hain, toh queue space O(N) ho sakti hai.
+*(Excluding output result list)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Size freeze karna sabse important trick hai: `int levelSize = queue.size()` loop se pehle store karna padta hai, kyunki loop ke andar hum next level ke nodes push kar rahe hote hain jisse queue ka size change hota rehta hai.
+- Follow-up variations:
+  1. Zigzag Level Order Traversal (alternate levels reverse karke).
+  2. Right/Left view of Binary Tree (har level ka last ya first element pick karke).
+  3. Average/Max value of each level.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (root == null) {
+            return result;
+        }
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            List<Integer> currLevel = new ArrayList<>();
+
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode currNode = queue.poll();
+                currLevel.add(currNode.val);
+
+                if (currNode.left != null) {
+                    queue.offer(currNode.left);
+                }
+                if (currNode.right != null) {
+                    queue.offer(currNode.right);
+                }
+            }
+            result.add(currLevel);
+        }
+
+        return result;
+    }
+}
