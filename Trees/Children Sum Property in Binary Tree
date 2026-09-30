@@ -1,0 +1,99 @@
+# 239. Children Sum Property in Binary Tree
+
+## APPROACH: CHILDREN SUM PROPERTY (RECURSIVE / DFS)
+
+Idea:
+Har internal node ki value uske left aur right child ki values ke sum ke barabar honi chahiye (`node.val == left.val + right.val`).
+Missing (`null`) child ko 0 treat karna hai.
+Leaf nodes aur null nodes automatically condition satisfy karte hain.
+
+--------------------------------------------------
+
+APPROACH (Recursive / DFS)
+
+1. Base Cases:
+   - Agar `root == null` ho, toh property satisfy hoti hai -> `return true`.
+   - Agar node leaf ho (`root.left == null && root.right == null`), toh rule automatically satisfied hai -> `return true`.
+
+2. Children Sum Calculate Karo:
+   - `int child = 0;`
+   - Agar left child present hai, uski value add karo: `child += root.left.val`.
+   - Agar right child present hai, uski value add karo: `child += root.right.val`.
+
+3. Condition Check:
+   - Current node condition satisfy kare: `root.val == child`
+   - Dono left aur right subtrees bhi valid hon:
+     `checkChildrenSum(root.left) && checkChildrenSum(root.right)`
+
+4. Agar teeno conditions true hain toh `return true`, warna `return false`.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        35
+       /  \
+     20    15
+    /  \   / \
+   15   5 10  5
+
+Dry Run:
+- Leaves (15, 5, 10, 5) -> All return true
+- Node 20: child = 15 + 5 = 20 -> 20 == 20 && true && true -> returns true
+- Node 15: child = 10 + 5 = 15 -> 15 == 15 && true && true -> returns true
+- Root 35: child = 20 + 15 = 35 -> 35 == 35 && true && true -> returns true
+
+Result: true
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node exactly ek baar visit hoti hai (short-circuit mismatch par pehle hi ruk jata hai).
+
+Space:
+O(H) -> Recursive call stack height ke barabar memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Critical bug trap: `if (root == null) return true;` hona chahiye, `return false;` nahi. Agar `false` return kar diya, toh jis bhi node ka single child hoga, uske missing doosre child par call jaate hi poora answer galat `false` ban jayega.
+- Follow-up problem (Hard variant):
+  - Convert an arbitrary binary tree to hold Children Sum Property (jisme tree modify karna allow hota hai without decreasing any node's value).
+
+--------------------------------------------------
+
+# CODE:
+
+// class TreeNode {
+//     int val;
+//     TreeNode left, right;
+//     TreeNode(int x) { val = x; }
+// }
+
+class Solution {
+    boolean checkChildrenSum(TreeNode root) { 
+        // Base Case 1: Null node vacuously satisfies the property
+        if (root == null) return true;
+
+        // Base Case 2: Leaf node automatically satisfies the rules
+        if (root.left == null && root.right == null) return true;
+
+        int child = 0;
+        if (root.left != null) child += root.left.val;
+        if (root.right != null) child += root.right.val;
+
+        // Current node match AND both subtrees satisfy the property
+        return (root.val == child) 
+            && checkChildrenSum(root.left) 
+            && checkChildrenSum(root.right);
+    }
+}
