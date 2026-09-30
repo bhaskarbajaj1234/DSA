@@ -1,0 +1,151 @@
+# 195. Print Root to Leaf Paths in Binary Tree
+
+## APPROACH: ROOT TO LEAF PATHS (BACKTRACKING / PREORDER DFS)
+
+Idea:
+Root se lekar har leaf node tak ka path trace karna hai.
+Preorder traversal (DFS) follow karenge:
+1. Current node ki value path list (`currentPath`) me add karo.
+2. Agar leaf node mil jaye (`left == null && right == null`), toh current path ki copy banakar final answer list (`allPath`) me daal do.
+3. Agar leaf nahi hai, toh left aur right subtrees me recursively explore karo.
+4. Backtracking step: Wapas aate waqt current node ko path se remove karo (`currentPath.remove(...)`) taaki doosri branch ke path me wo interfere na kare.
+
+--------------------------------------------------
+
+APPROACH (Recursive / Backtracking DFS)
+
+1. Edge Case:
+   Agar `root == null` ho, empty list return kar do.
+
+2. DFS Backtracking Helper:
+   - Base Case: Agar `root == null`, return kar jao.
+   - **Step 1 (Choose):** Current node ki value `currentPath` me add karo:
+     `currentPath.add(root.data);`
+   - **Step 2 (Leaf Check):**
+     Agar node leaf hai (`root.left == null && root.right == null`):
+     - Current path ki deep copy banakar final list me add karo:
+       `allPath.add(new ArrayList<>(currentPath));`
+   - **Step 3 (Explore):**
+     Agar internal node hai, dono directions me explore karo:
+     - `helper(root.left, currentPath, allPath)`
+     - `helper(root.right, currentPath, allPath)`
+   - **Step 4 (Backtrack):**
+     Subtree exploration khatam hone ke baad current node ko remove karo:
+     `currentPath.remove(currentPath.size() - 1);`
+
+3. Final `allPath` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+            1
+          /   \
+         2     3
+        /     / \
+       4     5   6
+        \
+         7
+
+Dry Run:
+- Visit 1 -> path = [1]
+- Visit 2 -> path = [1, 2]
+- Visit 4 -> path = [1, 2, 4]
+- Visit 7 -> path = [1, 2, 4, 7] (Leaf found!)
+  - allPath.add([1, 2, 4, 7])
+  - Backtrack 7 -> path = [1, 2, 4]
+  - Backtrack 4 -> path = [1, 2]
+  - Backtrack 2 -> path = [1]
+- Visit 3 -> path = [1, 3]
+- Visit 5 -> path = [1, 3, 5] (Leaf found!)
+  - allPath.add([1, 3, 5])
+  - Backtrack 5 -> path = [1, 3]
+- Visit 6 -> path = [1, 3, 6] (Leaf found!)
+  - allPath.add([1, 3, 6])
+  - Backtrack 6 -> path = [1, 3]
+  - Backtrack 3 -> path = [1]
+  - Backtrack 1 -> path = []
+
+Result: [[1, 2, 4, 7], [1, 3, 5], [1, 3, 6]]
+
+--------------------------------------------------
+
+WHY new ArrayList<>(currentPath)?
+
+- `currentPath` ka reference agar direct pass kar doge, toh future me hone wale saare modifications (aur backtracking ke removes) us list me reflect ho jayenge aur aakhiri me saare paths empty ho jayenge.
+- `new ArrayList<>(currentPath)` us snapshot ki ek independent copy banata hai jo safely preserve rehti hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+L = Number of leaf nodes
+
+Time:
+O(N) -> Har node exactly ek baar visit hoti hai. Leaf nodes par path copy karne me O(H) time lagta hai, toh worst case me O(N * H).
+
+Space:
+O(H) -> Recursive call stack aur `currentPath` list dono tree ki height ke proportional space lete hain.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+*(Excluding output list allPath)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Classic Backtracking Pattern:
+  - "Add -> Explore -> Remove"
+  - `currentPath.remove(currentPath.size() - 1)` ko loop/recursion unwinding ke end me rakhna compulsory hai.
+- Related LeetCode Problems:
+  1. Binary Tree Paths (LeetCode 257) - Wahan paths string format me maangte hain (`"1->2->5"`).
+  2. Path Sum II (LeetCode 113) - Same logic, bas leaf par `sum == targetSum` check karna hota hai.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int data;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int val) { data = val; left = null; right = null; }
+ * }
+ **/
+
+class Solution {
+    public List<List<Integer>> allRootToLeaf(TreeNode root) {
+        List<List<Integer>> allPath = new ArrayList<>();
+        List<Integer> currentPath = new ArrayList<>();
+
+        helper(root, currentPath, allPath);
+
+        return allPath;
+    }
+
+    private void helper(TreeNode root, List<Integer> currentPath, List<List<Integer>> allPath) {
+        if (root == null) return;
+
+        // Step 1: Add current node to path
+        currentPath.add(root.data);
+
+        // Step 2: If leaf node, snapshot current path
+        if (root.left == null && root.right == null) {
+            allPath.add(new ArrayList<>(currentPath));
+        } else {
+            // Step 3: Explore left and right subtrees
+            helper(root.left, currentPath, allPath);
+            helper(root.right, currentPath, allPath);
+        }
+
+        // Step 4: Backtrack (remove current node before returning to parent)
+        currentPath.remove(currentPath.size() - 1);
+    }
+}
