@@ -1,0 +1,167 @@
+# 987. Vertical Order Traversal of a Binary Tree
+
+## APPROACH: VERTICAL ORDER TRAVERSAL (COORDINATE SYSTEM + MULTI-LEVEL SORTING)
+
+Idea:
+Har node ko 2D plane par ek coordinate maano:
+- Root starts at `(row = 0, col = 0)`.
+- Left child jaata hai `(row + 1, col - 1)`.
+- Right child jaata hai `(row + 1, col + 1)`.
+
+Question ka sorting order constraint bohot specific hai:
+1. Column-wise: Leftmost column se rightmost column (`col` increasing).
+2. Row-wise: Agar column same hai, toh upar se neeche (`row` increasing).
+3. Value-wise: Agar `col` aur `row` dono same hon (overlap), toh values naturally sorted honi chahiye (`val` increasing).
+
+--------------------------------------------------
+
+APPROACH (DFS / Preorder Traversal + Custom Sorting)
+
+1. Coordinate Collection:
+   - Ek helper class `Point` banao: `(val, row, col)`.
+   - Tree ko traverse karke (DFS / BFS) saare nodes ke coordinates ek list `points` me store karo:
+     - Left call: `traverse(root.left, row + 1, col - 1, points)`
+     - Right call: `traverse(root.right, row + 1, col + 1, points)`
+
+2. 3-Tier Comparator Sorting:
+   `points` list ko 3 conditions ke basis par sort karo:
+   - If `a.col != b.col`: `a.col - b.col` (Left to Right columns)
+   - Else if `a.row != b.row`: `a.row - b.row` (Top to Bottom rows)
+   - Else: `a.val - b.val` (Overlapping cells me smaller value pehle)
+
+3. Grouping by Column:
+   - Sorted points ko traverse karo aur `LinkedHashMap<Integer, List<Integer>>` me `col` ke basis par group karo.
+   - Map ki saari values ko list of lists bana kar return kar do: `new ArrayList<>(map.values())`.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+          1 (0,0)
+        /   \
+    2 (1,-1) 3 (1,1)
+    /   \    /   \
+4(2,-2) 5(2,0) 6(2,0) 7(2,2)
+
+Dry Run:
+Points Collected:
+(1, 0, 0), (2, 1, -1), (4, 2, -2), (5, 2, 0), (3, 1, 1), (6, 2, 0), (7, 2, 2)
+
+After 3-Tier Sorting:
+- col -2: (4, 2, -2)
+- col -1: (2, 1, -1)
+- col  0:
+  - row 0: (1, 0, 0)
+  - row 2: (5, 2, 0) aur (6, 2, 0) -> dono same spot par hain, val sort hogi -> 5, 6
+  => [1, 5, 6]
+- col  1: (3, 1, 1)
+- col  2: (7, 2, 2)
+
+Result: [[4], [2], [1, 5, 6], [3], [7]]
+
+--------------------------------------------------
+
+WHY THIS SORTING LOGIC?
+
+- Normal BFS/Queue se Level Order karte waqt same level ke nodes automatically `row` sorted toh hote hain, par jab do nodes same `(row, col)` par collide karti hain (e.g., node 5 aur 6), tab unhe numerically sort karna standard BFS queue me tricky ho jata hai.
+- Sare points ko collect karke ek hi custom comparator se sort karna implementation ko extremely clean aur bug-free bana deta hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N log N) ->
+- Traversal: O(N) har node visit hoti hai.
+- Sorting: N points ko sort karne me O(N log N) time lagta hai.
+- Map grouping: O(N).
+Total Time = O(N log N).
+
+Space:
+O(N) ->
+- `points` list: N elements.
+- Recursive stack: O(H).
+- Map & Result: O(N).
+Total Space = O(N).
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Trap Condition (The "Hard" part):
+  Normal vertical order traversal me overlap par sorting nahi hoti (LeetCode standard vs Hard variation).
+  Is question me:
+  "There may be multiple nodes in the same row and same column. In such a case, sort these nodes by their values."
+  Isi ek line ki wajah se comparator me 3rd condition (`a.val - b.val`) aati hai.
+- BFS vs DFS:
+  Dono se solve ho sakta hai. BFS me `Queue` + `TreeMap<Integer, TreeMap<Integer, PriorityQueue<Integer>>>` use hota hai, jo implement karne me thoda verbose hota hai. DFS + Comparator approach code readable aur concise rakhta hai.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    class Point {
+        int val, row, col;
+        Point(int val, int row, int col) {
+            this.val = val;
+            this.row = row;
+            this.col = col;
+        }
+    }
+
+    public List<List<Integer>> verticalTraversal(TreeNode root) {
+        List<Point> points = new ArrayList<>();
+
+        // Step 1: Har node ke coordinates (row, col) collect karo
+        traverse(root, 0, 0, points);
+
+        // Step 2: 3-tier custom comparator se sort karo
+        Collections.sort(points, (a, b) -> {
+            if (a.col != b.col) return a.col - b.col; // 1. Leftmost column pehle
+            if (a.row != b.row) return a.row - b.row; // 2. Top-most row pehle
+            return a.val - b.val;                     // 3. Overlap par smaller value pehle
+        });
+
+        // Step 3: Column-wise group karo (LinkedHashMap insertion order preserve karega)
+        Map<Integer, List<Integer>> map = new LinkedHashMap<>();
+        for (Point p : points) {
+            if (!map.containsKey(p.col)) {
+                map.put(p.col, new ArrayList<>());
+            }
+            map.get(p.col).add(p.val);
+        }
+
+        return new ArrayList<>(map.values());
+    }
+
+    private void traverse(TreeNode root, int row, int col, List<Point> points) {
+        if (root == null) return;
+
+        points.add(new Point(root.val, row, col));
+
+        traverse(root.left, row + 1, col - 1, points);
+        traverse(root.right, row + 1, col + 1, points);
+    }
+}
