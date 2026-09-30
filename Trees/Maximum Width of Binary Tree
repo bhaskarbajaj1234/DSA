@@ -1,0 +1,192 @@
+# 662. Maximum Width of Binary Tree
+
+## APPROACH: MAXIMUM WIDTH OF BINARY TREE (BFS + 0-BASED SEGMENT INDEXING)
+
+Idea:
+Kisi bhi level par width = (Rightmost non-null node ka index - Leftmost non-null node ka index + 1).
+Beech me aane wale hypothetical null nodes bhi count honge.
+Complete Binary Tree indexing rule (0-based):
+- Agar parent node ka index `i` hai:
+  - Left child = `2 * i + 1`
+  - Right child = `2 * i + 2`
+
+Integer Overflow Prevention:
+Tree skewed ya deep ho toh index $2^{\text{height}}$ exponential badhta hai aur standard 32-bit signed integer overflow kar jaata hai.
+Isliye har level ki shuruat me level ke pehle index ko subtract karke normalize karte hain:
+`currIndex = curr.idx - startLevelIndex`.
+Isse har level par indexing wapas 0 se restart ho jaati hai bina relative distance ko effect kiye.
+
+--------------------------------------------------
+
+APPROACH (Level Order / BFS using Queue)
+
+1. Edge Case:
+   Agar `root == null` ho, `0` return kar do.
+
+2. Data Structures:
+   - Helper class `Pair`: `(TreeNode node, int idx)`.
+   - `Queue<Pair> q` initialize karo aur `root` ko index `0` ke sath offer karo:
+     `q.offer(new Pair(root, 0));`
+   - `int maxWidth = 0;`
+
+3. Level Order Loop:
+   - Current level ka size nikalo: `levelSize = q.size()`.
+   - Current level ka base index lock karo:
+     `int startLevelIndex = q.peek().idx;`
+   - `first = 0`, `last = 0` initialize karo.
+
+4. Current Level ke Nodes Process Karo (`for (int i = 0; i < levelSize; i++)`):
+   - Element poll karo: `Pair curr = q.poll();`.
+   - Overflow bachane ke liye index normalize karo:
+     `int currIndex = curr.idx - startLevelIndex;`
+   - Pehli node par: `if (i == 0) first = currIndex;`
+   - Aakhiri node par: `if (i == levelSize - 1) last = currIndex;`
+   - Left child push karo with index `2 * currIndex + 1`.
+   - Right child push karo with index `2 * currIndex + 2`.
+
+5. Width Update:
+   - Level width = `last - first + 1`.
+   - `maxWidth = Math.max(maxWidth, last - first + 1);`
+
+6. Loop end hone par `maxWidth` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+          1 (idx 0)
+        /   \
+       3     2
+      / \     \
+     5   3     9
+
+Dry Run:
+- Level 0:
+  - Queue = [(1, 0)], startLevelIndex = 0
+  - currIndex = 0 - 0 = 0 -> first = 0, last = 0
+  - Children: (3, 1), (2, 2)
+  - maxWidth = max(0, 0 - 0 + 1) = 1
+
+- Level 1:
+  - Queue = [(3, 1), (2, 2)], startLevelIndex = 1
+  - Node 3: currIndex = 1 - 1 = 0 -> first = 0
+    - Children of 3: left (5, 2*0+1 = 1), right (3, 2*0+2 = 2)
+  - Node 2: currIndex = 2 - 1 = 1 -> last = 1
+    - Children of 2: right (9, 2*1+2 = 4)
+  - maxWidth = max(1, 1 - 0 + 1) = 2
+
+- Level 2:
+  - Queue = [(5, 1), (3, 2), (9, 4)], startLevelIndex = 1
+  - Node 5: currIndex = 1 - 1 = 0 -> first = 0
+  - Node 3: currIndex = 2 - 1 = 1
+  - Node 9: currIndex = 4 - 1 = 3 -> last = 3
+  - maxWidth = max(2, 3 - 0 + 1) = 4 (Nodes: 5, 3, null, 9)
+
+Result: 4
+
+--------------------------------------------------
+
+WHY SUBTRACT startLevelIndex?
+
+- Deep tree me (e.g. height 60+), bina index reset kiye formula `2 * i + 1` integer boundary ($2^{31} - 1$) ko cross kar jayega aur negative values (overflow) dene lagega.
+- Relative difference `last - first + 1` calculate karna hota hai, toh har level par coordinates ko shift karne se distance change nahi hota:
+  $$(last - X) - (first - X) + 1 = last - first + 1$$
+  Is trick se integer overflow completely avoid ho jata hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+W = Maximum width of tree
+
+Time:
+O(N) -> Har node queue me exactly ek baar visit hoti hai.
+
+Space:
+O(W) ya O(N) -> Queue me at most widest level ke nodes store hote hain.
+*(Excluding variables)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Trap: Normal BFS level size vs Question ka width:
+  Normal BFS level size sirf non-null nodes count karta hai. Yahan **null nodes between endpoints** ko bhi count karna hai, isliye positional segment-tree indexing compulsory hai.
+- 0-based vs 1-based indexing:
+  - 0-based: Left = `2*i + 1`, Right = `2*i + 2`
+  - 1-based: Left = `2*i`, Right = `2*i + 1`
+  Dono se same result aata hai as long as normalization consistent ho.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    class Pair {
+        TreeNode node;
+        int idx;
+        Pair(TreeNode node, int idx) {
+            this.node = node;
+            this.idx = idx;
+        }
+    }
+
+    public int widthOfBinaryTree(TreeNode root) {
+        if (root == null) return 0;
+
+        int maxWidth = 0;
+        Queue<Pair> q = new LinkedList<>();
+        q.offer(new Pair(root, 0));
+
+        while (!q.isEmpty()) {
+            int levelSize = q.size();
+            
+            // Current level ke first element ka index pick karo
+            int startLevelIndex = q.peek().idx;
+            int first = 0;
+            int last = 0;
+
+            for (int i = 0; i < levelSize; i++) {
+                Pair curr = q.poll();
+                TreeNode currNode = curr.node;
+
+                // Overflow prevention: subtract base index of current level
+                int currIndex = curr.idx - startLevelIndex;
+
+                if (i == 0) first = currIndex;
+                if (i == levelSize - 1) last = currIndex;
+
+                if (currNode.left != null) {
+                    q.offer(new Pair(currNode.left, 2 * currIndex + 1));
+                }
+                if (currNode.right != null) {
+                    q.offer(new Pair(currNode.right, 2 * currIndex + 2));
+                }
+            }
+
+            maxWidth = Math.max(maxWidth, last - first + 1);
+        }
+
+        return maxWidth;
+    }
+}
