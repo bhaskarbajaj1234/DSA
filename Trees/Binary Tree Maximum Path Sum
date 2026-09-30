@@ -1,0 +1,160 @@
+# 124. Binary Tree Maximum Path Sum
+
+## APPROACH: MAXIMUM PATH SUM (OPTIMIZED POSTORDER / DFS)
+
+Idea:
+Binary tree me path non-empty hona chahiye aur kisi bhi node se shuru hoke kisi bhi node par end ho sakta hai (root se pass hona zaroori nahi).
+Har node par do cheezein calculate karni hoti hain:
+1. Local Curving Path (Max sum with current node as turning point):
+   `lVal + rVal + root.val` -> Isse hum global maximum path sum update karte hain.
+2. Parent ko contribute karne wala path:
+   Parent sirf ek branch choose kar sakta hai (ya left ya right), isliye return value hogi:
+   `root.val + Math.max(lVal, rVal)`.
+Negative sums ko ignore karne ke liye `Math.max(0, ...)` use karte hain.
+
+--------------------------------------------------
+
+APPROACH (Bottom-Up / DFS)
+
+1. Global Tracker:
+   `result[0] = Integer.MIN_VALUE` initialize karo kyunki tree me nodes ki values negative bhi ho sakti hain.
+
+2. Helper function `helper(root, result)`:
+   - Base Case:
+     Agar `root == null` ho, toh contribution `0` return karo.
+   
+   - Left aur Right subtrees ka contribution nikalo:
+     Negative contribution lene ka koi fayda nahi hota (sum kam ho jayega), isliye agar sum negative aaye toh `0` le lo:
+     `int lVal = Math.max(0, helper(root.left, result));`
+     `int rVal = Math.max(0, helper(root.right, result));`
+
+   - Global Max Path Sum Update:
+     Current node ko split point (turning point) maanke local complete path ka sum dekho:
+     `result[0] = Math.max(result[0], lVal + rVal + root.val);`
+
+   - Parent ko return karo:
+     Parent ko sirf ek straight path de sakte hain (ya to left branch se aayega ya right se):
+     `return root.val + Math.max(lVal, rVal);`
+
+3. Main function se `result[0]` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+       -10
+       /  \
+      9    20
+          /  \
+         15   7
+
+Dry Run:
+- Node 9:
+  - left = 0, right = 0
+  - result update: max(MIN_VALUE, 0 + 0 + 9) = 9
+  - returns to parent: 9 + max(0, 0) = 9
+
+- Node 15:
+  - left = 0, right = 0
+  - result update: max(9, 0 + 0 + 15) = 15
+  - returns to parent: 15 + max(0, 0) = 15
+
+- Node 7:
+  - left = 0, right = 0
+  - result update: max(15, 0 + 0 + 7) = 15
+  - returns to parent: 7 + max(0, 0) = 7
+
+- Node 20:
+  - lVal = 15, rVal = 7
+  - result update: max(15, 15 + 7 + 20) = 42 (Path: 15 -> 20 -> 7)
+  - returns to parent: 20 + max(15, 7) = 35
+
+- Root Node -10:
+  - lVal = max(0, 9) = 9
+  - rVal = max(0, 35) = 35
+  - result update: max(42, 9 + 35 + (-10)) = max(42, 34) = 42
+  - returns: -10 + 35 = 25
+
+Result: 42
+
+--------------------------------------------------
+
+WHY Math.max(0, ...) IS CRITICAL?
+
+- Agar kisi subtree ka total sum negative aa raha hai (e.g. -5), toh us branch ko path me shamil karne se overall sum kam ho jayega.
+- `Math.max(0, helper(...))` effectively us negative branch ko trim (discard) kar deta hai.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) -> Har node exactly ek baar visit hoti hai (single-pass Postorder DFS).
+
+Space:
+O(H) -> Recursive call stack height ke barabar memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Trap Test Case (All Negative Nodes):
+  Tree: `[-3]` ya `[-2, -1]`
+  Agar `result[0] = 0` initialize kar diya toh wrong answer (0) aayega, jabki answer negative node value hona chahiye (at least 1 node compulsory hai). Isliye `result[0] = Integer.MIN_VALUE` lagana must hai.
+- Difference between Return value and Result update:
+  - **Return:** Ek single path jo upar parent tak continue ho sake (`root.val + max(lVal, rVal)`).
+  - **Update:** Complete inverted 'V' path jo current node par turn le chuka ho (`root.val + lVal + rVal`).
+- Exact foundation: Diameter of Binary Tree (LeetCode 543) - Diameter me edges count karte hain (`lh + rh`), yahan weights add karte hain (`lVal + rVal + root.val`).
+
+--------------------------------------------------
+
+# CODE:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int maxPathSum(TreeNode root) {
+        int[] result = new int[1];
+        // Handle trees with all negative values
+        result[0] = Integer.MIN_VALUE;
+
+        helper(root, result);
+        return result[0]; 
+    }
+
+    private int helper(TreeNode root, int[] result) {
+        // Base case
+        if (root == null) {
+            return 0;
+        }
+
+        // Negative sums ko ignore karne ke liye Math.max(0, ...)
+        int lVal = Math.max(0, helper(root.left, result));
+        int rVal = Math.max(0, helper(root.right, result));
+
+        // Curving path through current node: update global maximum
+        result[0] = Math.max(result[0], lVal + rVal + root.val);
+
+        // Parent ko sirf ek valid branch ka contribution return karo
+        return root.val + Math.max(lVal, rVal);
+    }
+}
