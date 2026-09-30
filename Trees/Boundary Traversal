@@ -1,0 +1,187 @@
+# 216. Boundary Traversal of Binary Tree
+
+## APPROACH: BOUNDARY TRAVERSAL (ANTI-CLOCKWISE 3-STEP DFS)
+
+Idea:
+Boundary traversal root se start hoke anti-clockwise direction me 4 parts me divide hoti hai:
+1. Root Node (agar wo leaf na ho).
+2. Left Boundary nodes (top to bottom, excluding leaves).
+3. Saari Leaf Nodes (left to right order me).
+4. Right Boundary nodes (bottom to top / reverse order, excluding leaves).
+
+Leaf nodes ko boundary functions me include nahi karte taaki leaves do baar duplicate add na hon.
+
+--------------------------------------------------
+
+APPROACH
+
+1. Edge Case:
+   Agar `root == null` ho, empty list return karo.
+
+2. Root Handling:
+   Agar `root` akela leaf node nahi hai (`!isLeaf(root)`), toh usse result me add karo.
+
+3. Step 1: Left Boundary (`addLeftBoundary(root.left)`):
+   - Loop chalao jab tak node null na ho.
+   - Agar current node leaf nahi hai, toh result me add karo.
+   - Left child exist karta hai toh `curr = curr.left`, warna `curr = curr.right`.
+
+4. Step 2: Leaf Nodes (`addLeaves(root)`):
+   - Simple Preorder / DFS traversal karo.
+   - Jab bhi koi leaf node mile (`node.left == null && node.right == null`), uski value result me add karo.
+
+5. Step 3: Right Boundary (`addRightBoundary(root.right)`):
+   - Loop chalao jab tak node null na ho.
+   - Agar current node leaf nahi hai, toh usse ek temporary list/stack me add karo.
+   - Right child exist karta hai toh `curr = curr.right`, warna `curr = curr.left`.
+   - Temporary list ko reverse karke result list me add karo (Bottom to Top order ke liye).
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+          5
+        /   \
+       1     2
+      /     / \
+     8     4   5
+      \
+       6
+
+Dry Run:
+- Root: [5]
+- Left Boundary (excluding leaf):
+  - Node 1 (not leaf) -> add 1
+  - Node 8 (has right child 6, not leaf) -> add 8
+  - Node 6 is leaf -> stop
+  - Ans so far: [5, 1, 8]
+- Leaves (Left to Right):
+  - Traversal visits: 6, 4, 5
+  - Ans so far: [5, 1, 8, 6, 4, 5]
+- Right Boundary (Reverse order, excluding leaf):
+  - Node 2 (not leaf) -> add to temp
+  - Node 5 is leaf -> stop
+  - Reverse temp: [2]
+- Final Ans: [5, 1, 8, 6, 4, 5, 2]
+
+--------------------------------------------------
+
+WHY SEPARATE LEAF LOGIC?
+
+- Agar left aur right boundary me leaves ko bhi include kar lete, toh corner wali leaf nodes (jaise leftmost aur rightmost leaf) do-do baar add ho jaati.
+- Isliye rule hai:
+  - Left boundary: Non-leaf only
+  - Leaves function: All leaves
+  - Right boundary: Non-leaf only
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary tree
+
+Time:
+O(N) ->
+- Left boundary: O(H)
+- Right boundary: O(H)
+- Leaves traversal: O(N) (har node visit hoti hai)
+Total Time = O(N).
+
+Space:
+O(H) -> Recursive stack for leaves + temp list for right boundary (at most height H).
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
+*(Excluding output list ans)*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Traversal Direction Rule:
+  - Left boundary upar se neeche jaati hai (Top to Bottom).
+  - Right boundary neeche se upar aati hai (Bottom to Top), isliye Stack ya temporary list ko reverse karna zaroori hai.
+- Navigation Rule:
+  - Left boundary me hamesha left jao; agar left null hai tabhi right jao.
+  - Right boundary me hamesha right jao; agar right null hai tabhi left jao.
+- Edge case: Single node tree (`root` jisme koi child na ho) -> ans sirf `[root.data]` hona chahiye, duplicate add nahi hona chahiye.
+
+--------------------------------------------------
+
+# CODE:
+
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int data;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int val) { data = val; left = null; right = null; }
+ * }
+ **/
+
+class Solution {
+    public List<Integer> boundary(TreeNode root) {
+        List<Integer> ans = new ArrayList<>();
+        if (root == null) return ans;
+
+        // Root leaf nahi hai toh add karo (leaf function isse baad me cover karega)
+        if (!isLeaf(root)) {
+            ans.add(root.data);
+        }
+
+        // 1. Left boundary top-to-bottom
+        addLeftBoundary(root.left, ans);
+
+        // 2. All leaves left-to-right
+        addLeaves(root, ans);
+
+        // 3. Right boundary bottom-to-top (reverse)
+        addRightBoundary(root.right, ans);
+
+        return ans;
+    }
+
+    private boolean isLeaf(TreeNode node) {
+        return (node.left == null && node.right == null);
+    }
+
+    private void addLeftBoundary(TreeNode node, List<Integer> ans) {
+        TreeNode curr = node;
+        while (curr != null) {
+            if (!isLeaf(curr)) ans.add(curr.data);
+            if (curr.left != null) curr = curr.left;
+            else curr = curr.right;
+        }
+    }
+
+    private void addLeaves(TreeNode node, List<Integer> ans) {
+        if (node == null) return;
+        if (isLeaf(node)) {
+            ans.add(node.data);
+            return;
+        }
+
+        addLeaves(node.left, ans);
+        addLeaves(node.right, ans);
+    }
+
+    private void addRightBoundary(TreeNode node, List<Integer> ans) {
+        TreeNode curr = node;
+        List<Integer> temp = new ArrayList<>();
+
+        while (curr != null) {
+            if (!isLeaf(curr)) temp.add(curr.data);
+            if (curr.right != null) curr = curr.right;
+            else curr = curr.left;
+        }
+
+        // Reverse order me add karo bottom-to-top ke liye
+        for (int i = temp.size() - 1; i >= 0; i--) {
+            ans.add(temp.get(i));
+        }
+    }
+}
