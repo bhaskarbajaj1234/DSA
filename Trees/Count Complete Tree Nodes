@@ -1,0 +1,162 @@
+# 222. Count Complete Tree Nodes
+
+## APPROACH: COUNT COMPLETE TREE NODES (OPTIMIZED O(log² N) USING CBT PROPERTIES)
+
+Idea:
+Normal tree me nodes count karne me $O(N)$ lagta hai (`1 + count(left) + count(right)`).
+Par yeh **Complete Binary Tree (CBT)** hai:
+- Agar kisi subtree ki leftmost height (`lh`) uski rightmost height (`rh`) ke barabar hai, toh wo ek **Perfect Binary Tree** hai!
+- Perfect Binary Tree ke total nodes ka direct mathematical formula hota hai:
+  $$\text{Total Nodes} = 2^h - 1$$
+(code me `(1 << h) - 1`).
+- Agar `lh != rh` hai, sirf tabhi recursive call karo: `1 + countNodes(root.left) + countNodes(root.right)`.
+Har step par dono subtrees me se kam se kam ek subtree perfect binary tree zaroor banta hai, jisse time complexity drop hoke $O(\log^2 N)$ ban jaati hai.
+
+--------------------------------------------------
+
+APPROACH (Divide & Conquer / Mathematical DFS)
+
+1. Base Case:
+   Agar `root == null` ho, `0` return kar do:
+   `if (root == null) return 0;`
+
+2. Heights Calculate Karo:
+   - `int leftHeight = getLeftHeight(root);` (Extreme left jaate raho: `node = node.left`).
+   - `int rightHeight = getRightHeight(root);` (Extreme right jaate raho: `node = node.right`).
+
+3. Perfect Binary Tree Check:
+   - Agar `leftHeight == rightHeight`:
+     Matlab current subtree completely filled hai.
+     Formula laga kar direct return karo:
+     `return (1 << leftHeight) - 1;`  *(where `1 << h` means $2^h$)*.
+
+4. Partial CBT Case:
+   - Agar `leftHeight != rightHeight`:
+     Dono subtrees ko recursively count karo aur current root (+1) add karo:
+     `return 1 + countNodes(root.left) + countNodes(root.right);`
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+          1
+        /   \
+       2     3
+      / \   /
+     4   5 6
+
+Dry Run:
+- Root 1:
+  - leftHeight (1 -> 2 -> 4) = 3
+  - rightHeight (1 -> 3 -> null) = 2
+  - 3 != 2 -> recursive calls: 1 + countNodes(2) + countNodes(3)
+
+- Node 2 (Left child):
+  - leftHeight (2 -> 4) = 2
+  - rightHeight (2 -> 5) = 2
+  - leftHeight == rightHeight (2 == 2) -> Perfect Tree!
+  - returns (1 << 2) - 1 = 4 - 1 = 3 (Nodes: 2, 4, 5)
+
+- Node 3 (Right child):
+  - leftHeight (3 -> 6) = 2
+  - rightHeight (3 -> null) = 1
+  - 2 != 1 -> 1 + countNodes(6) + countNodes(null)
+  - Node 6: lh = 1, rh = 1 -> returns (1 << 1) - 1 = 1
+  - Node null: returns 0
+  - Node 3 returns 1 + 1 + 0 = 2 (Nodes: 3, 6)
+
+- Root 1 combines:
+  1 + 3 + 2 = 6
+
+Result: 6
+
+--------------------------------------------------
+
+WHY (1 << height) - 1?
+
+- Bitwise Left Shift `1 << k` fast way me $2^k$ calculate karta hai:
+  - `1 << 1` = 2, $2 - 1 = 1$
+  - `1 << 2` = 4, $4 - 1 = 3$
+  - `1 << 3` = 8, $8 - 1 = 7$
+- Perfect binary tree of height $h$ me exactly $2^h - 1$ nodes hote hain. Math formula O(1) me result deta hai bina subtree ke nodes traverse kiye.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of tree = O(log N) (kyunki CBT balanced hota hai)
+
+Time:
+O(log² N) ->
+- Har step par height nikaalne me O(log N) time lagta hai.
+- CBT property ki wajah se har level par dono me se koi ek branch $O(1)$ me formula se resolve ho jaati hai, toh at most $O(\log N)$ recursive steps bante hain.
+- Total Time = O(log N * log N) = O(log² N), which is strictly less than O(N).
+
+Space:
+O(log N) -> Recursion call stack height ke barabar memory leta hai.
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- Interview Question: *"Why not simply do normal DFS/BFS in O(N)?"*
+  - Answer: Problem statement explicitly bolta hai: *"Design an algorithm that runs in less than O(n) time complexity."*
+  - $O(N)$ code accept ho sakta hai standard platform par, par interview me seedha reject ho jayega agar CBT property ($O(\log^2 N)$) leverage nahi ki.
+- Alternative $O(\log^2 N)$ Approach:
+  Binary Search on Leaf Nodes (check existence using bit manipulation of path from root). Ye implementation thodi complex hoti hai, jabki height comparison approach clean aur standard best answer hai.
+
+--------------------------------------------------
+
+# CODE:
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int countNodes(TreeNode root) {
+        if (root == null) return 0;
+
+        int leftHeight = getLeftHeight(root);
+        int rightHeight = getRightHeight(root);
+
+        // Agar left aur right height same hai, toh yeh Perfect Binary Tree hai
+        if (leftHeight == rightHeight) {
+            return (1 << leftHeight) - 1; // 2^height - 1
+        }
+
+        // Warna Divide & Conquer karo
+        return 1 + countNodes(root.left) + countNodes(root.right);
+    }
+
+    private int getLeftHeight(TreeNode node) {
+        int height = 0;
+        while (node != null) {
+            height++;
+            node = node.left;
+        }
+        return height;
+    }
+
+    private int getRightHeight(TreeNode node) {
+        int height = 0;
+        while (node != null) {
+            height++;
+            node = node.right;
+        }
+        return height;
+    }
+}
