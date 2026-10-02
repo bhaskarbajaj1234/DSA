@@ -1,0 +1,116 @@
+# Morris Inorder Traversal
+
+## APPROACH: MORRIS INORDER TRAVERSAL (THREADED BINARY TREE)
+
+Idea:
+Without using recursion or stack (Space complexity O(1)), Binary Tree ko inorder traverse karne ke liye hum **Threaded Binary Tree** ka concept use karte hain. 
+Har node ke left subtree ka **inorder predecessor** (left subtree ka extreme right node) dhoondhte hain aur uski `right` pointer ko temporarily `curr` node se connect (thread) kar dete hain taaki traversing ke baad wapas upar aaya ja sake.
+
+--------------------------------------------------
+
+APPROACH (Iterative / O(1) Auxiliary Space)
+
+1. `curr = root` pointer initialize karo aur ek result list create karo.
+2. `while (curr != null)` loop chalao:
+   - **Case 1: Left child nahi hai (`curr.left == null`)**
+     - Current node ki value answer list me add karo.
+     - Right subtree me move kar jao (`curr = curr.right`).
+   - **Case 2: Left child present hai (`curr.left != null`)**
+     - Left subtree ka inorder predecessor dhoondho (`TreeNode pred = curr.left`).
+     - `pred` ko rightmost leaf tak le jao tab tak jab tak `pred.right != null` aur `pred.right != curr` na ho.
+     - **Sub-case A: Thread create karna (`pred.right == null`)**
+       - Predecessor ki `right` pointer ko `curr` par point karwao (`pred.right = curr`).
+       - Left child par move kar jao (`curr = curr.left`).
+     - **Sub-case B: Thread remove karna (`pred.right == curr`)**
+       - Thread tod do (`pred.right = null`).
+       - Current node ki value answer list me add karo.
+       - Right child par move kar jao (`curr = curr.right`).
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+      1
+     / \
+    2   3
+   / \
+  4   5
+
+Dry Run:
+1. `curr = 1`: Left exists (2). Predecessor = 5. Set `5.right = 1`. Move `curr = 2`.
+2. `curr = 2`: Left exists (4). Predecessor = 4. Set `4.right = 2`. Move `curr = 4`.
+3. `curr = 4`: Left is null. Add `4` to list. Move `curr = 4.right` (which is thread to 2).
+4. `curr = 2`: Predecessor = 4. Thread exists (`4.right == 2`). Reset `4.right = null`. Add `2` to list. Move `curr = 2.right` (5).
+5. `curr = 5`: Left is null. Add `5` to list. Move `curr = 5.right` (which is thread to 1).
+6. `curr = 1`: Predecessor = 5. Thread exists (`5.right == 1`). Reset `5.right = null`. Add `1` to list. Move `curr = 1.right` (3).
+7. `curr = 3`: Left is null. Add `3` to list. Move `curr = 3.right` (null). Loop ends.
+
+Result: [4, 2, 5, 1, 3]
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N) -> Har edge maximum 3 baar traverse hoti hai (Predecessor find karne me aur actual traversal me), overall linear time.
+
+Space:
+O(1) -> Extra stack ya recursion use nahi hota. Modified pointers original state me revert ho jaate hain.
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Inorder Rule:** Inorder me node **dono times left tree visit hone ke BAAD** (ya jab thread break ho raha ho tab) process/add hoti hai.
+- Key Advantage: Call stack overflow risks avoid karta hai aur space optimized solution deta hai.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+// class TreeNode {
+//     int data;
+//     TreeNode left, right;
+//     TreeNode(int val) { data = val; left = null; right = null; }
+// }
+
+class Solution {
+    public List<Integer> getInorder(TreeNode root) {
+        List<Integer> inorder = new ArrayList<>();
+        TreeNode curr = root;
+
+        while (curr != null) {
+            if (curr.left == null) {
+                // If no left child, visit current node and move right
+                inorder.add(curr.data);
+                curr = curr.right;
+            } else {
+                // Find in-order predecessor
+                TreeNode pred = curr.left;
+                while (pred.right != null && pred.right != curr) {
+                    pred = pred.right;
+                }
+
+                if (pred.right == null) {
+                    // Make current as right child of its in-order predecessor
+                    pred.right = curr;
+                    curr = curr.left;
+                } else {
+                    // Revert the changes made in if part to restore original tree
+                    pred.right = null;
+                    inorder.add(curr.data);
+                    curr = curr.right;
+                }
+            }
+        }
+
+        return inorder;
+    }
+}
