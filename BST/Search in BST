@@ -1,0 +1,96 @@
+# 700. Search in a Binary Search Tree
+
+## APPROACH: ITERATIVE SEARCH IN BST
+
+Idea:
+Binary Search Tree (BST) ki property hoti hai ki har node ka left child usse chhota (`left.val < node.val`) aur right child usse bada (`right.val > node.val`) hota hai. 
+Iss property ka use karke hum recursive stack space lagaye bina iteratively search kar sakte hain: agar target `val` current node se chhota hai toh left me move karo, agar bada hai toh right me move karo.
+
+--------------------------------------------------
+
+APPROACH (Iterative / O(1) Space)
+
+1. Loop run karo jab tak `root != null` aur `root.val != val` hai:
+   - **Ternary Condition:** 
+     - Agar `val < root.val`, toh `root = root.left` kar do (target left subtree me mil sakta hai).
+     - Warna (`val > root.val`), toh `root = root.right` kar do (target right subtree me mil sakta hai).
+2. Jab loop terminate hoga:
+   - Agar target mil gaya, toh `root` uss target node ko point karega (jiske saath poora subtree return ho jayega).
+   - Agar target nahi mila, toh `root` `null` ho jayega aur `null` return ho jayega.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        4
+       / \
+      2   7
+     / \
+    1   3
+
+Target `val = 2`
+
+Dry Run:
+1. `root = 4`: `root != null` and `4 != 2`. 
+   - `2 < 4` -> `root` moves to `root.left` (Node 2).
+2. `root = 2`: `root.val == 2`. Loop condition `root.val != val` fails. Loop ends.
+3. Return `root` (Node 2 with subtree [2, 1, 3]).
+
+Result: Node with value 2
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+O(H) -> Har step par tree ka ek level drop hota hai.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+Space:
+O(1) -> Ek pointer traversal ke liye use hota hai, zero extra auxiliary memory.
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Iterative vs Recursive in BST Search:** 
+  - Recursion me O(H) call stack space lagta hai.
+  - Iterative approach tail-recursion elimination ki tarah kaam karti hai aur O(1) space me optimization deti hai.
+- **Why Binary Search Tree simplifies search:** BST order property traversal decisions ko deterministic banati hai, jisse non-target branches discard ho jaati hain.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public TreeNode searchBST(TreeNode root, int val) {
+        // Iterate down the tree based on BST properties
+        while (root != null && root.val != val) {
+            root = val < root.val ? root.left : root.right;
+        }
+
+        // Returns target node if found, or null if target does not exist
+        return root;
+    }
+}
