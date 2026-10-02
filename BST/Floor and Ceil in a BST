@@ -1,0 +1,150 @@
+# 206. Floor and Ceil in a BST
+
+## APPROACH: ITERATIVE FLOOR AND CEIL IN BST
+
+Idea:
+Binary Search Tree (BST) property ka use karke hum floor aur ceil values efficient binary search manner me calculate kar sakte hain:
+- **Floor:** Node value $\le$ `key` me se Sabse Badi Value ($\le X$ maximum value).
+  - Agar `node.data == key`, floor mil gaya (`return key`).
+  - Agar `node.data < key`, toh yeh node candidate floor ho sakti hai (`floor = node.data`) aur isse bhi badi value dhoondhne ke liye `right` subtree me move karo.
+  - Agar `node.data > key`, toh node values key se badi hain, isliye bina update kiye `left` subtree me move karo.
+- **Ceil:** Node value $\ge$ `key` me se Sabse Chhoti Value ($\ge X$ minimum value).
+  - Agar `node.data == key`, ceil mil gaya (`return key`).
+  - Agar `node.data > key`, toh yeh node candidate ceil ho sakti hai (`ceil = node.data`) aur isse bhi chhoti value dhoondhne ke liye `left` subtree me move karo.
+  - Agar `node.data < key`, toh node values key se chhoti hain, isliye bina update kiye `right` subtree me move karo.
+
+--------------------------------------------------
+
+APPROACH (Iterative BST Traversal)
+
+1. Main function `floorCeilOfBST` me do helper functions call karo: `floorHelper` aur `ceilHelper`.
+2. `floorHelper(node, key)`:
+   - `floor = -1` initialize karo.
+   - `while(node != null)` loop run karo:
+     - `if (node.data == key)` -> `floor = node.data; return floor;`
+     - `else if (node.data < key)` -> Candidate set karo `floor = node.data; node = node.right;`
+     - `else` -> Left move karo `node = node.left;`
+3. `ceilHelper(node, key)`:
+   - `ceil = -1` initialize karo.
+   - `while(node != null)` loop run karo:
+     - `if (node.data == key)` -> `ceil = node.data; return ceil;`
+     - `else if (key > node.data)` -> Right move karo `node = node.right;`
+     - `else` -> Candidate set karo `ceil = node.data; node = node.left;`
+4. Result list me `floor` aur `ceil` add karke return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        8
+       / \
+      4   12
+     / \  / \
+    2   6 10 14
+
+Target `key = 1`
+
+Dry Run (Floor):
+1. `node = 8`: `8 > 1` -> Move to `node.left` (Node 4). `floor` is -1.
+2. `node = 4`: `4 > 1` -> Move to `node.left` (Node 2). `floor` is -1.
+3. `node = 2`: `2 > 1` -> Move to `node.left` (null). `floor` is -1.
+4. Loop ends -> `floor = -1`.
+
+Dry Run (Ceil):
+1. `node = 8`: `8 > 1` -> Candidate `ceil = 8`. Move to `node.left` (Node 4).
+2. `node = 4`: `4 > 1` -> Candidate `ceil = 4`. Move to `node.left` (Node 2).
+3. `node = 2`: `2 > 1` -> Candidate `ceil = 2`. Move to `node.left` (null).
+4. Loop ends -> `ceil = 2`.
+
+Result: [-1, 2]
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+O(H) -> Floor aur Ceil dono ke liye tree ke top se bottom tak maximum height `H` tak hi traverse karte hain.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+Space:
+O(1) -> Non-recursive iterative loop ka use karke process kiya hai, zero extra stack memory.
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Single Pass Optimization:** Floor aur Ceil alag-alag functions ke bajaye ek hi single BST traversal pass me simultaneosly update kiye ja sakte hain.
+- **Edge Cases:**
+  - Key tree ki saari values se choti ho -> `floor = -1` (e.g., `key = 1` for tree [8, 4, 12] returns floor -1).
+  - Key tree ki saari values se badi ho -> `ceil = -1`.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int data;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int val) { data = val; left = null; right = null; }
+ * }
+ **/
+
+class Solution {
+    public List<Integer> floorCeilOfBST(TreeNode root, int key) {
+        List<Integer> result = new ArrayList<>();
+        
+        int floor = floorHelper(root, key);
+        int ceil = ceilHelper(root, key);
+
+        result.add(floor);
+        result.add(ceil);
+
+        return result;
+    }
+
+    private int floorHelper(TreeNode node, int key) {
+        int floor = -1;
+
+        while (node != null) {
+            if (node.data == key) {
+                floor = node.data;
+                return floor;
+            } else if (node.data < key) {
+                floor = node.data; // Candidate floor value
+                node = node.right; // Look for a larger value <= key
+            } else {
+                node = node.left; // Node value > key, search left
+            }
+        }
+        return floor;
+    }
+
+    private int ceilHelper(TreeNode node, int key) {
+        int ceil = -1;
+
+        while (node != null) {
+            if (node.data == key) {
+                ceil = node.data;
+                return ceil;
+            } else if (key > node.data) {
+                node = node.right; // Node value < key, search right
+            } else {
+                ceil = node.data; // Candidate ceil value
+                node = node.left; // Look for a smaller value >= key
+            }
+        }
+        return ceil;
+    }
+}
