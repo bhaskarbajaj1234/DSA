@@ -1,49 +1,145 @@
-145. Binary Tree Postorder Traversal
-Solved
-Easy
-Topics
-premium lock icon
-Companies
-Given the root of a binary tree, return the postorder traversal of its nodes' values.
+# 145. Binary Tree Postorder Traversal
 
- 
+## APPROACH: POSTORDER TRAVERSAL USING 1 STACK
 
-Example 1:
+Idea:
+Postorder traversal me order **Left -> Right -> Root** hota hai. 
+Iteratively 1 stack use karke yeh achieve karne ke liye, hum extreme left tak jaate hain. Jab left child null ho jata hai, tab stack top ke `right` child ko check karte hain:
+1. Agar `right` child non-null hai, toh hum use processing ke liye `curr` bana dete hain.
+2. Agar `right` child null hai (ya hum use abhi process karke aaye hain), tab hum current node ko process (pop & add to result) karte hain.
 
-Input: root = [1,null,2,3]
+--------------------------------------------------
 
-Output: [3,2,1]
+APPROACH (Iterative using 1 Stack)
 
-Explanation:
+1. Stack (`Deque<TreeNode> stack`) aur result arraylist initialize karo. `curr = root` set karo.
+2. `while (curr != null || !stack.isEmpty())` loop chalao:
+   - **Step A: Extreme Left traverse karo**
+     - Jab tak `curr != null` hai, current node ko stack me `push` karte raho aur left side move karo (`curr = curr.left`).
+   - **Step B: Right child check karo**
+     - Agar `curr == null`, stack ke top element ka right child peek karo (`TreeNode temp = stack.peek().right`).
+     - **Case 1: Right child nahi hai (`temp == null`)**
+       - Top element ko pop karo aur result me add karo (`temp = stack.pop(); result.add(temp.val)`).
+       - **Backtracking/Upward movement:** Subtree process hone ke baad continuous pop karte jao jab tak stack top ka right child current processed node `temp` ke barabar hai (`while (!stack.isEmpty() && temp == stack.peek().right)`).
+     - **Case 2: Right child exist karta hai (`temp != null`)**
+       - Right child ko process karne ke liye `curr = temp` set karo taaki agle iteration me iska left subtree traverse ho sake.
 
+--------------------------------------------------
 
+EXAMPLE
 
-Example 2:
+Tree:
+      1
+     / \
+    2   3
+   / \
+  4   5
 
-Input: root = [1,2,3,4,5,null,8,null,null,6,7,9]
+Dry Run:
+1. `curr = 1`: Stack = [1] -> Stack = [1, 2] -> Stack = [1, 2, 4]. `curr` becomes null.
+2. `curr = null`: `temp = stack.peek().right` (4.right is null). 
+   - Pop 4 -> Result = [4].
+   - Inner while check fails (`4 != 2.right` since 2.right is 5).
+3. `curr = null`: `temp = stack.peek().right` (2.right is 5).
+   - `temp != null`, so `curr = 5`.
+4. `curr = 5`: Stack = [1, 2, 5]. `curr` becomes null.
+5. `curr = null`: `temp = stack.peek().right` (5.right is null).
+   - Pop 5 -> Result = [4, 5].
+   - Inner while check: `temp (5) == stack.peek().right` (2.right is 5) -> True!
+     - Pop 2 -> Result = [4, 5, 2].
+   - Inner while check: `temp (2) == stack.peek().right` (1.right is 3) -> False.
+6. `curr = null`: `temp = stack.peek().right` (1.right is 3).
+   - `temp != null`, so `curr = 3`.
+7. `curr = 3`: Stack = [1, 3]. `curr` becomes null.
+8. `curr = null`: `temp = stack.peek().right` (3.right is null).
+   - Pop 3 -> Result = [4, 5, 2, 3].
+   - Inner while check: `temp (3) == stack.peek().right` (1.right is 3) -> True!
+     - Pop 1 -> Result = [4, 5, 2, 3, 1].
+9. Stack is empty & `curr == null`. Loop terminates.
 
-Output: [4,6,7,5,2,9,8,3,1]
+Result: [4, 5, 2, 3, 1]
 
-Explanation:
+--------------------------------------------------
 
+COMPLEXITY
 
+N = Total number of nodes in tree
+H = Height of binary tree
 
-Example 3:
+Time:
+O(N) -> Har node stack me exactly ek baar push hoti hai aur ek baar pop hoti hai.
 
-Input: root = []
+Space:
+O(H) -> Stack height ke proportional memory leta hai.
+Worst case (skewed tree): O(N)
+Best/Average case (balanced tree): O(log N)
 
-Output: []
+--------------------------------------------------
 
-Example 4:
+INTERVIEW POINT
 
-Input: root = [1]
+- **Why 1 Stack Postorder is Tricky:** Preorder aur Inorder traversal me parent par aane par process karna direct hota hai, lekin Postorder me parent ko tabhi process karna hai jab right subtree poora finish ho chuka ho. Iss implementation me `while(!stack.isEmpty() && temp == stack.peek().right)` check guarantee karta hai ki hum right subtree se upar backtrack karte hue parent nodes ko unke sahi postorder timing par collect karein.
 
-Output: [1]
+--------------------------------------------------
 
- 
+# CODE:
 
-Constraints:
+```java
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
-The number of the nodes in the tree is in the range [0, 100].
--100 <= Node.val <= 100
- 
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        // Output list to store postorder sequence
+        List<Integer> result = new ArrayList<>();
+        // Single stack for explicit traversal tracking
+        Deque<TreeNode> stack = new ArrayDeque<>();
+
+        TreeNode curr = root;
+
+        while (curr != null || !stack.isEmpty()) {
+            if (curr != null) {
+                // Keep pushing nodes and move to extreme left
+                stack.push(curr);
+                curr = curr.left;
+            } else {
+                // Check right child of the node on top of stack
+                TreeNode temp = stack.peek().right;
+
+                if (temp == null) {
+                    // Node has no right child, process it
+                    temp = stack.pop();
+                    result.add(temp.val);
+
+                    // Backtrack up as long as we are returning from right subtree
+                    while (!stack.isEmpty() && temp == stack.peek().right) {
+                        temp = stack.pop();
+                        result.add(temp.val);
+                    }
+                } else {
+                    // Process right subtree first
+                    curr = temp;
+                }
+            }
+        }
+
+        return result;
+    }
+}
