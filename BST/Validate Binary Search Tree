@@ -1,0 +1,110 @@
+# 98. Validate Binary Search Tree
+
+## APPROACH: RECURSIVE RANGE VALIDATION (USING LONG / NULL BOUNDS)
+
+Idea:
+Binary Search Tree (BST) ki property sirf parent aur immediate children ke relation tak limited nahi hoti. Subtree ke saare nodes ka ek strict Range `(minVal, maxVal)` ke under belong karna zaroori hai:
+- Left Subtree me har node ki value root value se strictly chhoti honi chahiye: `(minVal, root.val)`.
+- Right Subtree me har node ki value root value se strictly badi honi chahiye: `(root.val, maxVal)`.
+
+**Corner Case Warning:**
+Aapke code me `Integer.MIN_VALUE` aur `Integer.MAX_VALUE` use hue the. Constraints me `Node.val` ki values `-2^31` se `2^31 - 1` tak ja sakti hain. Agar kisi node ki value khud `Integer.MIN_VALUE` ya `Integer.MAX_VALUE` ho, toh integer range boundary overflow hone se check fail ho jata hai. Isko handle karne ke liye bounds me `Long` wrapper ya `long` data type use karte hain.
+
+--------------------------------------------------
+
+APPROACH (Recursive Range Check)
+
+1. Helper method me initial boundaries set karo:
+   - `minVal = Long.MIN_VALUE` (`-2^63`)
+   - `maxVal = Long.MAX_VALUE` (`2^63 - 1`)
+
+2. **Base Case:**
+   - Agar `root == null` ho -> `return true` (empty tree is valid).
+
+3. **Validation Check:**
+   - Agar current node ki value range se bahar ho (`root.val <= minVal || root.val >= maxVal`) -> `return false`.
+
+4. **Recursive Step:**
+   - Left Subtree validate karo range `(minVal, root.val)` ke saath.
+   - Right Subtree validate karo range `(root.val, maxVal)` ke saath.
+   - Dono subtrees ka logical `AND` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        5
+       / \
+      1   4
+         / \
+        3   6
+
+Dry Run:
+1. `helper(root 5, -inf, +inf)`: `5` valid range me hai.
+2. Left Call: `helper(node 1, -inf, 5)`: `1` valid range me hai -> returns `true`.
+3. Right Call: `helper(node 4, 5, +inf)`:
+   - Node value `4` is `<= minVal (5)`. Condition violated!
+   - Returns `false`.
+
+Result: `false`
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+O(N) -> Har node ko exactly ek baar visit kiya jata hai.
+
+Space:
+O(H) -> Recursion stack space height ke proportional hoti hai.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Integer Overflow Edge Case:** Direct `Integer.MIN_VALUE` / `Integer.MAX_VALUE` pass karne se `[-2147483648]` ya `[2147483647]` waale testcases fail ho jaate hain. Interview me `long` values ya `TreeNode` pointers (`null` bounds) use karke edge cases point out karna impress karta hai.
+- **Alternative Inorder Approach:** BST ka Inorder traversal strictly increasing sequence deta hai. Ek `prev` pointer maintain karke check kar sakte hain ki `curr.val > prev.val` hai ya nahi.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean isValidBST(TreeNode root) {
+        // Use Long.MIN_VALUE and Long.MAX_VALUE to handle Integer boundary node values
+        return helper(root, Long.MIN_VALUE, Long.MAX_VALUE);        
+    }
+
+    private boolean helper(TreeNode root, long minVal, long maxVal) {
+        // Base case: empty subtree is valid
+        if (root == null) return true;
+
+        // Node value must be strictly within (minVal, maxVal)
+        if (root.val >= maxVal || root.val <= minVal) return false;
+
+        // Check left subtree with updated upper bound and right subtree with updated lower bound
+        return helper(root.left, minVal, root.val) && helper(root.right, root.val, maxVal);
+    }
+}
