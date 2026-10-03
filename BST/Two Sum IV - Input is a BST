@@ -1,0 +1,165 @@
+# 653. Two Sum IV - Input is a BST
+
+## APPROACH: TWO POINTERS USING DUAL BST ITERATORS
+
+Idea:
+Sorted array me **Two Pointers Technique** (`i = 0`, `j = n - 1`) se target sum find karte hain. 
+BST humein sorted property already deta hai:
+- **Forward Iterator (`isReverse = false`):** Left-to-Right traverse karke ascending order me next smallest element deta hai (like `left pointer i`).
+- **Reverse Iterator (`isReverse = true`):** Right-to-Left traverse karke descending order me next largest element deta hai (like `right pointer j`).
+
+In dono custom BST Iterators ko parallelly use karke hum Space Complexity ko $O(N)$ se reduce karke **$O(H)$** me Two Pointer approach run kar sakte hain.
+
+--------------------------------------------------
+
+APPROACH (Dual BST Iterators + Two Pointers)
+
+1. Base Case: Agar `root == null` ho -> `return false`.
+
+2. Do Iterators initialize karo:
+   - `l` = `BSTIterator(root, false)` (Next Smallest Element lakar dega)
+   - `r` = `BSTIterator(root, true)` (Next Largest Element lakar dega)
+
+3. Start pointers:
+   - `i = l.next()` (Tree ka minimum value)
+   - `j = r.next()` (Tree ka maximum value)
+
+4. `while (i < j)` loop chalao:
+   - **Case 1: `i + j == k`** -> Target sum mil gaya! `return true`.
+   - **Case 2: `i + j < k`** -> Sum chhota hai, isliye value badhane ke liye next smallest element lo: `i = l.next()`.
+   - **Case 3: `i + j > k`** -> Sum bada hai, isliye value kam karne ke liye next largest element lo: `j = r.next()`.
+
+5. Agar loop end ho jaye aur pair na mile -> `return false`.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        5
+       / \
+      3   6
+     / \   \
+    2   4   7
+
+Target `k = 9`
+
+Dry Run:
+1. `i = l.next()` -> `2` (Smallest element)
+2. `j = r.next()` -> `7` (Largest element)
+3. **Iteration 1:** `i = 2`, `j = 7`.
+   - `i + j = 2 + 7 = 9`.
+   - `i + j == k` (9 == 9) -> Pair found! Returns `true`.
+
+Result: `true`
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+O(N) -> Maximum tree ke saare nodes ek baar forward aur reverse iterators ke dwara visit ho sakte hain.
+
+Space:
+O(H) -> Auxilary space dono iterators ke stacks me max height `H` ke equal nodes store karegi.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Comparison with Alternative Approaches:**
+  - **Inorder Array + Two Pointers:** BST ka Inorder traversal list me store karo (O(N) space) aur phir Two Pointers lagao. Time O(N), Space O(N).
+  - **HashSet (DFS/BFS):** Tree traverse karte waqt HashSet me `k - node.val` check karo. Time O(N), Space O(N).
+  - **Dual Iterators (Current Optimal):** Two Pointers concept apply hota hai direct tree par, reducing Space Complexity to **O(H)**.
+- **`isReverse` Flag Benefit:** Single reusable `BSTIterator` class dono directions (Left-to-Right & Right-to-Left) handle kar leti hai code duplication avoid karke.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+import java.util.Stack;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+
+// Custom BST Iterator that supports both forward (Inorder) and reverse (Reverse Inorder)
+class BSTIterator {
+    private Stack<TreeNode> stack = new Stack<>();
+    private boolean isReverse; // false -> ascending order, true -> descending order
+
+    public BSTIterator(TreeNode root, boolean isReverse) {
+        this.isReverse = isReverse;
+        pushNode(root);
+    }
+
+    public boolean hasNext() {
+        return !stack.isEmpty();
+    }
+
+    public int next() {
+        TreeNode temp = stack.pop();
+        if (!isReverse) {
+            pushNode(temp.right);
+        } else {
+            pushNode(temp.left);
+        }
+        return temp.val;
+    }
+
+    private void pushNode(TreeNode node) {
+        while (node != null) {
+            stack.push(node);
+            if (!isReverse) {
+                node = node.left;
+            } else {
+                node = node.right;
+            }
+        }
+    }
+}
+
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+        if (root == null) return false;
+
+        // l -> Forward Iterator (gives smallest elements)
+        // r -> Reverse Iterator (gives largest elements)
+        BSTIterator l = new BSTIterator(root, false);
+        BSTIterator r = new BSTIterator(root, true);
+
+        int i = l.next(); // Start pointer (Smallest value)
+        int j = r.next(); // End pointer (Largest value)
+
+        // Two Pointers approach
+        while (i < j) {
+            if (i + j == k) {
+                return true;
+            } else if (i + j < k) {
+                i = l.next(); // Increase sum by taking next smallest
+            } else {
+                j = r.next(); // Decrease sum by taking next largest
+            }
+        }
+        
+        return false;
+    }
+}
