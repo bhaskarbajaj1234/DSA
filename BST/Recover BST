@@ -1,0 +1,166 @@
+# 99. Recover Binary Search Tree
+
+## APPROACH: INORDER TRAVERSAL WITH VIOLATION POINTERS
+
+Idea:
+Binary Search Tree (BST) ka **Inorder Traversal** (`Left -> Root -> Right`) humesha strictly sorted (ascending) order me hota hai.
+Agar do nodes aapas me swap ho gaye hain, toh sorted order distrupt ho jayega. Traverse karte waqt, `prev.val > root.val` wali conditions ko track karke hum swapped nodes identify kar sakte hain:
+
+Do cases ho sakte hain:
+1. **Nodes non-adjacent hain:** Inorder order me 2 violations milenge.
+   - First violation par: `first = prev` aur `middle = root` assign karte hain.
+   - Second violation par: `last = root` assign karte hain.
+   - Swap: `first` aur `last` ke values ko swap kar dete hain.
+
+2. **Nodes adjacent hain:** Inorder order me sirf 1 violation milega.
+   - Violation par: `first = prev` aur `middle = root` assign hota hai.
+   - Second violation nahi milta, isliye `last` remains `null`.
+   - Swap: `first` aur `middle` ke values ko swap kar dete hain.
+
+--------------------------------------------------
+
+APPROACH (Inorder Traversal & Violation Identification)
+
+1. Global pointers declare karo:
+   - `first`, `middle`, `last` -> Swapped nodes ko mark karne ke liye (initially `null`).
+   - `prev` -> Previous node track karne ke liye (`prev = new TreeNode(Integer.MIN_VALUE)`).
+
+2. **Inorder Helper Function (`inorder(root)`):**
+   - Base Case: Agar `root == null` ho -> `return`.
+   - Recurse Left Subtree: `inorder(root.left)`.
+   - **Violation Check:**
+     - Agar `prev.val > root.val`:
+       - Agar `first == null` (First Violation): `first = prev` and `middle = root`.
+       - Else (Second Violation): `last = root`.
+     - Update `prev = root`.
+   - Recurse Right Subtree: `inorder(root.right)`.
+
+3. **Value Swapping Logic (`recoverTree(root)`):**
+   - Inorder run hone ke baad:
+     - Agar `first != null && last != null` (Non-adjacent nodes swapped): `first.val` aur `last.val` swap karo.
+     - Else if `first != null && middle != null` (Adjacent nodes swapped): `first.val` aur `middle.val` swap karo.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree (Nodes 3 and 1 swapped):
+        3
+       /
+      1
+       \
+        2
+
+Inorder Traversal Sequence: `[1, 3, 2]`
+
+Dry Run:
+1. Visit `1`: `prev = MIN_VALUE`. No violation. `prev = 1`.
+2. Visit `3`: `prev = 1`. No violation. `prev = 3`.
+3. Visit `2`: `prev = 3`. `3 > 2` -> **Violation 1!**
+   - `first = 3` (`prev`)
+   - `middle = 2` (`root`)
+   - `prev = 2`.
+4. Traversal ends. `last` is `null` (Single violation case).
+5. Adjacent Swap Triggered: Swap `first.val` (3) and `middle.val` (2).
+
+Corrected Tree:
+        2
+       /
+      1
+       \
+        3
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+O(N) -> Single pass inorder traversal se saare `N` nodes exactly ek baar process hote hain.
+
+Space:
+O(H) -> Recursion call stack space equal to height `H`.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+*(Note: Space complexity ko O(1) me reduce karne ke liye Morris Inorder Traversal traversal use kar sakte hain).*
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Why keep `middle` pointer?**
+  - Jab swapped nodes adjacent hote hain (e.g. `[1, 3, 2, 4]` jahan 3 aur 2 swapped hain), toh Inorder me sirf ek hi violation (`3 > 2`) milta hai. Is case me `last` pointer set nahi hota, so `middle` pointer (which stores 2) adjacent node ko restore karne me help karta hai.
+- **Morris Traversal Optimization:**
+  - Interviewer O(1) space constraint dene par **Morris Inorder Traversal** ka follow-up puchhta hai, jisme temporary thread links banakar without stack / recursion tree traverse kiya jata hai.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    private TreeNode first = null;
+    private TreeNode last = null;
+    private TreeNode middle = null;
+    private TreeNode prev = new TreeNode(Integer.MIN_VALUE);
+
+    public void recoverTree(TreeNode root) {
+        // Find nodes causing violation in sorted inorder sequence
+        inorder(root);
+
+        // Swap node values back to restore BST property
+        if (first != null && last != null) {
+            // Case 1: Swapped nodes are not adjacent
+            int temp = first.val;
+            first.val = last.val;
+            last.val = temp;
+        } else if (first != null && middle != null) {
+            // Case 2: Swapped nodes are adjacent
+            int temp = first.val;
+            first.val = middle.val;
+            middle.val = temp;
+        }
+    }
+
+    private void inorder(TreeNode root) {
+        if (root == null) return;
+
+        inorder(root.left);
+
+        // Process current node: check for BST violation with prev node
+        if (prev.val > root.val) {
+            if (first == null) {
+                // First violation found
+                first = prev;
+                middle = root;
+            } else {
+                // Second violation found
+                last = root;
+            }
+        }
+        
+        // Move prev pointer forward
+        prev = root;
+
+        inorder(root.right);
+    }
+}
