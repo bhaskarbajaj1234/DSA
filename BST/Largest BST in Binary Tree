@@ -1,0 +1,154 @@
+# 142. Largest BST in Binary Tree
+
+## APPROACH: BOTTOM-UP POSTORDER TRAVERSAL (OPTIMAL O(N))
+
+Idea:
+Kisi Binary Tree ke har node par ja kar yeh check karna ki wo tree BST hai ya nahi $O(N^2)$ time leta hai.
+Optimal tarike me hum **Postorder Traversal (`Left -> Right -> Root`)** ka use karke bottom-up information pass karte hain.
+
+Har node apne parent ko 3 key details return karta hai ek `NodeValue` object me:
+1. `minNode`: Is subtree ka minimum value.
+2. `maxNode`: Is subtree ka maximum value.
+3. `maxSize`: Is subtree ke andar ka largest BST size.
+
+--------------------------------------------------
+
+APPROACH (Bottom-Up Postorder)
+
+1. Base Case:
+   - Agar `root == null` ho, toh ek dummy `NodeValue` return karo:
+     - `minNode = Integer.MAX_VALUE`
+     - `maxNode = Integer.MIN_VALUE`
+     - `maxSize = 0`
+
+2. Subtrees process karo:
+   - Left child compute karo: `NodeValue left = helper(root.left)`
+   - Right child compute karo: `NodeValue right = helper(root.right)`
+
+3. **Valid BST Check:**
+   - Current node tabhi BST banega jab:
+     `left.maxNode < root.data && root.data < right.minNode`
+   - Agar yeh condition **TRUE** hai:
+     - Is node ko include karke new BST ka size ho jayega: `left.maxSize + right.maxSize + 1`.
+     - Parent ko return karo:
+       - `minNode = Math.min(root.data, left.minNode)`
+       - `maxNode = Math.max(root.data, right.maxNode)`
+       - `maxSize = left.maxSize + right.maxSize + 1`
+
+4. **Invalid BST Case:**
+   - Agar condition **FALSE** hai (BST property break ho gayi):
+     - Mark current subtree as invalid by returning `minNode = MIN_VALUE` and `maxNode = MAX_VALUE`.
+     - `maxSize` me child subtrees ka maximum preserved rehta hai: `Math.max(left.maxSize, right.maxSize)`.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        3
+       / \
+      1   4
+         /
+        2
+
+Input: `root = [3, 1, 4, null, null, 2]`
+
+Dry Run:
+1. Node `1`: Valid BST -> `size = 1`, `min = 1`, `max = 1`.
+2. Node `2`: Valid BST -> `size = 1`, `min = 2`, `max = 2`.
+3. Node `4`: Left = Node `2` (`max = 2`), Right = `null` (`min = MAX_VALUE`).
+   - `2 < 4` and `4 < MAX_VALUE` -> Valid BST!
+   - `size = 1 + 0 + 1 = 2`, `min = 2`, `max = 4`.
+4. Root Node `3`:
+   - Left (`1`) -> `max = 1`.
+   - Right (`4`) -> `min = 2`.
+   - Condition check: `left.maxNode < 3` (`1 < 3`) AND `3 < right.minNode` (`3 < 2`) -> **FALSE!**
+   - Invalid BST at root `3`.
+   - Result = `Math.max(left.maxSize, right.maxSize)` = `Math.max(1, 2) = 2`.
+
+Result: `2`
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in binary tree
+H = Height of binary tree
+
+Time:
+O(N) -> Bottom-up postorder traversal me har node par exact ek baar visit hota hai.
+
+Space:
+O(H) -> Auxilary recursion stack space equal to height `H`.
+- Best/Average Case (Balanced Tree): O(log N)
+- Worst Case (Skewed Tree): O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Why `Integer.MAX_VALUE` for null's min and `Integer.MIN_VALUE` for null's max?**
+  - Jab koi node leaf node hota hai, toh uske null children validity check `left.maxNode < root.data < right.minNode` ko true banate hain, kyunki `MIN_VALUE < root.data` aur `root.data < MAX_VALUE` humesha true hoga.
+- **Why pass `MIN_VALUE` and `MAX_VALUE` on invalid BST?**
+  - Jab koi node invalid BST ban jata hai, toh uske upar ke jitne bhi ancestor nodes honge wo bhi automatically invalid BST ban jayenge. Extreme bounds return karne se future parent nodes ki `left.maxNode < root.data < right.minNode` condition guarantee ke saath fail ho jati hai.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int data;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int val) { data = val; left = null; right = null; }
+ * }
+ **/
+
+// Helper class to store subtree metadata bottom-up
+class NodeValue {
+    int minNode, maxNode, maxSize;
+
+    NodeValue(int minNode, int maxNode, int maxSize) {
+        this.minNode = minNode;
+        this.maxNode = maxNode;
+        this.maxSize = maxSize;
+    }
+}
+
+class Solution {
+
+    public int largestBST(TreeNode root) {
+        return helper(root).maxSize;
+    }
+
+    private NodeValue helper(TreeNode root) {
+        // Base Case: An empty tree is a valid BST of size 0
+        if (root == null) {
+            return new NodeValue(Integer.MAX_VALUE, Integer.MIN_VALUE, 0);
+        }
+
+        // Postorder Traversal: Get values from left and right subtrees
+        NodeValue left = helper(root.left);
+        NodeValue right = helper(root.right);
+
+        // Check if current node forms a valid BST with left and right subtrees
+        if (left.maxNode < root.data && root.data < right.minNode) {
+            // Valid BST
+            return new NodeValue(
+                Math.min(root.data, left.minNode),  // minNode for current subtree
+                Math.max(root.data, right.maxNode),  // maxNode for current subtree
+                left.maxSize + right.maxSize + 1     // combined size of BST
+            );
+        }
+
+        // Invalid BST: Return invalid bounds so parent nodes also fail BST check
+        return new NodeValue(
+            Integer.MIN_VALUE,
+            Integer.MAX_VALUE,
+            Math.max(left.maxSize, right.maxSize) // Preserve max BST size found so far
+        );
+    }
+}
