@@ -1,0 +1,99 @@
+# 235. Lowest Common Ancestor of a Binary Search Tree
+
+## APPROACH: BST SPLIT-POINT TRAVERSAL (RECURSIVE / ITERATIVE)
+
+Idea:
+Binary Search Tree (BST) property ka faayda utha kar Lowest Common Ancestor (LCA) bohot easily dhoondha ja sakta hai:
+- Agar dono nodes `p` aur `q` ki values current node se badi hain, toh LCA guaranteed **right subtree** me hoga.
+- Agar dono nodes `p` aur `q` ki values current node se chhoti hain, toh LCA guaranteed **left subtree** me hoga.
+- Agar ek value chhoti aur ek badi hai (ya koi ek node current node ke barabar hai), toh wahi current node split point hai — aur wahi humara **LCA** hai.
+
+--------------------------------------------------
+
+APPROACH (BST Property Traversal)
+
+1. Base Case: Agar `root == null` ho, toh `return null`.
+2. Current node value read karo: `int curr = root.val`.
+3. **Condition 1:** Agar `curr < p.val && curr < q.val`, dono targets right side hain -> `return lowestCommonAncestor(root.right, p, q)`.
+4. **Condition 2:** Agar `curr > p.val && curr > q.val`, dono targets left side hain -> `return lowestCommonAncestor(root.left, p, q)`.
+5. **Condition 3 (Split Point):** Agar dono different sides me hain ya `curr` khud `p` ya `q` ke barabar hai -> `return root`.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        6
+       / \
+      2   8
+     / \ / \
+    0  4 7  9
+      / \
+     3   5
+
+`p = 2`, `q = 4`
+
+Dry Run:
+1. `root = 6`: `p.val = 2` (chhota) aur `q.val = 4` (chhota). Both `< 6` -> Go Left.
+2. `root = 2`: `p.val = 2` (equal) aur `q.val = 4` (bada). Split point hit! (`curr > p.val && curr > q.val` false ho gaya).
+3. `return root` (Node 2).
+
+Result: Node 2
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+O(H) -> Split point tak traverse karne ke liye max tree height `H` lagti hai.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+Space:
+O(H) -> Auxiliary recursion stack space. (Note: Iterative implementation se space O(1) kar sakte hain).
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Iterative Optimization:** BST path linear hota hai, isliye `while(root != null)` loop use karke recursion stack space O(H) se reduce karke **O(1) auxiliary space** banayi ja sakti hai.
+- **BST vs General Binary Tree:** General Binary Tree (LeetCode 236) me left aur right dono subtrees full explore karne padte hain (O(N) time), jabki BST me binary search logic ki wajah se sirf ek branch me traverse karna padta hai.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) return null;
+
+        int curr = root.val;
+        
+        // Both p and q lie in the right subtree
+        if (curr < p.val && curr < q.val) {
+            return lowestCommonAncestor(root.right, p, q);
+        }
+        
+        // Both p and q lie in the left subtree
+        if (curr > p.val && curr > q.val) {
+            return lowestCommonAncestor(root.left, p, q);
+        }
+        
+        // Split point found: current node is the LCA
+        return root;
+    }
+}
