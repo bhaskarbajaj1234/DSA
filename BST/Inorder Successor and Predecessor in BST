@@ -1,0 +1,149 @@
+# Inorder Successor and Predecessor in BST
+
+## APPROACH: BST PROPERTY ITERATIVE TRAVERSAL
+
+Idea:
+Binary Search Tree (BST) me **Inorder Predecessor** `key` se sabse bada chhota element (`val < key`) hota hai, aur **Inorder Successor** `key` se sabse chhota bada element (`val > key`) hota hai.
+
+BST ki sorted property ka use karke hum binary search style traverse kar sakte hain:
+- **Predecessor ke liye:** Agar current node value `key` se chhoti hai (`curr.data < key`), toh yeh potential predecessor ho sakti hai. Iski value store karo aur aur badi value dhoondhne ke liye `right` chale jao (`curr = curr.right`). Warna `left` chale jao.
+- **Successor ke liye:** Agar current node value `key` se badi hai (`curr.data > key`), toh yeh potential successor ho sakti hai. Iski value store karo aur aur chhoti value dhoondhne ke liye `left` chale jao (`curr = curr.left`). Warna `right` chale jao.
+
+--------------------------------------------------
+
+APPROACH (Iterative Binary Search)
+
+1. `succPredBST` function me do separate helper function call karte hain: `predecessorHelper` aur `successorHelper`.
+2. **Predecessor Traversal (`predecessorHelper`):**
+   - Initialize `val = -1` aur `curr = root`.
+   - `while(curr != null)` loop chalao:
+     - Agar `curr.data < key`: Iska matlab `curr.data` humara answer ho sakta hai. Update `val = curr.data` aur better option dhoondhne ke liye **Right** side jao (`curr = curr.right`).
+     - Agar `curr.data >= key`: Iska matlab yeh value bohot badi hai, **Left** side jao (`curr = curr.left`).
+   - Return `val`.
+
+3. **Successor Traversal (`successorHelper`):**
+   - Initialize `val = -1` aur `curr = root`.
+   - `while(curr != null)` loop chalao:
+     - Agar `curr.data > key`: Iska matlab `curr.data` humara candidate hai. Update `val = curr.data` aur aur close/chhoti value candidate ke liye **Left** side jao (`curr = curr.left`).
+     - Agar `curr.data <= key`: Iska matlab yeh value choti hai, **Right** side jao (`curr = curr.right`).
+   - Return `val`.
+
+4. Result list me `predecessor` aur `successor` add karke return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        5
+       / \
+      2   10
+     / \  / \
+    1   4 7  12
+
+Target `key = 1`
+
+Dry Run:
+1. **Find Predecessor (`key = 1`):**
+   - `curr = 5` (`5 >= 1`) -> `curr = curr.left` (Node 2)
+   - `curr = 2` (`2 >= 1`) -> `curr = curr.left` (Node 1)
+   - `curr = 1` (`1 >= 1`) -> `curr = curr.left` (`null`)
+   - Predecessor = `-1`
+
+2. **Find Successor (`key = 1`):**
+   - `curr = 5` (`5 > 1`) -> `val = 5`, `curr = curr.left` (Node 2)
+   - `curr = 2` (`2 > 1`) -> `val = 2`, `curr = curr.left` (Node 1)
+   - `curr = 1` (`1 <= 1`) -> `curr = curr.right` (`null`)
+   - Successor = `2`
+
+Result: `[-1, 2]`
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+O(H) -> Predecessor aur Successor dono dhoondhne ke liye maximum tree ki height `H` tak traverse karna padta hai.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+Space:
+O(1) Auxiliary Space -> Pura traversal iterative hai, koi extra recursion stack space use nahi hoti.
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Single Pass Optimization:** Aise alag-alag helper functions se code clear rehta hai. Lekin interview me interviewer bol sakta hai ki ek single tree traversal pass me dono pred aur succ dhoondho. Tab hum `key` node tak pohonch kar left subtree ka maximum (predecessor) aur right subtree ka minimum (successor) ek hi pass me nikal sakte hain.
+- **Edge Cases:** Jab key extreme smallest value ho (no predecessor -> `-1`) ya extreme largest value ho (no successor -> `-1`).
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int data;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int val) { data = val; left = null; right = null; }
+ * }
+ **/
+
+class Solution {
+    List<Integer> succPredBST(TreeNode root, int key) {
+        List<Integer> result = new ArrayList<>();
+
+        int predecessor = predecessorHelper(root, key);
+        int successor = successorHelper(root, key);
+
+        result.add(predecessor);
+        result.add(successor);
+
+        return result;
+    }
+
+    // Successor: Key se just bada element (Smallest element > key)
+    private int successorHelper(TreeNode root, int key) {
+        TreeNode curr = root;
+        int val = -1;
+
+        while (curr != null) {
+            if (curr.data <= key) {
+                // Current value chhoti ya barabar hai, toh right me jao
+                curr = curr.right;
+            } else {
+                // Current value key se badi hai, potential successor saved
+                val = curr.data;
+                curr = curr.left; // Aur closer (chhoti) value dhoondhne left jao
+            }
+        }
+        return val;
+    }
+
+    // Predecessor: Key se just chhota element (Largest element < key)
+    private int predecessorHelper(TreeNode root, int key) {
+        TreeNode curr = root;
+        int val = -1;
+
+        while (curr != null) {
+            if (curr.data < key) {
+                // Current value key se chhoti hai, potential predecessor saved
+                val = curr.data;
+                curr = curr.right; // Aur closer (badi) value dhoondhne right jao
+            } else {
+                // Current value key se badi ya barabar hai, left me jao
+                curr = curr.left;
+            }
+        }
+        return val;
+    }
+}
