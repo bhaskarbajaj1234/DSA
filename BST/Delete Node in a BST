@@ -1,0 +1,147 @@
+# 450. Delete Node in a BST
+
+## APPROACH: RECURSIVE BST DELETION (ATTACH LEFT SUBTREE TO INORDER SUCCESSOR)
+
+Idea:
+Binary Search Tree (BST) me node delete karne ke liye pehle target node search karte hain. Jab target node mil jaati hai (`key == root.val`), toh 3 cases bante hain:
+1. **0 ya 1 Child:** Agar left child null hai, toh right child return kar do. Agar right child null hai, toh left child return kar do.
+2. **2 Children:** Node ko delete karne ke liye right subtree me se **Inorder Successor** (right subtree ka minimum node) dhoondhte hain. 
+   Target node ke pooray left subtree ko iss minimum node ke `left` pointer se attach kar dete hain, aur `root.right` ko return karke deleted node ko bypass kar dete hain.
+
+--------------------------------------------------
+
+APPROACH (Recursive / DFS)
+
+1. **Base Case:** 
+   - Agar `root == null` ho, toh target key tree me nahi hai -> `return null`.
+
+2. **Search Stage:**
+   - Agar `key < root.val`, left subtree me search karke update karo: `root.left = deleteNode(root.left, key)`.
+   - Agar `key > root.val`, right subtree me search karke update karo: `root.right = deleteNode(root.right, key)`.
+
+3. **Deletion Stage (`key == root.val`):**
+   - **Case A (One or No Child):**
+     - `if (root.left == null) return root.right;`
+     - `if (root.right == null) return root.left;`
+   - **Case B (Two Children):**
+     - Right subtree ka minimum node (Inorder Successor) dhoondho: `TreeNode minNode = findMin(root.right)`.
+     - Current node ke left subtree ko `minNode` ke left me connect karo: `minNode.left = root.left`.
+     - `root.right` return kar do (jisse current node bypass / delete ho jaati hai).
+
+4. Helper `findMin(node)`:
+   - Jab tak `node.left != null` hai, `node = node.left` karke extreme left tak jao aur minimum node return karo.
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        5
+       / \
+      3   6
+     / \   \
+    2   4   7
+
+Target `key = 3`
+
+Dry Run:
+1. `root = 5`: `3 < 5` -> Recursive call on `root.left` (Node 3).
+2. `root = 3`: `key == 3` (Node found!).
+   - Node 3 has both left (2) and right (4) children.
+   - Find min in right subtree (`root.right = 4`): `minNode` is Node 4.
+   - Connect left subtree of Node 3 to `minNode`: `4.left = 2`.
+   - Return `root.right` (Node 4) to replace Node 3.
+3. Node 5 updates its left child: `5.left = 4`.
+
+Tree post-deletion:
+        5
+       / \
+      4   6
+     /     \
+    2       7
+
+Result: Updated BST root.
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+O(H) -> Target node tak pahunchne aur right subtree me minimum find karne ke liye maximum tree height `H` tak traversal lagta hai.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+Space:
+O(H) -> Recursion call stack space height ke proportional hoti hai.
+- Best/Average Case: O(log N)
+- Worst Case: O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Two Approaches for 2 Children Case:**
+  - **Re-linking / Bypassing (Current Code):** Left subtree ko right subtree ke minimum node ke left se attach karte hain. Iss technique me minimum node ki value copy karne ki zaroorat nahi padti.
+  - **Value Replacement:** Right subtree ke minimum node ki value ko root me copy karke phir right subtree se uss minimum node ko delete karte hain (`root.val = minNode.val; root.right = deleteNode(root.right, minNode.val);`).
+- **Safety:** Null checks critical hain taaki missing branches ya empty tree inputs par `NullPointerException` na aaye.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public TreeNode deleteNode(TreeNode root, int key) {
+        // Base Case: Key not found in tree
+        if (root == null) return null;
+
+        if (key < root.val) {
+            root.left = deleteNode(root.left, key);
+        } else if (key > root.val) {
+            root.right = deleteNode(root.right, key);
+        } else {
+            // Node to be deleted found
+
+            // Case 1 & 2: Node has 0 or 1 child
+            if (root.left == null) return root.right;
+            else if (root.right == null) return root.left;
+
+            // Case 3: Node has 2 children
+            // Step 1: Find min node in right subtree (Inorder Successor)
+            TreeNode minNode = findMin(root.right);
+            
+            // Step 2: Attach left subtree to min node's left pointer
+            minNode.left = root.left;
+
+            // Step 3: Bypass deleted node by returning root.right
+            return root.right;
+        }
+        return root;
+    }
+
+    // Helper method to find the leftmost (minimum) node in a subtree
+    private TreeNode findMin(TreeNode node) {
+        while (node.left != null) {
+            node = node.left;
+        }
+        return node;
+    }
+}
