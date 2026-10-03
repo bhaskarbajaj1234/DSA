@@ -1,0 +1,139 @@
+# 230. Kth Smallest Element in a BST
+
+## APPROACH: MORRIS INORDER TRAVERSAL (OPTIMAL O(1) AUXILIARY SPACE)
+
+Idea:
+Binary Search Tree (BST) ka Inorder Traversal (`Left -> Root -> Right`) humesha strictly sorted order (ascending) me values deta hai.
+Standard Inorder traversal me recursion stack ya iterative stack O(H) space leta hai. 
+**Morris Traversal** technique Temporary Threading create karti hai:
+- Left subtree ke Inorder Predecessor (left child ka rightmost node) ko current node se link kar dete hain.
+- Isse without any stack space back-tracking possible ho jaati hai, and space complexity O(1) ho jaati hai.
+
+--------------------------------------------------
+
+APPROACH (Morris Inorder Traversal)
+
+1. Variable `cnt = 0` (nodes processed count tracking ke liye) aur `result = -1` initialize karo.
+2. `curr = root` se traversal start karo:
+   - **Case 1: `curr.left == null`**
+     - Left branch missing hai, toh node process karo: `cnt++`.
+     - `if (cnt == k) result = curr.val;`
+     - Move to right child: `curr = curr.right`.
+   - **Case 2: `curr.left != null`**
+     - Find Inorder Predecessor (`prev`): `curr.left` se maximum right tak jao (`while (prev.right != null && prev.right != curr)`).
+     - **Thread Creation (`prev.right == null`):**
+       - Thread create karo: `prev.right = curr`.
+       - Move left: `curr = curr.left`.
+     - **Thread Removal & Node Visit (`prev.right == curr`):**
+       - Thread remove karo (tree original state me restore karne ke liye): `prev.right = null`.
+       - Node process karo: `cnt++`.
+       - `if (cnt == k) result = curr.val;`
+       - Move right: `curr = curr.right`.
+3. Whole tree traverse hone ke baad `result` return kar do (taaki tree threads completely clean up ho jayein).
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        3
+       / \
+      1   4
+       \
+        2
+
+`k = 1`
+
+Dry Run:
+1. `curr = 3`: Left exists (1). Predecessor of 3 is Node 2. Thread created (`2.right = 3`). `curr = 1`.
+2. `curr = 1`: `curr.left == null`. Node 1 visited -> `cnt = 1`.
+   - `cnt == k` (1 == 1) -> `result = 1`.
+3. `curr` moves to `1.right` (Node 2).
+4. `curr = 2`: `curr.left == null`. Node 2 visited -> `cnt = 2`.
+5. `curr` moves to `2.right` (threaded to 3).
+6. `curr = 3`: Thread detected (`2.right == 3`). Thread removed (`2.right = null`). Node 3 visited -> `cnt = 3`. Move to `curr.right` (Node 4).
+7. `curr = 4`: Node 4 visited -> `cnt = 4`. `curr` becomes null. Loop terminates.
+
+Result: `1`
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+
+Time:
+O(N) -> Har node par max 2-3 visits hote hain (thread creation, processing, thread deletion).
+
+Space:
+O(1) Auxiliary Space -> Tree pointers rewind karke traverse kiye jaate hain, no recursion or external stack used.
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Why complete loop after finding result?**
+  - Agar `cnt == k` par loop direct `break` kar denge, toh tree ke pointers (threads) modified reh jayenge. Tree ko original state me restore karne ke liye traversal complete karna best practice hoti hai (ya extra clean up step run karna padta hai).
+- **Follow-up Handling:**
+  - *Follow-up Question:* "If the BST is modified often (insert/delete) and you need to find kth smallest frequently, how would you optimize?"
+  - *Answer:* Har node me extra space `leftCount` maintain kar sakte hain (Augmented BST). Search duration O(H) ho jayegi.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int kthSmallest(TreeNode root, int k) {
+        TreeNode curr = root;
+        int cnt = 0;
+        int result = -1;
+
+        // Morris Inorder Traversal
+        while (curr != null) {
+            if (curr.left == null) {
+                // Visit current node
+                cnt++;
+                if (cnt == k) result = curr.val;
+                
+                curr = curr.right;
+            } else {
+                // Find the inorder predecessor of curr
+                TreeNode prev = curr.left;
+                while (prev.right != null && prev.right != curr) {
+                    prev = prev.right;
+                }
+
+                if (prev.right == null) {
+                    // Create thread to curr and move left
+                    prev.right = curr;
+                    curr = curr.left;
+                } else {
+                    // Revert thread, visit current node, move right
+                    prev.right = null;
+                    cnt++;
+                    if (cnt == k) result = curr.val;
+                    
+                    curr = curr.right;
+                }
+            }
+        }
+        
+        return result;        
+    }
+}
