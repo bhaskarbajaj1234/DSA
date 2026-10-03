@@ -1,0 +1,152 @@
+# 173. Binary Search Tree Iterator
+
+## APPROACH: CONTROLLED INORDER TRAVERSAL USING STACK
+
+Idea:
+Binary Search Tree (BST) ka **Inorder Traversal** (`Left -> Root -> Right`) elements ko strictly sorted (ascending) order me visit karta hai.
+Sabse optimal tarika hai ki poori tree ko pehle se list me store karne ki jagah ek **Custom Stack** maintain kiya jaye jo har waqt sirf current path ke nodes ko hold kare:
+- Jab bhi kisi node par pohonchein, uske saare **Left** children ko extreme bottom tak stack me push kar do (`pushNode`). Isse stack top par humesha sabse chhota unvisited element hoga.
+- `next()` call hone par stack top se element pop karo. Pop hue node ka value return karne se pehle uske **Right** child ke poore left boundary branch ko stack me push kar do (`pushNode(temp.right)`).
+- `hasNext()` sirf check karta hai ki stack empty hai ya nahi.
+
+--------------------------------------------------
+
+APPROACH (Controlled Inorder Iterative Stack)
+
+1. Internal state ke liye ek `Stack<TreeNode> stack` define karo.
+
+2. **Constructor (`BSTIterator(TreeNode root)`):**
+   - Helper method `pushNode(root)` call karo.
+   - Yeh `root` se start karke tab tak left move karega jab tak `node == null` na ho jaye, aur saare intermediate nodes ko stack me push karta rahega.
+
+3. **`hasNext()`:**
+   - Agar `!stack.isEmpty()` hai toh `return true`, warna `return false`.
+
+4. **`next()`:**
+   - Stack se top node pop karo: `TreeNode temp = stack.pop()`.
+   - Pop hue node ke right subtree par `pushNode(temp.right)` call karo taaki agli sorted values stack me line up ho jayein.
+   - `temp.val` return kar do.
+
+5. **Helper (`pushNode(TreeNode node)`):**
+   - Loop run karo: `while (node != null)`
+     - `stack.push(node)`
+     - `node = node.left`
+
+--------------------------------------------------
+
+EXAMPLE
+
+Tree:
+        7
+       / \
+      3   15
+         /  \
+        9    20
+
+Dry Run:
+1. **Constructor (`pushNode(7)`):**
+   - Push 7, Push 3. Stack state: `[7, 3]` (top is 3).
+
+2. **`next()`:**
+   - Pop `3`. Value to return = `3`.
+   - Call `pushNode(3.right)` (which is `null`).
+   - Stack state: `[7]` (top is 7).
+
+3. **`next()`:**
+   - Pop `7`. Value to return = `7`.
+   - Call `pushNode(7.right)` (`pushNode(15)`).
+   - Push 15, Push 9. Stack state: `[15, 9]` (top is 9).
+
+4. **`hasNext()`:**
+   - Stack is not empty (`[15, 9]`) -> returns `true`.
+
+Result Output: `[3, 7, true, ...]`
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total number of nodes in tree
+H = Height of binary search tree
+
+Time:
+- `next()`: **Amortized O(1)**. Har node tree me exact 1 baar stack me push hota hai aur 1 baar pop hota hai. Total N operations me O(N) work, so average time per call is O(1).
+- `hasNext()`: **O(1)**. Simple stack empty check.
+
+Space:
+- **O(H)** Auxiliary Space. Stack me kisi bhi point par max tree height `H` ke barabar nodes hote hain (pure left skewed branch).
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Why not store complete Inorder traversal in ArrayList?**
+  - Storing all nodes upfront takes **O(N) memory**.
+  - Iterative Stack approach uses **O(H) memory**, which is significantly better (O(log N) for balanced trees).
+- **Amortized Time Complexity Explanation:**
+  - Interviewer puchhta hai ki `pushNode` me loop hai toh `next()` O(1) kaise hua?
+  - Point out karo ki tree ke saare `N` nodes overall lifecycle me sirf ek hi baar stack me push aur pop honge. Isliye $N$ calls across total time $O(N)$ lenge, making each `next()` call **Amortized $O(1)$**.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+import java.util.Stack;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class BSTIterator {
+
+    private Stack<TreeNode> stack = new Stack<>();
+
+    public BSTIterator(TreeNode root) {
+        // Push all left-most nodes starting from root
+        pushNode(root);
+    }
+    
+    public int next() {
+        // Top element is the current smallest unvisited node
+        TreeNode temp = stack.pop();
+        
+        // Process the right child's left-most branch
+        pushNode(temp.right);
+        
+        return temp.val;
+    }
+    
+    public boolean hasNext() {
+        // Returns true if there are still nodes to visit in the stack
+        return !stack.isEmpty();
+    }
+
+    // Helper function to push a node and all its left descendants
+    private void pushNode(TreeNode node) {
+        while (node != null) {
+            stack.push(node);
+            node = node.left;
+        }
+    }
+}
+
+/**
+ * Your BSTIterator object will be instantiated and called as such:
+ * BSTIterator obj = new BSTIterator(root);
+ * int param_1 = obj.next();
+ * boolean param_2 = obj.hasNext();
+ */
