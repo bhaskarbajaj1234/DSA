@@ -1,0 +1,118 @@
+# 1008. Construct Binary Search Tree from Preorder Traversal
+
+## APPROACH: UPPER BOUND RECURSIVE CONSTRUCTION (OPTIMAL O(N))
+
+Idea:
+Preorder traversal ka order `Root -> Left -> Right` hota hai. 
+BST construction ke liye har recursive level par ek **Upper Bound (`bound`)** maintain kiya jata hai:
+- Current element `preorder[idx]` ko `root` banate hain.
+- Left subtree banate waqt upper bound `root.val` ban jata hai, kyunki left subtree ke saare nodes root se chhote hone chahiye.
+- Right subtree banate waqt upper bound parent function ka `bound` rehta hai.
+- Agar `preorder[idx] > bound`, toh iska matlab current subtree over ho gaya hai aur hum `null` return karke backtrack karte hain.
+
+--------------------------------------------------
+
+APPROACH (Upper Bound Recursion)
+
+1. Global index tracker `idx = 0` initialize karo.
+2. Helper function ko `bound = Integer.MAX_VALUE` ke saath call karo:
+   - **Base Cases:**
+     - Agar saare elements consume ho chuke hain (`idx == preorder.length`) -> `return null`.
+     - Agar current element upper bound surpass kar raha hai (`preorder[idx] > bound`) -> `return null`.
+3. Current element se naya node create karo: `TreeNode root = new TreeNode(preorder[idx++])`.
+4. Left subtree build karo (`bound = root.val` ke saath): `root.left = helper(preorder, root.val)`.
+5. Right subtree build karo (`bound` unchanged rehta hai): `root.right = helper(preorder, bound)`.
+6. Built `root` return kar do.
+
+--------------------------------------------------
+
+EXAMPLE
+
+`preorder = [8, 5, 1, 7, 10, 12]`
+
+Dry Run:
+1. `helper(bound = MAX)`: `root = 8`, `idx = 1`.
+2. Left of 8: `helper(bound = 8)` -> `root = 5`, `idx = 2`.
+   - Left of 5: `helper(bound = 5)` -> `root = 1`, `idx = 3`.
+     - Left of 1: `helper(bound = 1)` -> `1 < 7`, returns `null`.
+     - Right of 1: `helper(bound = 5)` -> `5 < 7`, returns `null`.
+   - Right of 5: `helper(bound = 8)` -> `root = 7`, `idx = 4`.
+3. Right of 8: `helper(bound = MAX)` -> `root = 10`, `idx = 5`.
+   - Right of 10: `helper(bound = MAX)` -> `root = 12`, `idx = 6`.
+
+Tree post-construction:
+        8
+       / \
+      5   10
+     / \    \
+    1   7   12
+
+Result: Root Node 8
+
+--------------------------------------------------
+
+COMPLEXITY
+
+N = Total elements in preorder array
+
+Time:
+O(N) -> Har element ko array me exact ek baar process kiya jata hai.
+
+Space:
+O(H) -> Tree height `H` ke equal recursion call stack space use hoti hai.
+- Best/Average Case (Balanced BST): O(log N)
+- Worst Case (Skewed BST): O(N)
+
+--------------------------------------------------
+
+INTERVIEW POINT
+
+- **Comparison with other techniques:**
+  - **Brute Force:** Every element ko `insertIntoBST()` se insert karna O(N²) time leta hai.
+  - **Inorder Sorting:** Preorder ko sort karke Inorder array bana kar tree construct karna O(N log N) time aur O(N) extra space leta hai.
+  - **Upper Bound Method (Current):** Optimal O(N) time aur O(1) extra space (excluding call stack) me tree construct karta hai.
+
+--------------------------------------------------
+
+# CODE:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+
+    private int idx = 0;
+
+    public TreeNode bstFromPreorder(int[] preorder) {
+        return helper(preorder, Integer.MAX_VALUE);        
+    }
+
+    private TreeNode helper(int[] preorder, int bound) {
+        // Base case: if all elements are processed or current element exceeds bound
+        if (idx == preorder.length || preorder[idx] > bound) return null;
+
+        // Create node with current preorder element and advance index
+        TreeNode root = new TreeNode(preorder[idx++]);
+
+        // Left subtree must be smaller than root.val
+        root.left = helper(preorder, root.val);
+
+        // Right subtree must be smaller than current upper bound
+        root.right = helper(preorder, bound);
+
+        return root;
+    }
+}
